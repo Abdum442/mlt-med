@@ -1,6 +1,6 @@
 // main.js
 
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const url = require('url');
 
@@ -9,6 +9,7 @@ function createWindow() {
     width: 800,
     height: 600,
     webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: true,
     },
   });
@@ -20,8 +21,22 @@ function createWindow() {
     })
   );
 
-  win.webContents.openDevTools(); // Remove this line for production
+  ipcMain.on('addTodo', async (event, taskText) => {
+    const queryText = 'INSERT INTO todo (task) VALUES ($1)';
+    const values = [taskText];
+
+    try {
+      const result = await pool.query(queryText, values);
+      console.log('Todo item added successfully:', result.rows);
+    } catch (error) {
+      console.error('Error adding todo item:', error);
+    }
+  });
+
+  // win.webContents.openDevTools(); // Remove this line for production
 }
+
+
 
 app.whenReady().then(createWindow);
 
