@@ -382,11 +382,20 @@ body {
   border-radius: 20px;
 }
 
-.details .cardHeader {
+.details .cardHeader,
+.details .footer,
+.details .header_wrap {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
 }
+
+
+/* .details .header_wrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+} */
 
 .cardHeader h2 {
   font-weight: 600;
@@ -402,6 +411,16 @@ body {
   border-radius: 6px;
 }
 
+.recentOrders .tb_search,
+.recentOrders .rows_count {
+  position: relative;
+  /* padding: 5px 10px; */
+  /* background: var(--blue); */
+  /* text-decoration: none; */
+  /* color: var(--white); */
+  /* border-radius: 6px; */
+}
+
 .details table {
   width: 100%;
   border-collapse: collapse;
@@ -412,9 +431,9 @@ body {
   font-weight: 600;
 }
 
-.details .recentOrders table tr {
+.details .recentOrders table tbody tr {
   color: var(--black1);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .details .recentOrders table tr:last-child {
@@ -428,9 +447,10 @@ body {
 
 .details .recentOrders table tr td {
   padding: 10px;
+  text-align: start;
 }
 
-.details .recentOrders table tr td:last-child {
+/* .details .recentOrders table tr td:last-child {
   text-align: end;
 }
 
@@ -440,7 +460,7 @@ body {
 
 .details .recentOrders table tr td:nth-child(3) {
   text-align: center;
-}
+} */
 
 .status.delivered {
   padding: 2px 4px;
@@ -527,6 +547,33 @@ body {
 
 .recentCustomers table tr:hover td h4 span {
   color: var(--white);
+}
+
+.pagination a {
+  color: black;
+  float: left;
+  padding: 8px 16px;
+  text-decoration: none;
+  transition: background-color .3s;
+  background-color: beige;
+  border-color: 4px var(--blue);
+}
+
+.rows_count {
+  color: black;
+  float: left;
+  padding: 8px 16px;
+}
+
+.pagination a.active {
+  background-color: dodgerblue;
+  color: white;
+}
+
+
+
+.pagination a:hover:not(.active) {
+  background-color: #ddd;
 }
 
 /* ====================== Responsive Design ========================== */
