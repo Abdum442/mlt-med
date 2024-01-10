@@ -1,4 +1,4 @@
-
+# a database creation code 
 
 CREATE TABLE suppliers (
 ID SERIAL PRIMARY KEY,
