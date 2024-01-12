@@ -25,6 +25,7 @@ CREATE TABLE products (
 CREATE TABLE purchase (
   id SERIAL PRIMARY KEY,
   product_id INTEGER REFERENCES products(id) ON UPDATE CASCADE,
+  supplier_id INTEGER REFERENCES suppliers(id) ON UPDATE CASCADE,
   quantity INTEGER,
   purchase_date DATE,
   payment_method VARCHAR(100),

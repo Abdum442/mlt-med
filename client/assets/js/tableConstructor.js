@@ -42,7 +42,17 @@ function CreateTableFromData(combined_data) {
         td.innerHTML = data;
         tr.appendChild(td);
       })
+      const edit_btn = clickable_dropdown_btn();
+      const edit_td = document.createElement('td');
+      edit_td.innerHTML = edit_btn;
+      tr.appendChild(edit_td);
       table_body.appendChild(tr);
+
+      edit_td.querySelector('.dropdown-btn .drop-btn').addEventListener('click', function (event) {
+        edit_td.querySelector('.dropdown-btn .drop-btn').nextElementSibling.classList.toggle('show');
+        // Prevent the click event from propagating if necessary
+        event.stopPropagation();
+      });
     })
     const showRowsCount = document.querySelector('.rows_count');
 
@@ -67,6 +77,9 @@ function CreateTableFromData(combined_data) {
       td.innerText = title;
       tr.appendChild(td);
     })
+    const action_td = document.createElement('td');
+    action_td.innerHTML = "Action";
+    tr.appendChild(action_td);
     table.appendChild(thead);
 
     table.appendChild(tbody);
@@ -166,6 +179,17 @@ function CreateTableFromData(combined_data) {
   }
 
 
+}
+
+const clickable_dropdown_btn = function(){
+  let btn = `<div class="dropdown-btn">
+              <button class="drop-btn"><span>Edit</span> <ion-icon name="chevron-down-outline"></button>
+              <div class="drop-content">
+                <a href="#">Modify</a>
+                <a href="#">Delete</a>
+              </div>
+            </div>`;
+  return btn;
 }
 
 

@@ -411,7 +411,7 @@ body {
   border-radius: 6px;
 }
 
-.recentOrders .tb_search,
+.recentOrders .tb_search select,
 .recentOrders .rows_count {
   position: relative;
   /* padding: 5px 10px; */
@@ -560,8 +560,8 @@ body {
 }
 
 .rows_count {
-  color: black;
-  float: left;
+  color: var(--black2);
+  float: right;
   padding: 8px 16px;
 }
 
@@ -576,6 +576,50 @@ body {
   background-color: #ddd;
 }
 
+/* +++++++++++++++++++++Ror edit buttons +++++++++++++++++++++++++ */
+.drop-btn {
+  background-color: #3498DB;
+  color: white;
+  padding: 4px 10px;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+}
+
+.drop-btn:hover,
+.drop-btn:focus {
+  background-color: #2980B9;
+}
+
+.dropdown-btn {
+  position: relative;
+  display: inline-block;
+}
+
+.drop-content {
+  display: none;
+  position: absolute;
+  background-color: #f1f1f1;
+  min-width: 120px;
+  overflow: auto;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
+
+.drop-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-btn a:hover {
+  background-color: #ddd;
+}
+
+.show {
+  display: block;
+}
 /* ====================== Responsive Design ========================== */
 @media (max-width: 991px) {
   .navigation {
