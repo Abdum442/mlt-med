@@ -14,7 +14,10 @@
  }
 
 .form-row:hover {
-  background-color: #f1f1f1;
+  background-color: #2a2185;
+  color: white;
+  border-radius: 20px;
+
 }
 
  label {
@@ -26,7 +29,7 @@
  }
 
  .form-row input,
- .form-row select,
+ .form-row datalist,
  .form-row textarea {
    flex: 2;
    box-sizing: border-box;

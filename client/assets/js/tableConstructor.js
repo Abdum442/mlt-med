@@ -33,7 +33,7 @@ function CreateTableFromData(combined_data) {
 
   const make_table = function (table_body, start_index, end_index) {
     table_body.innerHTML = '';
-    const renderData = this.filteredData.slice(start_index, end_index + 1);
+    const renderData = this.filteredData.slice(start_index, end_index);
 
     renderData.forEach(row_data => {
       const tr = document.createElement('tr');
@@ -42,21 +42,14 @@ function CreateTableFromData(combined_data) {
         td.innerHTML = data;
         tr.appendChild(td);
       })
-      const edit_btn = clickable_dropdown_btn();
-      const edit_td = document.createElement('td');
-      edit_td.innerHTML = edit_btn;
-      tr.appendChild(edit_td);
+
+      // const edit_btn = clickable_dropdown_btn();
+      // const edit_td = document.createElement('td');
+      // edit_td.innerHTML = edit_btn;
+      // tr.appendChild(edit_td);
       table_body.appendChild(tr);
-
-      edit_td.querySelector('.dropdown-btn .drop-btn').addEventListener('click', function (event) {
-        edit_td.querySelector('.dropdown-btn .drop-btn').nextElementSibling.classList.toggle('show');
-        // Prevent the click event from propagating if necessary
-        event.stopPropagation();
-      });
     })
-    const showRowsCount = document.querySelector('.rows_count');
-
-    showRowsCount.innerHTML = `<span>Showing ${start_index + 1} to ${end_index} of ${this.filteredData.length} entries <span>`;
+    
   }.bind(this);
 
 
@@ -77,9 +70,10 @@ function CreateTableFromData(combined_data) {
       td.innerText = title;
       tr.appendChild(td);
     })
-    const action_td = document.createElement('td');
-    action_td.innerHTML = "Action";
-    tr.appendChild(action_td);
+
+    // const action_td = document.createElement('td');
+    // action_td.innerHTML = "Action";
+    // tr.appendChild(action_td);
     table.appendChild(thead);
 
     table.appendChild(tbody);
@@ -90,27 +84,35 @@ function CreateTableFromData(combined_data) {
 
     tableContainer.insertAdjacentHTML('beforeend', footWrap);
 
+    make_table(tbody, 0, this.tableData.length);
+
 
 
     const maxRowsContainer = document.getElementById('maxRows')
     const paginationContainer = document.querySelector('.pagination');
 
-
-    let count = 0;
-
     maxRowsContainer.addEventListener('change', (event) => {
       event.preventDefault();
 
 
-      count += 1;
-      console.log('Count : ', count);
-
       const total_rows = this.filteredData.length;
 
       const max_rows = parseInt(maxRowsContainer.value);
-      const no_pages = Math.ceil(total_rows / max_rows);
+      let trnum = 0;
+      tbody.querySelectorAll('tr').forEach(function (tr, index) {
+        trnum++;
 
-      make_table(tbody, 0, max_rows);
+        if (trnum > max_rows) {
+          tr.style.display = 'none';
+        }
+        if (trnum <= max_rows) {
+          tr.style.display = '';
+        }
+      });
+
+
+
+      const no_pages = Math.ceil(total_rows / max_rows);
 
 
       paginationContainer.innerHTML = '';
@@ -120,27 +122,36 @@ function CreateTableFromData(combined_data) {
         }
         paginationContainer.querySelector('a:first-child').classList.add('active');
       }
+
+      showRowsCount(max_rows, 1, total_rows);
+
       paginationContainer.querySelectorAll('a').forEach(function (a) {
         a.addEventListener('click', function (event) {
           event.preventDefault();
 
           const current_page = parseInt(a.innerHTML);
 
-          const start_index = max_rows * (current_page - 1);
-          const end_index = max_rows * current_page - 1;
-
-
-          make_table(tbody, start_index, end_index);
+          let trIndex = 0;
 
           paginationContainer.querySelectorAll('a').forEach(function (a) {
             a.classList.remove('active');
-          })
+          });
+
           this.classList.add('active');
 
+          showRowsCount(max_rows, current_page, total_rows);
 
-        })
-      })
-    })
+          tbody.querySelectorAll('tr').forEach(function (tr) {
+            trIndex++;
+            if (trIndex > max_rows * current_page || trIndex <= max_rows * current_page - max_rows) {
+              tr.style.display = 'none';
+            } else {
+              tr.style.display = '';
+            }
+          });
+        });
+      });
+    });
 
     maxRowsContainer.dispatchEvent(new Event('change'));
 
@@ -181,16 +192,32 @@ function CreateTableFromData(combined_data) {
 
 }
 
-const clickable_dropdown_btn = function(){
+const clickable_dropdown_btn = function(table){
   let btn = `<div class="dropdown-btn">
-              <button class="drop-btn"><span>Edit</span> <ion-icon name="chevron-down-outline"></button>
+              <button type="button" class="drop-btn"><span>Edit</span> <ion-icon name="chevron-down-outline"></button>
               <div class="drop-content">
-                <a href="#">Modify</a>
-                <a href="#">Delete</a>
+                <a href="#" class="modify">Modify</a>
+                <a href="#" class="delete">Delete</a>
               </div>
             </div>`;
-  return btn;
+
+  const actionTitle = '<td>Action</td>';
+  table.querySelector('thead tr').insertAdjacentHTML('beforeEnd', actionTitle);
+  table.querySelectorAll('tbody tr').forEach(function (tr) {
+    const td = `<td>${btn}</td>`;
+    tr.insertAdjacentHTML('beforeend', td);
+  });
+}
+
+function showRowsCount(max_rows, page_num, total_rows){
+  const end_index = max_rows * page_num > total_rows ? total_rows : max_rows * page_num;
+  const start_index = max_rows * page_num - max_rows + 1;
+  const rowsCount = document.querySelector('.rows_count');
+
+  rowsCount.innerHTML = `<span>Showing ${start_index} to ${end_index} of ${total_rows} entries <span>`;
 }
 
 
-export { CreateTableFromData };
+
+
+export { CreateTableFromData, clickable_dropdown_btn };

@@ -411,14 +411,27 @@ body {
   border-radius: 6px;
 }
 
+.header_wrap {
+  margin-top: 20px;
+  margin-top: 10px;
+}
+
 .recentOrders .tb_search select,
 .recentOrders .rows_count {
   position: relative;
-  /* padding: 5px 10px; */
+  padding: 5px 10px;
   /* background: var(--blue); */
   /* text-decoration: none; */
   /* color: var(--white); */
   /* border-radius: 6px; */
+}
+
+.header_wrap .num_rows select,
+.header_wrap .tb_search input {
+  height: 35px;
+  padding: 5px 5px;
+  outline: none;
+  border: 1px solid var(--black2);
 }
 
 .details table {

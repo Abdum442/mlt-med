@@ -1,4 +1,4 @@
-import { CreateTableFromData } from "../assets/js/tableConstructor.js";
+import { CreateTableFromData, clickable_dropdown_btn } from "../assets/js/tableConstructor.js";
 import { purchaseForm } from '../assets/js/purchaseForm.js';
 
 let tableHeader = ['Name', 'Price', 'Payment', 'Status'];
@@ -37,6 +37,7 @@ const data = {
 const mainContainer = document.getElementById("recent_orders");
 
 const supplierBtn = document.getElementById("supplier");
+const addSupplierBtn = document.getElementById("addSupplier");
 
 supplierBtn.addEventListener("click", function (event) {
   const recentOrders = new CreateTableFromData(data);
@@ -45,17 +46,55 @@ supplierBtn.addEventListener("click", function (event) {
   const title = '<h2>Supplier Companies</h2>';
   mainContainer.insertAdjacentHTML('afterbegin', title)
 
-})
+  clickable_dropdown_btn(mainContainer.querySelector('table'));
 
-const addSupplierBtn = document.getElementById("addSupplier");
+  mainContainer.querySelectorAll('table tbody .drop-btn').forEach(function(btn){
+    btn.addEventListener('click', function (event) {
+      // event.preventDefault();
+      event.stopPropagation();
+
+      const dropContent = btn.nextElementSibling;
+
+      dropContent.classList.add('show');
+
+      // console.log('drop content: ', dropContent);
+
+      dropContent.querySelectorAll('a').forEach(function(subBtn) {
+        subBtn.addEventListener('click', function (event) {
+          event.preventDefault();
+          addSupplierBtn.click();
+        });
+      });
+
+    });
+  });
+
+});
+
+const products = [];
+const status = [];
+
+
+tableData.forEach(row => {
+  products.push(row[0]);
+  status.push(row[3]);
+});
+
+const dataNames = {
+  products: products,
+  status: status
+};
+
 
 addSupplierBtn.addEventListener("click", function(event) {
 
   // Use the functions from the purchaseForm object
-  purchaseForm.showPurchaseForm();
+  purchaseForm.showPurchaseForm(dataNames);
   // purchaseForm.savePurchase();
   // purchaseForm.exitForm();
 })
+
+
 
 
 
@@ -82,6 +121,12 @@ window.onclick = function(event){
     }
   }
 }
+
+// window.onclick = function (event) {
+//   if (event.target.matches(".modify")) {
+//     addSupplierBtn.click();
+//   }
+// }
 
 
 

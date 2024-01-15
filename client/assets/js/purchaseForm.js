@@ -1,4 +1,4 @@
-function showPurchaseForm() {
+function showPurchaseForm(data_names) {
   // Create the form elements dynamically
   const formContainer = document.createElement('div');
   formContainer.className = 'form-container';
@@ -7,15 +7,20 @@ function showPurchaseForm() {
   purchaseForm.id = 'purchaseForm';
 
   const formFields = [
-    { label: 'Purchase Item:', type: 'select', name: 'productId', options: ['Product 1', 'Product 2', 'Product 3'] }, 
-    { label: 'Supplier:', type: 'select', name: 'supplierId', options: ['Supplier 1', 'Supplier 2', 'Supplier 3'] },
+    { label: 'Purchase Item:', type: 'datalist', name: 'productId', options: [] }, 
+    { label: 'Supplier:', type: 'datalist', name: 'supplierId', options: [] },
     { label: 'Quantity:', type: 'number', name: 'quantity' },
     { label: 'Purchasing Date:', type: 'date', name: 'purchaseDate' },
     { label: 'Payment Method:', type: 'text', name: 'paymentMtd' },
-    { label: 'Amount Paid:', type: 'text', name: 'amountPaid' },
+    { label: 'Amount Paid:', type: 'number', name: 'amountPaid' },
     { label: 'Tax Withheld:', type: 'text', name: 'taxWithheld' },
     { label: 'Remark:', type: 'text', name: 'remark' },
   ];
+
+  formFields[0].options = data_names.products;
+  formFields[1].options = data_names.status;
+
+  
 
   formFields.forEach(field => {
     const formRow = document.createElement('div');
@@ -26,18 +31,24 @@ function showPurchaseForm() {
     label.innerText = field.label;
     formRow.appendChild(label);
 
-    if (field.type === 'select') {
-      const select = document.createElement('select');
-      select.id = field.name;
-      select.name = field.name;
+    if (field.type === 'datalist') {
+      const input = document.createElement('input');
+      input.type = "text";
+      input.id = field.name + '_input';
+      // input.list = field.name + 'OptionsList';
+      input.setAttribute('list', field.name + 'OptionsList');
+      const select = document.createElement('datalist');
+      select.id = field.name + 'OptionsList';
+      // select.name = field.name;
 
       field.options.forEach(optionText => {
         const option = document.createElement('option');
-        option.value = optionText.toLowerCase().replace(' ', '_');
+        option.value = optionText;
         option.text = optionText;
-        select.add(option);
+        // select.add(option);
+        select.appendChild(option);
       });
-
+      formRow.appendChild(input);
       formRow.appendChild(select);
     }else if (field.name === 'remark') {
       const textArea = document.createElement('textarea');
@@ -49,6 +60,15 @@ function showPurchaseForm() {
     }else  {
       const input = document.createElement('input');
       input.type = field.type;
+      if (field.type === 'number') {
+        if (field.label === 'Quantity:') {
+          input.setAttribute('min', '0');
+          input.setAttribute('step', 1);
+        } else {
+          input.setAttribute('min', '0');
+          input.setAttribute('step', 'any');
+        }
+      }
       input.id = field.name;
       input.name = field.name;
       formRow.appendChild(input);
@@ -81,7 +101,10 @@ function showPurchaseForm() {
 
 
 
-  document.getElementById('recent_orders').appendChild(formContainer)
+  document.getElementById('recent_orders').appendChild(formContainer);
+
+  const ids = [formFields[0].name, formFields[1].name];
+  manageDataLists(ids);
 
 }
 
@@ -92,8 +115,35 @@ function savePurchase() {
 
 function exitForm() {
   // Add logic to handle exiting the form
-  document.body.removeChild(document.querySelector('.form-container'));
+  document.querySelector('.form-container').innerHTML = '';
 }
+
+function manageDataLists(ids){
+  ids.forEach(function (id) {
+    const autocompleteInput = document.getElementById(id + '_input');
+    const optionsList = document.getElementById(id + 'OptionsList');
+
+    autocompleteInput.addEventListener('input', function () {
+      const inputText = autocompleteInput.value.toLowerCase();
+      const options = optionsList.querySelectorAll('option');
+
+      options.forEach(option => {
+        const optionText = option.value.toLowerCase();
+        option.style.display = optionText.includes( inputText ) ? 'block' : 'none';
+      });
+    });
+
+    autocompleteInput.addEventListener('change', function() {
+      const selectedOption = optionsList.querySelector(`option[value="${autocompleteInput.value}"]`);
+      if (selectedOption) {
+        console.log(`Selected option: ${selectedOption.value}`);
+      }
+    });
+
+  });
+}
+
+
 
 
 const purchaseForm = {
