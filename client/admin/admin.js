@@ -1,5 +1,7 @@
 import { CreateTableFromData, clickable_dropdown_btn } from "../assets/js/tableConstructor.js";
 import { purchaseForm } from '../assets/js/purchaseForm.js';
+import { productForm } from '../assets/js/productForm.js';
+
 
 let tableHeader = ['Name', 'Price', 'Payment', 'Status'];
 
@@ -82,14 +84,16 @@ tableData.forEach(row => {
 
 const dataNames = {
   products: products,
-  status: status
+  status: status,
+  suppliers: products
 };
 
 
 addSupplierBtn.addEventListener("click", function(event) {
 
   // Use the functions from the purchaseForm object
-  purchaseForm.showPurchaseForm(dataNames);
+  // purchaseForm.showPurchaseForm(dataNames);
+  productForm.showProductForm(dataNames);
   // purchaseForm.savePurchase();
   // purchaseForm.exitForm();
 })

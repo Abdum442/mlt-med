@@ -163,26 +163,47 @@ function CreateTableFromData(combined_data) {
 
     const searchInputElement = document.getElementById("search_input_all");
 
-    const table_data = this.tableData;
+    // const table_data = this.tableData;
+
+
 
     searchInputElement.addEventListener('keyup', (event) => {
 
       const filter = event.target.value.toLowerCase();
       if (filter) {
-        this.filteredData = table_data.filter(row => row.some(item => item.toLowerCase().includes(filter)));
-
-        make_table(document.querySelector('tbody'), 0, this.maxRows);
-
-        document.querySelector('.pagination').innerHTML = '';
-        const no_pages = Math.ceil(this.filteredData.length / this.maxRows)
-        if (no_pages > 1) {
-          for (let i = 1; i <= no_pages; i++) {
-            document.querySelector('.pagination').innerHTML += `<a href="#">${i}</a>`
-          }
-          document.querySelector('.pagination').querySelector('a:first-child').classList.add('active');
-        }
-      } else {
         document.getElementById('maxRows').dispatchEvent(new Event('change'));
+        document.getElementById('maxRows').value = '5000';
+        document.getElementById(this.tableId).querySelector('.rows_count').innerHTML = '';
+        document.getElementById(this.tableId).querySelector('.pagination').innerHTML = '';
+        // this.filteredData = table_data.filter(row => row.some(item => item.toLowerCase().includes(filter)));
+
+        // make_table(document.querySelector('tbody'), 0, this.maxRows);
+        let flag;
+        const numCol = this.tableData[0].length;
+
+        const tbody = document.getElementById(this.tableId).querySelector('table tbody');
+
+        tbody.querySelectorAll('tr').forEach(function (tr) {
+          flag = 0;
+          tr.querySelectorAll('td').forEach(function (td, idx) {
+            if (idx < numCol){
+              const td = tr.children[idx];
+              const tdText = td.innerHTML.toLowerCase();
+              if (tdText.includes(filter)) {
+                flag = 1;
+              }
+            }
+            if(flag === 1) {
+              tr.style.display = '';
+            } else {
+              tr.style.display = 'none';
+            }
+          });
+        });
+      } else {
+        
+        document.getElementById('maxRows').dispatchEvent(new Event('change'));
+        
       }
 
     })
