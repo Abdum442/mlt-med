@@ -61,8 +61,6 @@ for (var i = 0; i < dropdown.length; i++) {
 const fullName = localStorage.getItem('fullname');
 const isPic = localStorage.getItem('has_pic');
 
-console.log('user name : ', fullName)
-
 
 const userName = document.querySelector(".user-profile .dropdown .user-name");
 userName.textContent = fullName;

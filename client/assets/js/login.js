@@ -6,6 +6,8 @@ loginBtn.addEventListener("click", (event) => {
   window.electronAPI.sendToMain('fetch-users');
   window.electronAPI.receiveFromMain('fetch-users-response', (event, response) => {
     users = response;
+
+    console.log('users: ', users);
   });
 })
 

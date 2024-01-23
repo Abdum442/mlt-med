@@ -62,6 +62,13 @@ body {
   background-color: var(--white);
 }
 
+.navigation ul li a:hover,
+.navigation ul li a.hovered,
+.navigation ul li a:active,
+.navigation ul li a:focus {
+  font-weight: bold;
+}
+
 .navigation ul li:nth-child(1) {
   margin-bottom: 40px;
   pointer-events: none;
@@ -367,7 +374,7 @@ body {
   width: 100%;
   padding: 20px;
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: 3fr 1fr;
   grid-gap: 30px;
   /* margin-top: 10px; */
 }
@@ -375,7 +382,7 @@ body {
 .details .recentOrders {
   position: relative;
   display: grid;
-  min-height: 500px;
+  min-height: 100px;
   background: var(--white);
   padding: 20px;
   box-shadow: 0 7px 25px rgba(0, 0, 0, 0.08);
@@ -438,6 +445,8 @@ body {
   width: 100%;
   border-collapse: collapse;
   margin-top: 10px;
+  /* white-space: nowrap; */
+  /* overflow-x: auto; */
 }
 
 .details table thead td {
@@ -461,6 +470,9 @@ body {
 .details .recentOrders table tr td {
   padding: 10px;
   text-align: start;
+  /* max-width: 200px; */
+  /* overflow: hidden; */
+  /* text-overflow: ellipsis; */
 }
 
 /* .details .recentOrders table tr td:last-child {

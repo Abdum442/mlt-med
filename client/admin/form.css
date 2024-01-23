@@ -39,7 +39,9 @@
 
  .button-container {
    margin-top: 20px;
+   margin-left: 100px;
    text-align: center;
+   display: flex;
  }
 
  button {
@@ -58,6 +60,11 @@
 
 #save_btn {
   background-color: #04AA6D;
+}
+
+#modify_btn {
+  display: 'none';
+  background-color: rgb(42, 111, 239);
 }
 
 /* button[type=button]:hover{

@@ -1,4 +1,4 @@
-function showSupplierForm(data_names) {
+function showSupplierForm() {
   // Create the form elements dynamically
   const formContainer = document.createElement('div');
   formContainer.className = 'form-container';
@@ -6,13 +6,14 @@ function showSupplierForm(data_names) {
   const supplierForm = document.createElement('form');
   supplierForm.id = 'supplierForm';
 
+  supplierForm.innerHTML = '';
+
   const formFields = [
     { label: 'Supplier Company:', type: 'text', name: 'supplierName' },
     { label: 'Contact Info:', type: 'text', name: 'contactInfo' },
     { label: 'Address:', type: 'text', name: 'address'},
     { label: 'Tin Number:', type: 'text', name: 'taxInfo' },
     { label: 'Licence Number:', type: 'text', name: 'LicenceNumber' },
-    { label: 'Expiry Date:', type: 'date', name: 'expiryDate' },
     { label: 'Remark:', type: 'text', name: 'remark' },
   ];
 
@@ -75,8 +76,14 @@ function showSupplierForm(data_names) {
   saveButton.type = 'button';
   saveButton.innerText = 'Save';
   saveButton.id = 'save_btn';
-  saveButton.addEventListener('click', savePurchase);
+  saveButton.addEventListener('click', saveData);
   buttonContainer.appendChild(saveButton);
+
+  const modifyButton = document.createElement('button');
+  modifyButton.type = 'button';
+  modifyButton.id = 'modify_btn';
+  modifyButton.innerText = 'Modify';
+  buttonContainer.appendChild(modifyButton);
 
   const exitButton = document.createElement('button');
   exitButton.type = 'button';
@@ -85,27 +92,42 @@ function showSupplierForm(data_names) {
   exitButton.addEventListener('click', exitForm);
   buttonContainer.appendChild(exitButton);
 
-  formContainer.appendChild(purchaseForm);
+  
+
+  formContainer.appendChild(supplierForm);
   formContainer.appendChild(buttonContainer);
 
-  document.getElementById("recent_orders").innerHTML = '<h2>Product Registration Form</h2>';
+  const mainContainer = document.getElementById('mainContainer');
 
+  mainContainer.innerHTML = '';
 
-
-  document.getElementById('recent_orders').appendChild(formContainer);
+  mainContainer.appendChild(formContainer);
 
   // const ids = [formFields[2].name];
   // manageDataLists(ids);
 
 }
 
-function savePurchase() {
-  document.getElementById("supplier").click();
+function saveData() {
+  const formData = new FormData(document.getElementById('supplierForm'));
+
+  // Convert form data to a plain JavaScript object
+  const formDataObject = {};
+  formData.forEach((value, key) => {
+    formDataObject[key] = value;
+
+  });
+  window.electronAPI.sendToMain('add-supplier-data', formDataObject);
+
+  window.electronAPI.receiveFromMain('add-supplier-data-response', (event, responseData) => {
+
+    console.log('Supplier added: ', responseData);
+  });
+  document.getElementById("viewSupplier").click();
 }
 
 function exitForm() {
-  // Add logic to handle exiting the form
-  document.getElementById("supplier").click();
+  document.getElementById("viewSupplier").click();
 }
 
 function manageDataLists(ids) {
@@ -137,9 +159,7 @@ function manageDataLists(ids) {
 
 
 const supplierForm = {
-  showSupplierForm,
-  savePurchase,
-  exitForm
+  showSupplierForm
 };
 
 export { supplierForm };
