@@ -50,7 +50,7 @@ const getSuppliers = (request, response) => {
 const addSupplier = (request, response) => {
   const { supplierName, contactInfo, address, taxInfo, LicenceNumber, remark } = request.body
 
-  console.log('Name: ', supplierName);
+  // console.log('Supplier Name: ', supplierName);
 
   pool.query('INSERT INTO suppliers (name, contactinfo, address, taxinfo, licencenumber, remark) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id', 
     [supplierName, contactInfo, address, taxInfo, LicenceNumber, remark], (error, results) => {
@@ -115,6 +115,58 @@ const deleteUser = (request, response) => {
   })
 }
 
+// -------------------------------retailer-----------------------
+
+const getRetailers = (request, response) => {
+  pool.query('SELECT * FROM retailers ORDER BY id ASC', (error, results) => {
+    if (error) {
+      throw error
+    }
+    response.status(200).json(results.rows)
+  })
+}
+
+const addRetailer = (request, response) => {
+  const { retailerName, contactInfo, address, remark } = request.body
+
+  // console.log('request: ', request.body);
+
+  pool.query('INSERT INTO retailers (name, contact, address, remarks) VALUES ($1, $2, $3, $4) RETURNING id',
+    [retailerName, contactInfo, address, remark], (error, results) => {
+      if (error) {
+        throw error
+      }
+      response.status(201).send(`Retailer added with ID: ${results.rows[0].id}`)
+    })
+}
+
+const updateRetailer = (request, response) => {
+  const iD = parseInt(request.params.id)
+  const { id, retailerName, contactInfo, address, remark } = request.body
+
+  pool.query(
+    'UPDATE retailers SET name = $1, contact = $2, address = $3, remarks = $4  WHERE id = $5',
+    [retailerName, contactInfo, address, remark, iD],
+    (error, results) => {
+      if (error) {
+        throw error
+      }
+      response.status(200).send(`Retailer modified with ID: ${id}`)
+    }
+  )
+}
+
+const deleteRetailer = (request, response) => {
+  const id = parseInt(request.params.id)
+
+  pool.query('DELETE FROM retailers WHERE id = $1', [id], (error, results) => {
+    if (error) {
+      throw error
+    }
+    response.status(200).send(`Retailer deleted with ID: ${id}`)
+  })
+}
+
 const userData = {
   getUsers,
   getUserById,
@@ -130,7 +182,15 @@ const supplierData = {
   deleteSupplier
 }
 
+const retailerData = {
+  getRetailers,
+  addRetailer,
+  updateRetailer,
+  deleteRetailer
+}
+
 module.exports = {
   userData,
-  supplierData
+  supplierData,
+  retailerData
 }
