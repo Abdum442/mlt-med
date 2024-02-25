@@ -57,7 +57,7 @@ const addSupplier = (request, response) => {
     if (error) {
       throw error
     }
-    response.status(201).send(`Supplier added with ID: ${results.rows[0].id}`)
+    response.status(201).send(results.rows)
   })
 }
 
@@ -136,7 +136,7 @@ const addRetailer = (request, response) => {
       if (error) {
         throw error
       }
-      response.status(201).send(`Retailer added with ID: ${results.rows[0].id}`)
+      response.status(201).send(results.rows)
     })
 }
 

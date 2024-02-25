@@ -76,7 +76,7 @@ function showSupplierForm() {
   saveButton.type = 'button';
   saveButton.innerText = 'Save';
   saveButton.id = 'save_btn';
-  saveButton.addEventListener('click', saveData);
+  // saveButton.addEventListener('click', saveData);
   buttonContainer.appendChild(saveButton);
 
   const modifyButton = document.createElement('button');
@@ -108,23 +108,23 @@ function showSupplierForm() {
 
 }
 
-function saveData() {
-  const formData = new FormData(document.getElementById('supplierForm'));
+// function saveData() {
+//   const formData = new FormData(document.getElementById('supplierForm'));
 
-  // Convert form data to a plain JavaScript object
-  const formDataObject = {};
-  formData.forEach((value, key) => {
-    formDataObject[key] = value;
+//   // Convert form data to a plain JavaScript object
+//   const formDataObject = {};
+//   formData.forEach((value, key) => {
+//     formDataObject[key] = value;
 
-  });
-  window.electronAPI.sendToMain('add-supplier-data', formDataObject);
+//   });
+//   window.electronAPI.sendToMain('add-supplier-data', formDataObject);
 
-  window.electronAPI.receiveFromMain('add-supplier-data-response', (event, responseData) => {
+//   window.electronAPI.receiveFromMain('add-supplier-data-response', (event, responseData) => {
 
-    console.log('Supplier added: ', responseData);
-  });
-  document.getElementById("viewSupplier").click();
-}
+//     console.log('Supplier added: ', responseData);
+//   });
+//   document.getElementById("viewSupplier").click();
+// }
 
 function exitForm() {
   document.getElementById("viewSupplier").click();

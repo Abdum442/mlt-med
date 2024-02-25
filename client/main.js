@@ -9,15 +9,10 @@ const fetchSupplierReply = (_event, _data) => {
 };
 
 const fetchSupplierData = async (event, data) => {
-  try {
+  try { 
     const response = await axios.get(`${serverUrl}/suppliers`, data);
-
-    // event.reply('fetch-suppliers-data-response', response.data);
-    fetchSupplierReply(event, response.data);
-
-    // Remove the listener after handling the response
-    ipcMain.removeListener('fetch-suppliers-data', fetchSupplierData);
-    ipcMain.removeListener('fetch-suppliers-data-response', fetchSupplierReply);
+    event.reply('fetch-suppliers-data-response', response.data);
+    // fetchSupplierReply(event, response.data);
 
   } catch (error) {
     if (error.code === 'ECONNRESET' || error.code === 'ECONNABORTED') {
@@ -36,12 +31,9 @@ const addSupplierReply = (_event, _data) => {
 const addSupplierData = async (event, data) => {
   try {
     const response = await axios.post(`${serverUrl}/suppliers`, data);
+    event.reply('add-supplier-data-response', response.data);
+    // addSupplierReply(event, response.data);
 
-    // event.reply('add-supplier-data-response', response.data);
-    addSupplierReply(event, response.data);
-
-    ipcMain.removeListener('add-supplier-data', addSupplierData);
-    ipcMain.removeListener('add-supplier-data-response', addSupplierReply);
   } catch (error) {
     if (error.code === 'ECONNRESET' || error.code === 'ECONNABORTED') {
       console.error('Connection error:', error.message);
@@ -59,16 +51,10 @@ const modifySupplierReply = (_event, _data) => {
 const modifySupplierData = async (event, data) => {
   try {
     const response = await axios.put(`${serverUrl}/suppliers/${parseInt(data.id)}`, data);
+    event.reply('modify-supplier-data-response', response.data);
 
-    // const modifyReply = (_event, _data) => {
-    //   _event.reply('modify-supplier-data-response', _data);
-    // };
+    // modifySupplierReply(event, response.data);
 
-    modifySupplierReply(event, response.data);
-    
-
-    ipcMain.removeListener('modify-supplier-data', modifySupplierData);
-    ipcMain.removeListener('modify-supplier-data-response', modifySupplierReply);
   } catch (error) {
     if (error.code === 'ECONNRESET' || error.code === 'ECONNABORTED') {
       console.error('Connection error:', error.message);
@@ -86,12 +72,10 @@ const deleteSupplierReply = (_event, _data) => {
 const deleteSupplierData =  async (event, data) => {
   try {
     const response = await axios.delete(`${serverUrl}/suppliers/${parseInt(data.id)}`, data);
+    event.reply('delete-supplier-data-response', response.data);
 
-    // event.reply('delete-supplier-data-response', response.data);
-    deleteSupplierReply(event, response.data);
+    // deleteSupplierReply(event, response.data);
 
-    ipcMain.removeListener('delete-supplier-data', deleteSupplierData);
-    ipcMain.removeListener('delete-supplier-data-response', deleteSupplierReply);
   } catch (error) {
     if (error.code === 'ECONNRESET' || error.code === 'ECONNABORTED') {
       console.error('Connection error:', error.message);
@@ -113,10 +97,7 @@ const fetchRetailerData = async (event, args) => {
     const response = await axios.get(`${serverUrl}/retailers`);
 
     event.reply('fetch-retailer-data-response', response.data);
-    fetchRetailerReply(event, response.data);
-
-    ipcMain.removeListener('fetch-retailer-data', fetchRetailerData);
-    ipcMain.removeListener('fetch-retailer-data-response', fetchRetailerReply);
+    // fetchRetailerReply(event, response.data);
 
   } catch (error) {
     console.error(error);
@@ -131,11 +112,10 @@ const addRetailerData = async (event, data) => {
   try {
     const response = await axios.post(`${serverUrl}/retailers`, data);
 
-    // event.reply('add-retailer-data-response', response.data);
-    addRetailerReply(event, response.data);
+    event.reply('add-retailer-data-response', response.data);
 
-    ipcMain.removeListener('add-retailer-data', addRetailerData);
-    ipcMain.removeListener('add-retailer-data-response', addRetailerReply);
+    // addRetailerReply(event, response.data);
+
   } catch (error) {
     if (error.code === 'ECONNRESET' || error.code === 'ECONNABORTED') {
       console.error('Connection error:', error.message);
@@ -154,11 +134,10 @@ const modifyRetailerData = async (event, data) => {
   try {
     const response = await axios.put(`${serverUrl}/retailers/${parseInt(data.id)}`, data);
 
-    // event.reply('modify-retailer-data-response', response.data);
-    modifyRetailerReply('modify-retailer-data-response', response.data);
+    event.reply('modify-retailer-data-response', response.data);
 
-    ipcMain.removeListener('modify-retailer-data', modifyRetailerData);
-    ipcMain.removeListener('modify-retailer-data-response', modifyRetailerReply);
+    // modifyRetailerReply('modify-retailer-data-response', response.data);
+
   } catch (error) {
     if (error.code === 'ECONNRESET' || error.code === 'ECONNABORTED') {
       console.error('Connection error:', error.message);
@@ -177,11 +156,10 @@ const deleteRetailerData = async (event, data) => {
   try {
     const response = await axios.delete(`${serverUrl}/retailers/${parseInt(data.id)}`, data);
 
-    // event.reply('delete-retailer-data-response', response.data);
-    deleteRetailerReply(event, response.data);
+    event.reply('delete-retailer-data-response', response.data);
 
-    ipcMain.removeListener('delete-retailer-data', deleteRetailerData);
-    ipcMain.removeListener('delete-retailer-data-response', deleteRetailerReply);
+    // deleteRetailerReply(event, response.data);
+
 
   } catch (error) {
     if (error.code === 'ECONNRESET' || error.code === 'ECONNABORTED') {
