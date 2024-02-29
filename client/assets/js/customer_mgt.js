@@ -4,6 +4,8 @@ import { retailerForm } from './retailerForm.js';
 import { supplierForm } from './supplierForm.js';
 
 
+
+
 const customerMgt = document.getElementById('customerMgt');
 
 const viewSupplierBtn = document.getElementById('viewSupplier');
@@ -28,30 +30,33 @@ let commonData = {
 };
 
 
-customerMgt.addEventListener('click', function () {
+customerMgt.addEventListener('click', async function () {
 
-  window.electronAPI.sendToMain('fetch-suppliers-data');
-  window.electronAPI.receiveFromMain('fetch-suppliers-data-response', (event, response) => {
-    
-    const supplierObjData = response;
-    
-    supplierTableData = supplierObjData.map(obj => [obj.id, obj.name, obj.contactinfo, obj.address, 
-                                                    obj.taxinfo, obj.licencenumber, obj.remark]);
-  });
+  // const suppliersRowData = localStorage.getItem('suppliers-data');
 
-  window.electronAPI.sendToMain('fetch-retailer-data');
-  window.electronAPI.receiveFromMain('fetch-retailer-data-response', (event, response) => {
+  // const supplierObjData = JSON.parse(suppliersRowData);
 
-    const retailerObjData = response;
+  // supplierTableData = supplierObjData.map(obj => [obj.id, obj.name, obj.contactinfo, obj.address,
+  //                                                 obj.taxinfo, obj.licencenumber, obj.remark]);
 
-    // console.log("Data: ", response);
 
-    retailerTableData = retailerObjData.map(obj => [obj.id, obj.name, obj.contact, obj.address, obj.remarks]);
-  });
+  // const retailersRowData = await localStorage.getItem('retailers-data');
+
+
+
+  // const retailerObjData = JSON.parse(retailersRowData);
+  // retailerTableData = retailerObjData.map(obj => [obj.id, obj.name, obj.contact, obj.address, obj.remarks]);
 });
 
 
 viewSupplierBtn.addEventListener('click', function (){
+ 
+  const suppliersRowData = localStorage.getItem('suppliers-data');
+
+  const supplierObjData = JSON.parse(suppliersRowData);
+
+  supplierTableData = supplierObjData.map(obj => [obj.id, obj.name, obj.contactinfo, obj.address,
+  obj.taxinfo, obj.licencenumber, obj.remark]);
 
   
   addNewBtn.style.display = 'block';
@@ -121,47 +126,44 @@ viewSupplierBtn.addEventListener('click', function (){
 
         mainContainer.style.display = 'block';
 
-        supplierHTMLForm.parentNode.querySelector('#modify_btn').addEventListener('click', function (event) {
+        supplierHTMLForm.parentNode.querySelector('#modify_btn').addEventListener('click', async function (event) {
           event.stopPropagation();
           const formData = new FormData(supplierHTMLForm);
 
           const formDataObject = {};
-          const rowList = [rowData.id];
+          // const rowList = [rowData.id];
 
           formDataObject['id'] = rowData.id;
 
           formData.forEach((value, key) => {
             
             formDataObject[key] = value;
-            rowList.push(value);
+            // rowList.push(value);
 
           });
-          window.electronAPI.sendToMain('modify-supplier-data', formDataObject);
 
-          window.electronAPI.receiveFromMain('modify-supplier-data-response', (event, responseData) => {
-
-            
-          });
+          const id = await window.electronAPI.fetchData('modify-suppliers-data', formDataObject);
           
-          supplierTableData = modifyDataById(supplierTableData, rowList);
-          console.log('rowList: ', supplierTableData);
-          viewSupplierBtn.click();
+          // supplierTableData = modifyDataById(supplierTableData, rowList);
+          // console.log('rowList: ', supplierTableData);
+          mainContainer.innerHTML = '';
+          setTimeout(()=>{
+            viewSupplierBtn.click();
+          }, 1000);
         });
       });
 
-      deleteBtn.addEventListener('click', function (event) {
+      deleteBtn.addEventListener('click', async function (event) {
         event.stopPropagation();
 
         const dataID = {id: rowData.id};
-        window.electronAPI.sendToMain('delete-supplier-data', dataID);
-
-        window.electronAPI.receiveFromMain('delete-supplier-data-response', (event, responseData) => {
-
-          // console.log('Supplier modified: ', responseData);
-        });
+        const id = await window.electronAPI.fetchData('delete-suppliers-data', dataID);
         console.log('id : ', rowData.id);
         supplierTableData = deleteDataById(supplierTableData, rowData.id);
-        viewSupplierBtn.click();
+        mainContainer.innerHTML = '';
+        setTimeout(() => {
+          viewSupplierBtn.click();
+        }, 1000);
       });
     });
   });
@@ -176,27 +178,27 @@ viewSupplierBtn.addEventListener('click', function (){
 
     pageTitle.innerHTML = 'Supplier Company Registration Form';
 
-    supplierHTMLForm.parentNode.querySelector('#save_btn').addEventListener('click', function (event) {
+    supplierHTMLForm.parentNode.querySelector('#save_btn').addEventListener('click', async function (event) {
       event.stopPropagation();
       const formData = new FormData(document.getElementById('supplierForm'));
 
       const formDataObject = {};
-      const rowList = [0];
+      // const rowList = [0];
       formData.forEach((value, key) => {
         formDataObject[key] = value;
-        rowList.push(value);
+        // rowList.push(value);
       });
-      window.electronAPI.sendToMain('add-supplier-data', formDataObject);
 
-      window.electronAPI.receiveFromMain('add-supplier-data-response', (event, responseData) => {
-        console.log('Supplier added with Id: ', responseData[0].id);
-        console.log('rowList[0]: ', rowList[0]);
-        rowList[0] = responseData[0].id;
-        supplierTableData.push(rowList);
+      const rowRawData = await window.electronAPI.fetchData('add-suppliers-data', formDataObject);
 
+      // const res = JSON.parse(rowRawData);
+      // rowList[0] = res[0].id;
+      // supplierTableData.push(rowList);
+
+      mainContainer.innerHTML = '';
+      setTimeout(() => {
         viewSupplierBtn.click();
-      });
-      
+      }, 1000);
     });
   });
 
@@ -204,13 +206,18 @@ viewSupplierBtn.addEventListener('click', function (){
 
 
 viewRetailerBtn.addEventListener('click', function () {
+
+
+  const retailersRowData = localStorage.getItem('retailers-data');
+
+
+
+  const retailerObjData = JSON.parse(retailersRowData);
+  retailerTableData = retailerObjData.map(obj => [obj.id, obj.name, obj.contact, obj.address, obj.remarks]);
+
   addNewBtn.style.display = 'block';
 
   pageTitle.innerHTML = 'Retailer Customers';
-
-  
-
-    // console.log('Retailer Data: ', retailerTableData);
 
 
   commonData.tableHeader = retailerTableHeader;
@@ -270,7 +277,7 @@ viewRetailerBtn.addEventListener('click', function () {
 
           mainContainer.style.display = 'block';
 
-          retailerHTMLForm.parentNode.querySelector('#modify_btn').addEventListener('click', function () {
+          retailerHTMLForm.parentNode.querySelector('#modify_btn').addEventListener('click', async function () {
 
             const formData = new FormData(retailerHTMLForm);
 
@@ -284,31 +291,28 @@ viewRetailerBtn.addEventListener('click', function () {
               formDataObject[key] = value;
               rowList.push(value);
             });
-            // console.log('Retailer ID: ', formDataObject)
-            window.electronAPI.sendToMain('modify-retailer-data', formDataObject);
 
-            window.electronAPI.receiveFromMain('modify-retailer-data-response', (event, responseData) => {
-
-              
-            });
+            const id = await window.electronAPI.fetchData('modify-retailers-data', formDataObject);
             
             retailerTableData = modifyDataById(retailerTableData, rowList);
-            viewRetailerBtn.click();
+            
+            mainContainer.innerHTML = '';
+            setTimeout(() => {
+              viewRetailerBtn.click();
+            }, 1000);
           });
         });
 
-        deleteBtn.addEventListener('click', function (event) {
+        deleteBtn.addEventListener('click', async function (event) {
           event.stopPropagation();
-          // data['id'] = rowData.id;
-          window.electronAPI.sendToMain('delete-retailer-data', rowData);
 
-          window.electronAPI.receiveFromMain('delete-retailer-data-response', (event, responseData) => {
+          const id =  window.electronAPI.fetchData('delete-retailers-data', rowData);
 
-            // console.log('Retailer modified: ', responseData);
-          });
-          
           retailerTableData = deleteDataById(retailerTableData, rowData.id);
-          viewRetailerBtn.click();
+          mainContainer.innerHTML = '';
+          setTimeout(() => {
+            viewRetailerBtn.click();
+          }, 1000);
         });
       });
     });
@@ -322,27 +326,29 @@ viewRetailerBtn.addEventListener('click', function () {
 
     pageTitle.innerHTML = 'Retailer Customer Registration Form';
 
-    retailerHTMLForm.parentNode.querySelector('#save_btn').addEventListener('click', function (event) {
+    retailerHTMLForm.parentNode.querySelector('#save_btn').addEventListener('click', async function (event) {
       event.stopPropagation();
 
       const formData = new FormData(document.getElementById('retailerForm'));
 
       // Convert form data to a plain JavaScript object
       const formDataObject = {};
-      const rowList = [0];
+      // const rowList = [0];
       formData.forEach((value, key) => {
         formDataObject[key] = value;
-        rowList.push(value);
+        // rowList.push(value);
       });
-      window.electronAPI.sendToMain('add-retailer-data', formDataObject);
 
-      window.electronAPI.receiveFromMain('add-retailer-data-response', (event, responseData) => {
-        
-        rowList[0] = responseData[0].id;
-        console.log("rowList :", rowList)
-        retailerTableData.push(rowList);
+      const rowRawData = await window.electronAPI.fetchData('add-retailers-data', formDataObject);
+
+      // const res = JSON.parse(rowRawData);
+      // rowList[0] = res[0].id;
+      // retailerTableData.push(rowList);
+
+      mainContainer.innerHTML = '';
+      setTimeout(() => {
         viewRetailerBtn.click();
-      });
+      }, 1000);
       
     });
   });

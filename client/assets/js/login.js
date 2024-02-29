@@ -1,14 +1,11 @@
 const loginBtn = document.getElementById("loginBtn");
 let users;
 
-loginBtn.addEventListener("click", (event) => {
+loginBtn.addEventListener("click", async (event) => {
   event.preventDefault();
-  window.electronAPI.sendToMain('fetch-users');
-  window.electronAPI.receiveFromMain('fetch-users-response', (event, response) => {
-    users = response;
 
-    console.log('users: ', users);
-  });
+  const userResponse = await window.electronAPI.fetchData('fetch-users-data');
+  users = JSON.parse(userResponse);
 })
 
 document.getElementById("loginForm").addEventListener("submit", async (e) => {
@@ -22,15 +19,14 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
   if (user) {
     // Redirect to admin or user page based on user role
     const userRole = getUserRole(user); // Fetch user role from database or server
-    if (userRole === "admin") {
-      
+    if (userRole === "admin") {    
       window.location.href = "admin/admin_page.html"; // Redirect to admin page
-    } else {
+    } else if (userRole === 'user') {
       window.location.href = "user/user_page.html"; // Redirect to user page
+    } else {
+      alert("Invalid credentials. Please try again.");
     }
-  } else {
-    alert("Invalid credentials. Please try again.");
-  }
+  } 
 });
 
 async function authenticateUser(username, password) {

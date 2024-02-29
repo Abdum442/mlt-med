@@ -6,5 +6,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   },
   receiveFromMain: (channel, callback) => {
     ipcRenderer.on(channel, callback);
-  } 
+  }, 
+  fetchData: (channel, data = null) => {
+    return ipcRenderer.invoke(channel, data) 
+  }
 })

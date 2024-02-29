@@ -3,8 +3,8 @@ function showProductForm(data_names) {
   const formContainer = document.createElement('div');
   formContainer.className = 'form-container';
 
-  const purchaseForm = document.createElement('form');
-  purchaseForm.id = 'productForm';
+  const productForm = document.createElement('form');
+  productForm.id = 'productForm';
 
   const formFields = [
     { label: 'Item Name:', type: 'text', name: 'productName'},
@@ -16,7 +16,7 @@ function showProductForm(data_names) {
     { label: 'Remark:', type: 'text', name: 'remark' },
   ];
 
-  formFields[2].options = data_names.suppliers;
+  formFields[2].options = data_names.map(obj => [obj.name + "  " + obj.id]);
 
 
 
@@ -67,7 +67,7 @@ function showProductForm(data_names) {
       formRow.appendChild(input);
     }
 
-    purchaseForm.appendChild(formRow);
+    productForm.appendChild(formRow);
   });
 
   const buttonContainer = document.createElement('div');
@@ -77,8 +77,13 @@ function showProductForm(data_names) {
   saveButton.type = 'button';
   saveButton.innerText = 'Save';
   saveButton.id = 'save_btn';
-  saveButton.addEventListener('click', savePurchase);
   buttonContainer.appendChild(saveButton);
+
+  const modifyButton = document.createElement('button');
+  modifyButton.type = 'button';
+  modifyButton.id = 'modify_btn';
+  modifyButton.innerText = 'Modify';
+  buttonContainer.appendChild(modifyButton);
 
   const exitButton = document.createElement('button');
   exitButton.type = 'button';
@@ -87,27 +92,23 @@ function showProductForm(data_names) {
   exitButton.addEventListener('click', exitForm);
   buttonContainer.appendChild(exitButton);
 
-  formContainer.appendChild(purchaseForm);
+  formContainer.appendChild(productForm);
   formContainer.appendChild(buttonContainer);
 
-  document.getElementById("recent_orders").innerHTML = '<h2>Product Registration Form</h2>';
+  const mainContainer = document.getElementById('mainContainer');
 
+  mainContainer.innerHTML = '';
 
-
-  document.getElementById('recent_orders').appendChild(formContainer);
+  mainContainer.appendChild(formContainer);
 
   const ids = [formFields[2].name];
   manageDataLists(ids);
 
 }
 
-function savePurchase() {
-  document.getElementById("supplier").click();
-}
-
 function exitForm() {
   // Add logic to handle exiting the form
-  document.getElementById("supplier").click();
+  document.getElementById("productBtn").click();
 }
 
 function manageDataLists(ids) {

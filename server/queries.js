@@ -167,6 +167,31 @@ const deleteRetailer = (request, response) => {
   })
 }
 
+const getProducts = (request, response) => {
+  pool.query('SELECT * FROM products ORDER BY id ASC', (error, results) => {
+    if (error) {
+      throw error
+    }
+    response.status(200).json(results.rows)
+  })
+}
+
+const addProduct = (request, response) => {
+  const { name, description, purchase_price, saling_price,
+    expiry_date, supplier_id, remarks } = request.body
+
+  // console.log('request: ', request.body);
+  console.log('productName : ', name)
+
+  pool.query('INSERT INTO products (name, description, purchase_price, saling_price, expiry_date, supplier_id, remarks) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id',
+    [name, description, purchase_price, saling_price, expiry_date, supplier_id, remarks], (error, results) => {
+      if (error) {
+        throw error
+      }
+      response.status(201).send(results.rows)
+    })
+}
+
 const userData = {
   getUsers,
   getUserById,
@@ -189,8 +214,14 @@ const retailerData = {
   deleteRetailer
 }
 
+const productData = {
+  getProducts,
+  addProduct
+}
+
 module.exports = {
   userData,
   supplierData,
-  retailerData
+  retailerData,
+  productData
 }

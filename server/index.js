@@ -31,6 +31,9 @@ app.post('/retailers', db.retailerData.addRetailer)
 app.put('/retailers/:id', db.retailerData.updateRetailer)
 app.delete('/retailers/:id', db.retailerData.deleteRetailer)
 
+app.get('/products', db.productData.getProducts);
+app.post('/products', db.productData.addProduct);
+
 app.listen(port, () => {
   console.log(`App running on port ${port}.`)
 })

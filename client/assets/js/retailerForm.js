@@ -106,24 +106,6 @@ function showRetailerForm() {
 
 }
 
-// function saveData() {
-//   const formData = new FormData(document.getElementById('retailerForm'));
-
-//   // Convert form data to a plain JavaScript object
-//   const formDataObject = {};
-//   formData.forEach((value, key) => {
-//     formDataObject[key] = value;
-
-//   });
-//   window.electronAPI.sendToMain('add-retailer-data', formDataObject);
-
-//   window.electronAPI.receiveFromMain('add-retailer-data-response', (event, responseData) => {
-
-//     console.log('Retailer added: ', responseData);
-//   });
-//   document.getElementById("viewRetailer").click();
-// }
-
 function exitForm() {
   document.getElementById("viewRetailer").click();
 }
