@@ -73,20 +73,27 @@ fetchData('users');
 fetchData('suppliers');
 fetchData('retailers');
 fetchData('products');
+fetchData('stock');
+fetchData('sales');
+fetchData('purchase');
 
 // addData('users');
 addData('suppliers');
 addData('retailers');
 addData('products');
+addData('purchase');
+addData('sales');
 
 // modifyData('users');
 modifyData('suppliers');
 modifyData('retailers');
+modifyData('products');
+
 
 // deleteData('users');
 deleteData('suppliers');
 deleteData('retailers');
-
+deleteData('products');
 
 
 // const fetchSupplierReply = (_event, _data) => {

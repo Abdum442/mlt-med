@@ -33,6 +33,17 @@ app.delete('/retailers/:id', db.retailerData.deleteRetailer)
 
 app.get('/products', db.productData.getProducts);
 app.post('/products', db.productData.addProduct);
+app.put('/products/:id', db.productData.updateProduct)
+app.delete('/products/:id', db.productData.deleteProduct)
+
+app.get('/stock', db.stockData.getStock);
+
+app.get('/sales', db.salesData.getSales);
+app.post('/sales', db.salesData.addSales);
+
+
+app.get('/purchase', db.purchaseData.getPurchase);
+app.post('/purchase', db.purchaseData.addPurchase);
 
 app.listen(port, () => {
   console.log(`App running on port ${port}.`)

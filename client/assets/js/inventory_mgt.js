@@ -27,7 +27,7 @@ productBtn.addEventListener('click', function () {
   const productsObjData = JSON.parse(productsRawData);
 
   const productsTableData = productsObjData.map(obj => [obj.id, obj.name, obj.description, obj.saling_price,
-    obj.expiry_date, obj.remarks]);
+    formatDate(obj.expiry_date), obj.remarks]);
   addNewBtn.style.display = 'block';
   pageTitle.innerHTML = 'Product List';
 
@@ -51,6 +51,7 @@ productBtn.addEventListener('click', function () {
     const supplierNames = supplierObjData.map(obj => ({id: obj.id, name: obj.name}));
 
     productForm.showProductForm(supplierNames);
+
     const productHTMLForm = document.getElementById('productForm');
 
     productHTMLForm.parentNode.querySelector('#modify_btn').style.display = 'none'
@@ -73,16 +74,6 @@ productBtn.addEventListener('click', function () {
         remarks: productHTMLForm.querySelector('#remark').value,
       };
 
-      // const formData = new FormData(productHTMLForm);
-
-      // const formDataObject = {};
-      // // const rowList = [0];
-      // formData.forEach((value, key) => {
-      //   formDataObject[key] = value;
-      //   // rowList.push(value);
-      // });
-      console.log('formValues', formValues);
-
       const rowRawData = await window.electronAPI.fetchData('add-products-data', formValues);
 
       // const res = JSON.parse(rowRawData);
@@ -97,4 +88,152 @@ productBtn.addEventListener('click', function () {
     });
   });
 
+  mainContainer.querySelectorAll('table tbody tr').forEach(function (tr) {
+
+    const rowData = {};
+
+    for (const product of productsObjData) {
+      const expDate = new Date(product.expiry_date);
+      // console.log('date : ', expDate.toISOString().slice(0, 10));
+      if (product.id == tr.cells[0].textContent) {
+        rowData['id'] = product.id;
+        rowData['name'] = product.name;
+        rowData['description'] = product.description;
+        rowData['purchase_price'] = product.purchase_price;
+        rowData['saling_price'] = product.saling_price;
+        rowData['expiry_date'] = expDate.toISOString().slice(0, 10);
+        rowData['remarks'] = product.remarks;
+        rowData['supplier_id'] = product.supplier_id;
+      }
+    }
+
+    
+
+    tr.querySelector(".drop-btn").addEventListener('click', function (event) {
+      event.stopPropagation();
+
+      const dropContent = tr.querySelector("td .drop-btn").nextElementSibling;
+
+      dropContent.classList.add('show');
+
+
+
+      const modifyBtn = tr.querySelector("td .modify");
+      // console.log("modify btn: ", modifyBtn);
+
+      const deleteBtn = dropContent.querySelector('.delete');
+
+      modifyBtn.addEventListener('click', function (event) {
+        event.stopPropagation();
+        mainContainer.style.display = 'none';
+
+        console.log('rowData: ', rowData);
+
+        addNewBtn.click();
+
+        const productHTMLForm = mainContainer.querySelector('#productForm');
+        // console.log(supplierForm)
+
+
+        productHTMLForm.querySelector('[name="productName"]').value = rowData.name;
+        productHTMLForm.querySelector('[name="description"]').value = rowData.description;
+        productHTMLForm.querySelector('[name="purchasePrice"]').value = rowData.purchase_price;
+        productHTMLForm.querySelector('[name="SellingPrice"]').value = rowData.saling_price;
+        productHTMLForm.querySelector('#expiryDate').value = rowData.expiry_date;
+        productHTMLForm.querySelector('[name="remark"]').value = rowData.remarks;
+        productHTMLForm.querySelector('#supplierId_input').value = rowData.supplier_id;
+
+        console.log('Expiry Date: ', productHTMLForm.querySelector('#expiryDate').value);
+
+
+
+        productHTMLForm.parentNode.querySelector('#save_btn').style.display = 'none';
+
+        productHTMLForm.parentNode.querySelector('#modify_btn').style.display = 'block';
+
+        mainContainer.style.display = 'block';
+
+        productHTMLForm.parentNode.querySelector('#modify_btn').addEventListener('click', async function () {
+
+        const supplierPair = productHTMLForm.querySelector('#supplierId_input').value.split(/\s+/);
+        const supplierId = supplierPair[supplierPair.length - 1];
+
+        const formValues = {
+          id: rowData.id,
+          name: productHTMLForm.querySelector('#productName').value,
+          description: productHTMLForm.querySelector('#description').value,
+          supplier_id: supplierId,
+          purchase_price: productHTMLForm.querySelector('#purchasePrice').value,
+          saling_price: productHTMLForm.querySelector('#SellingPrice').value,
+          expiry_date: productHTMLForm.querySelector('#expiryDate').value,
+          remarks: productHTMLForm.querySelector('#remark').value,
+        };
+
+        
+
+          const id = await window.electronAPI.fetchData('modify-products-data', formValues);
+
+          mainContainer.innerHTML = '';
+          setTimeout(() => {
+            productBtn.click();
+          }, 1000);
+        });
+      });
+
+      deleteBtn.addEventListener('click', async function (event) {
+        event.stopPropagation();
+
+        const id = window.electronAPI.fetchData('delete-products-data', rowData);
+
+        mainContainer.innerHTML = '';
+        setTimeout(() => {
+          productBtn.click();
+        }, 1000);
+      });
+    });
+  });
 });
+const stockTableHeader = ['Item Name', 'Quantity', 'Purchase ID', 'Supplier', 'Remarks'];
+stockMgtBtn.addEventListener('click', function () {
+  pageTitle.innerHTML = 'Company Stock';
+  mainContainer.innerHTML = '';
+
+  const stockRawData = localStorage.getItem('stock-data');
+
+  const stockObjData = JSON.parse(stockRawData);
+
+  const stockTableData = stockObjData.map(obj => {
+
+    return [obj.id, obj.quantity, obj.purchase, obj.supplier_id, obj.remarks]
+  });
+  addNewBtn.style.display = 'block';
+
+  commonData.tableHeader = stockTableHeader;
+  commonData.tableData = stockTableData;
+
+  const stockHTMLtable = new CreateTableFromData(commonData);
+
+  stockHTMLtable.renderTable();
+
+
+});
+
+
+//========================utility functions====================
+function formatDate(dateString) {
+  // Parse the date string using Date.parse() for better compatibility
+  const dateObject = new Date(dateString);
+
+  // Define default formatting options
+  const options = {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour12: false 
+  };
+
+  const formatter = new Intl.DateTimeFormat(navigator.language, options);
+  const formattedDate = formatter.format(dateObject);
+
+  return formattedDate;
+}

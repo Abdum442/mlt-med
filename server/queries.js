@@ -180,11 +180,87 @@ const addProduct = (request, response) => {
   const { name, description, purchase_price, saling_price,
     expiry_date, supplier_id, remarks } = request.body
 
-  // console.log('request: ', request.body);
-  console.log('productName : ', name)
-
   pool.query('INSERT INTO products (name, description, purchase_price, saling_price, expiry_date, supplier_id, remarks) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id',
     [name, description, purchase_price, saling_price, expiry_date, supplier_id, remarks], (error, results) => {
+      if (error) {
+        throw error
+      }
+      response.status(201).send(results.rows)
+    })
+}
+const updateProduct = (request, response) => {
+  const iD = parseInt(request.params.id)
+  const { id, name, description, purchase_price, saling_price, expiry_date, supplier_id, remarks } = request.body
+
+  console.log('Expiry Date : ', [iD, name, purchase_price, saling_price, expiry_date, supplier_id, remarks]);
+
+  pool.query(
+    'UPDATE products SET name = $1, description = $2, purchase_price = $3, saling_price = $4, expiry_date = $5, supplier_id = $6, remarks = $7  WHERE id = $8',
+    [name, description, purchase_price, saling_price, expiry_date, supplier_id, remarks, iD],
+    (error, results) => {
+      if (error) {
+        throw error
+      }
+      response.status(200).send(`Product modified with ID: ${id}`)
+    }
+  )
+}
+
+const deleteProduct = (request, response) => {
+  const id = parseInt(request.params.id)
+
+  pool.query('DELETE FROM products WHERE id = $1', [id], (error, results) => {
+    if (error) {
+      throw error
+    }
+    response.status(200).send(`Product deleted with ID: ${id}`)
+  })
+}
+
+const getStock = (request, response) => {
+  pool.query('SELECT * FROM company_stock ORDER BY product_id ASC', (error, results) => {
+    if (error) {
+      throw error
+    }
+    response.status(200).json(results.rows)
+  })
+}
+
+const getSales = (request, response) => {
+  pool.query('SELECT * FROM sales ORDER BY id ASC', (error, results) => {
+    if (error) {
+      throw error
+    }
+    response.status(200).json(results.rows)
+  })
+}
+
+const addSales = (request, response) => {
+  const { product_id, retailer_id, quantity_sold, sale_date, payment_method, amount_received, remarks } = request.body
+
+  pool.query('INSERT INTO sales (product_id, retailer_id, quantity_sold, sale_date, payment_method, amount_received, remarks) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id',
+    [product_id, retailer_id, quantity_sold, sale_date, payment_method, amount_received, remarks], (error, results) => {
+      if (error) {
+        throw error
+      }
+      response.status(201).send(`User added with ID: ${results.rows}`)
+    })
+}
+
+const getPurchase = (request, response) => {
+  pool.query('SELECT * FROM purchase ORDER BY id ASC', (error, results) => {
+    if (error) {
+      throw error
+    }
+    response.status(200).json(results.rows)
+  })
+}
+
+const addPurchase = (request, response) => {
+  const { product_id, supplier_id, quantity, purchase_date, payment_method, amount_paid, tax_withheld, remarks } = request.body
+
+  pool.query('INSERT INTO purchase (product_id, supplier_id, quantity, purchase_date, payment_method, amount_paid, tax_withheld, remarks) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id',
+    [product_id, supplier_id, quantity, purchase_date, payment_method, amount_paid, tax_withheld, remarks], (error, results) => {
       if (error) {
         throw error
       }
@@ -216,12 +292,31 @@ const retailerData = {
 
 const productData = {
   getProducts,
-  addProduct
+  addProduct,
+  updateProduct,
+  deleteProduct
+}
+
+const stockData = {
+  getStock
+}
+
+const salesData = {
+  getSales,
+  addSales
+}
+
+const purchaseData = {
+  getPurchase,
+  addPurchase
 }
 
 module.exports = {
   userData,
   supplierData,
   retailerData,
-  productData
+  productData,
+  stockData,
+  salesData,
+  purchaseData
 }

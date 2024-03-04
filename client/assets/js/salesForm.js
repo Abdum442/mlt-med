@@ -4,23 +4,27 @@ function showSalesForm(data_names) {
   formContainer.className = 'form-container';
 
   const salesForm = document.createElement('form');
-  salesForms.id = 'salesForm';
+  salesForm.id = 'salesForm';
+
 
   const formFields = [
-    { label: 'Item:', type: 'datalist', name: 'productId', options: [] },
-    { label: 'Supplier Company:', type: 'datalist', name: 'supplierId', options: [] },
+    { label: 'Item Name:', type: 'datalist', name: 'productId', options: [] },
+    { label: 'Retailer Company:', type: 'datalist', name: 'retailerId', options: [] },
+    { label: '   Enter New:', type: 'text', name: 'newRetailer' },
     { label: 'Quantity:', type: 'number', name: 'quantity' },
-    { label: 'Unit of Measurement:', type: 'text', name: 'unit' },
+    { label: 'Unit Price:', type: 'text', name: 'unit' },
     { label: 'Invoice Number:', type: 'text', name: 'invoiceNum' },
     { label: 'Sales Date:', type: 'date', name: 'salesDate' },
     { label: 'Payment Method:', type: 'text', name: 'paymentMtd' },
+    { label: 'Full Amount:', type: 'text', name: 'fullAmount' },
     { label: 'Amount Received:', type: 'number', name: 'amountReceived' },
     { label: 'Tax Withheld:', type: 'number', name: 'taxWithheld' },
     { label: 'Remark:', type: 'text', name: 'remark' },
   ];
 
-  formFields[0].options = data_names.products;
-  formFields[1].options = data_names.suppliers;
+  formFields[0].options = data_names.product.map(pro => [pro.name + ', ' + pro.description + ', ' + pro.id]);
+  formFields[1].options = data_names.retailer.map(ret => [ret.name + ', ' + ret.id]);
+  formFields[1].options.push(['None']);
 
 
 
@@ -86,7 +90,6 @@ function showSalesForm(data_names) {
   saveButton.type = 'button';
   saveButton.innerText = 'Save';
   saveButton.id = 'save_btn';
-  saveButton.addEventListener('click', savePurchase);
   buttonContainer.appendChild(saveButton);
 
   const exitButton = document.createElement('button');
@@ -99,25 +102,20 @@ function showSalesForm(data_names) {
   formContainer.appendChild(salesForm);
   formContainer.appendChild(buttonContainer);
 
-  document.getElementById("recent_orders").innerHTML = '<h2>Sales Registration Form</h2>';
+  const mainContainer = document.getElementById('mainContainer');
 
+  mainContainer.innerHTML = '';
 
-
-  document.getElementById('recent_orders').appendChild(formContainer);
+  mainContainer.appendChild(formContainer);
 
   const ids = [formFields[0].name, formFields[1].name];
   manageDataLists(ids);
 
 }
 
-function savePurchase() {
-  // Add logic to handle saving the purchase data
-  alert('Purchase saved!');
-}
-
 function exitForm() {
   // Add logic to handle exiting the form
-  document.getElementById("supplier").click();
+  document.getElementById("salesBtn").click();
   // document.querySelector('.form-container').innerHTML = '';
 }
 
@@ -126,19 +124,32 @@ function manageDataLists(ids) {
     const autocompleteInput = document.getElementById(id + '_input');
     const optionsList = document.getElementById(id + 'OptionsList');
 
+    const newRetailer = document.getElementById('newRetailer');
+
+    newRetailer.parentElement.style.display = 'none';
+
     autocompleteInput.addEventListener('input', function () {
       const inputText = autocompleteInput.value.toLowerCase();
       const options = optionsList.querySelectorAll('option');
 
       options.forEach(option => {
         const optionText = option.value.toLowerCase();
-        option.style.display = optionText.includes(inputText) ? 'block' : 'none';
+        if (option.value == 'None') {
+          option.style.display = 'block';
+        } else {
+          option.style.display = optionText.includes(inputText) ? 'block' : 'none';
+        } 
+        
       });
     });
 
     autocompleteInput.addEventListener('change', function () {
       const selectedOption = optionsList.querySelector(`option[value="${autocompleteInput.value}"]`);
       if (selectedOption) {
+        if (selectedOption.value == 'None') {
+          newRetailer.parentElement.style.display = 'flex';
+          newRetailer.setAttribute('placeholder', 'Enter New Retailer');
+        }
         console.log(`Selected option: ${selectedOption.value}`);
       }
     });
@@ -151,7 +162,6 @@ function manageDataLists(ids) {
 
 const salesForm = {
   showSalesForm,
-  savePurchase,
   exitForm
 };
 

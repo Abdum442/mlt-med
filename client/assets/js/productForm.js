@@ -104,6 +104,7 @@ function showProductForm(data_names) {
   const ids = [formFields[2].name];
   manageDataLists(ids);
 
+
 }
 
 function exitForm() {
@@ -141,7 +142,6 @@ function manageDataLists(ids) {
 
 const productForm = {
   showProductForm,
-  savePurchase,
   exitForm
 };
 

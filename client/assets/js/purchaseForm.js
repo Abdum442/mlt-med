@@ -7,20 +7,25 @@ function showPurchaseForm(data_names) {
   purchaseForm.id = 'purchaseForm';
 
   const formFields = [
-    { label: 'Purchase Item:', type: 'datalist', name: 'productId', options: [] }, 
+    { label: 'Item:', type: 'text', name: 'productId'}, 
+    { label: 'Description:', type: 'text', name: 'description' },
     { label: 'Supplier:', type: 'datalist', name: 'supplierId', options: [] },
+    { label: '   Enter New:', type: 'text', name: 'newSupplier' },
+    { label: 'Batch Number:', type: 'text', name: 'batchNum'},
+    { label: 'Expiry Date:', type: 'date', name: 'expiryDate' },
+    { label: 'Unit Price:', type: 'text', name: 'unit' },
     { label: 'Quantity:', type: 'number', name: 'quantity' },
-    { label: 'Unit of Measurement:', type: 'text', name: 'unit' },
     { label: 'Invoice Number:', type: 'text', name: 'invoiceNum' },
-    { label: 'Purchasing Date:', type: 'date', name: 'purchaseDate' },
+    { label: 'Purchase Date:', type: 'date', name: 'purchaseDate' },
     { label: 'Payment Method:', type: 'text', name: 'paymentMtd' },
-    { label: 'Amount Paid:', type: 'number', name: 'amountPaid' },
-    { label: 'Tax Withheld:', type: 'number', name: 'taxWithheld' },
+    { label: 'Full Amount:', type: 'text', name: 'fullAmount' },
+    { label: 'Amount Paid:', type: 'text', name: 'amountPaid' },
+    { label: 'Tax Withheld:', type: 'text', name: 'taxWithheld' },
     { label: 'Remark:', type: 'text', name: 'remark' },
   ];
 
-  formFields[0].options = data_names.products;
-  formFields[1].options = data_names.status;
+  formFields[2].options = data_names.supplier.map(obj => [obj.name + "  " + obj.id]);
+  formFields[2].options.push(['None']);
 
   
 
@@ -52,10 +57,10 @@ function showPurchaseForm(data_names) {
       });
       formRow.appendChild(input);
       formRow.appendChild(select);
-    }else if (field.name === 'remark') {
+    }else if (field.name === 'remark' || field.name === 'description') {
       const textArea = document.createElement('textarea');
-      textArea.id = 'remark';
-      textArea.name = 'remark';
+      textArea.id = field.name;
+      textArea.name = field.name;
       textArea.style = 'height:100px';
       textArea.style = 'width:100%'
       formRow.appendChild(textArea);
@@ -86,7 +91,6 @@ function showPurchaseForm(data_names) {
   saveButton.type = 'button';
   saveButton.innerText = 'Save';
   saveButton.id = 'save_btn';
-  saveButton.addEventListener('click', savePurchase);
   buttonContainer.appendChild(saveButton);
 
   const exitButton = document.createElement('button');
@@ -99,25 +103,21 @@ function showPurchaseForm(data_names) {
   formContainer.appendChild(purchaseForm);
   formContainer.appendChild(buttonContainer);
 
-  document.getElementById("recent_orders").innerHTML = '<h2>Purchase Registration Form</h2>';
 
+  const mainContainer = document.getElementById('mainContainer');
 
+  mainContainer.innerHTML = '';
 
-  document.getElementById('recent_orders').appendChild(formContainer);
+  mainContainer.appendChild(formContainer);
 
-  const ids = [formFields[0].name, formFields[1].name];
+  const ids = [formFields[2].name];
   manageDataLists(ids);
 
 }
 
-function savePurchase() {
-  // Add logic to handle saving the purchase data
-  alert('Purchase saved!');
-}
-
 function exitForm() {
   // Add logic to handle exiting the form
-  document.querySelector('.form-container').innerHTML = '';
+  document.getElementById("purchaseBtn").click();
 }
 
 function manageDataLists(ids){
@@ -125,19 +125,31 @@ function manageDataLists(ids){
     const autocompleteInput = document.getElementById(id + '_input');
     const optionsList = document.getElementById(id + 'OptionsList');
 
+    const newSupplier = document.getElementById('newSupplier');
+
+    newSupplier.parentElement.style.display = 'none';
+
     autocompleteInput.addEventListener('input', function () {
       const inputText = autocompleteInput.value.toLowerCase();
       const options = optionsList.querySelectorAll('option');
 
       options.forEach(option => {
         const optionText = option.value.toLowerCase();
-        option.style.display = optionText.includes( inputText ) ? 'block' : 'none';
+        if (option.value == 'None') {
+          option.style.display = 'block';
+        } else {
+          option.style.display = optionText.includes(inputText) ? 'block' : 'none';
+        }    
       });
     });
 
     autocompleteInput.addEventListener('change', function() {
       const selectedOption = optionsList.querySelector(`option[value="${autocompleteInput.value}"]`);
       if (selectedOption) {
+        if(selectedOption.value == 'None') {
+          newSupplier.parentElement.style.display = 'flex';
+          newSupplier.setAttribute('placeholder', 'Enter New Supplier');
+        }
         console.log(`Selected option: ${selectedOption.value}`);
       }
     });
@@ -150,7 +162,6 @@ function manageDataLists(ids){
 
 const purchaseForm = {
   showPurchaseForm,
-  savePurchase,
   exitForm
 };
 

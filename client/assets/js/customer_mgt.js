@@ -294,8 +294,6 @@ viewRetailerBtn.addEventListener('click', function () {
 
             const id = await window.electronAPI.fetchData('modify-retailers-data', formDataObject);
             
-            retailerTableData = modifyDataById(retailerTableData, rowList);
-            
             mainContainer.innerHTML = '';
             setTimeout(() => {
               viewRetailerBtn.click();
@@ -316,6 +314,7 @@ viewRetailerBtn.addEventListener('click', function () {
         });
       });
     });
+
   addNewBtn.addEventListener('click', function (event) {
     event.stopPropagation();
     addNewBtn.style.display = 'none';

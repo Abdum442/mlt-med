@@ -67,7 +67,7 @@
         </li>
 
         <li>
-          <a class="dropdown-btn" href="#">
+          <a class="dropdown-btn" href="#" id="transactionMgt">
             <span class="icon">
               <ion-icon name="bar-chart-outline"></ion-icon>
             </span>
@@ -77,8 +77,8 @@
             </span>
           </a>
           <div class="dropdown-container">
-            <a href="#"><span class="subtitle">View Sales</span></a>
-            <a href="#"><span class="subtitle">View Purchase</span></a>
+            <a href="#" id="salesBtn"><span class="subtitle">Sales</span></a>
+            <a href="#" id="purchaseBtn"><span class="subtitle">Purchase</span></a>
           </div>
         </li>
 
@@ -217,9 +217,9 @@
         </div>
 
         <!-- ================= New Customers ================ -->
-        <div class="recentCustomers">
+        <div class="recentCustomers" id="recent_customers">
           <div class="cardHeader">
-            <h2>Recent Customers</h2>
+            <h2>Detailed View</h2>
           </div>
 
           <!-- <table>
@@ -322,6 +322,7 @@
   <script type="module" src="admin.js"></script>
   <script type="module" src="../assets/js/customer_mgt.js"></script>
   <script type="module" src="../assets/js/inventory_mgt.js"></script>
+  <script type="module" src="../assets/js/transaction_mgt.js"></script>
 
 
   <!-- ====== ionicons ======= -->
