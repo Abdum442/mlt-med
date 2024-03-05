@@ -143,7 +143,6 @@ productBtn.addEventListener('click', function () {
         productHTMLForm.querySelector('[name="remark"]').value = rowData.remarks;
         productHTMLForm.querySelector('#supplierId_input').value = rowData.supplier_id;
 
-        console.log('Expiry Date: ', productHTMLForm.querySelector('#expiryDate').value);
 
 
 
@@ -194,18 +193,32 @@ productBtn.addEventListener('click', function () {
   });
 });
 const stockTableHeader = ['Item Name', 'Quantity', 'Purchase ID', 'Supplier', 'Remarks'];
+
 stockMgtBtn.addEventListener('click', function () {
   pageTitle.innerHTML = 'Company Stock';
   mainContainer.innerHTML = '';
 
-  const stockRawData = localStorage.getItem('stock-data');
+  const stockObjData = JSON.parse(localStorage.getItem('stock-data'));
+  const productObjData = JSON.parse(localStorage.getItem('products-data'));
 
-  const stockObjData = JSON.parse(stockRawData);
+  // const stockTableData = stockObjData.map(obj => {
+  //   let prodName;
+  //   for (const prod of productObjData) {
+  //     if ( obj.id == prod.id) {
+  //       prodName = prod.name;
+  //       break;
+  //     }
+  //   }
+  //   return [obj.id, obj.quantity, obj.purchase, obj.supplier_id, obj.remarks]
+  // });
+
+  const productMap = new Map(productObjData.map(prod => [prod.id, prod.name]));
 
   const stockTableData = stockObjData.map(obj => {
-
-    return [obj.id, obj.quantity, obj.purchase, obj.supplier_id, obj.remarks]
+    const prodName = productMap.get(obj.product_id);
+    return [prodName, obj.quantity, obj.purchase_id, obj.supplier_id, obj.remarks];
   });
+
   addNewBtn.style.display = 'block';
 
   commonData.tableHeader = stockTableHeader;

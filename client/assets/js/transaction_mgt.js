@@ -4,7 +4,7 @@ import { salesForm } from './salesForm.js';
 
 const transactionMgtMenu = document.getElementById('transactionMgt');
 
-document.getElementById('recent_customers').style.display = 'none';
+// document.getElementById('recent_customers').style.display = 'none';
 
 const salesBtn = document.getElementById('salesBtn');
 const purchaseBtn = document.getElementById('purchaseBtn');
@@ -42,6 +42,7 @@ salesBtn.addEventListener('click', function () {
         itemName = product.name;
       }
     }
+
     for (const retailer of retailersObjectData) {
       if (sales.retailer_id == retailer.id) {
         retailerName = retailer.name;
@@ -66,6 +67,8 @@ salesBtn.addEventListener('click', function () {
     const productObjData = JSON.parse(localStorage.getItem('products-data'));
     const retailerObjData = JSON.parse(localStorage.getItem('retailers-data'));
 
+    // const productMap = new Map(productObjData.map(pro => [pro.id, pro.name]));
+
 
     const retailerNames = retailerObjData.map(obj => ({ name: obj.name, id: obj.id  }));
     const productNames = productObjData.map(obj => ({ name: obj.name, description: obj.description, id: obj.id}));
@@ -87,7 +90,7 @@ salesBtn.addEventListener('click', function () {
       // event.stopPropagation();
 
       const proGroup = salesHTMLForm.querySelector('#productId_input').value.split(',');
-      productId = proGroup[proGroup.length - 1];
+      productId = proGroup[proGroup.length - 1].trim();
 
       for (const product of productObjData) {
         if (product.id == productId) {
@@ -112,7 +115,7 @@ salesBtn.addEventListener('click', function () {
 
     salesHTMLForm.querySelector('#amountReceived').addEventListener('change', function () {
       const pay_amount = Number(salesHTMLForm.querySelector('#amountReceived').value);
-      salesHTMLForm.querySelector('#remark').value = `To be paid: ${(0.98 * amount_paid - pay_amount).toFixed(2)}`;
+      salesHTMLForm.querySelector('#remark').value = `To Receive: ${(0.98 * amount_paid - pay_amount).toFixed(2)}`;
     });
 
 
@@ -154,9 +157,24 @@ salesBtn.addEventListener('click', function () {
 
       const salesId = await window.electronAPI.fetchData('add-sales-data', formValues);
 
-      // const res = JSON.parse(rowRawData);
-      // rowList[0] = res[0].id;
-      // supplierTableData.push(rowList);
+      const stockObjData = JSON.parse(localStorage.getItem('stock-data'));
+
+      const stockMap = new Map(stockObjData.map(stock => [stock.product_id, {quantity: stock.quantity, purchase_id: stock.purchase_id, 
+                                                                           supplier_id: stock.supplier_id, remarks: stock.remarks }]));
+      const id = parseInt(productId); 
+
+      const stockData = {
+        id: id,
+        product_id: id,
+        supplier_id: stockMap.get(id).supplier_id,
+        quantity: stockMap.get(id).quantity - formValues.quantity_sold,
+        purchase_id: stockMap.get(id).purchase_id,
+        remarks: stockMap.get(id).remarks
+      }
+
+      console.log('stock Data', stockData);
+
+      const product_id = await window.electronAPI.fetchData('modify-stock-data', stockData);
 
       mainContainer.innerHTML = '';
 
@@ -205,12 +223,12 @@ purchaseBtn.addEventListener('click', function () {
     event.stopPropagation();
     addNewBtn.style.display = 'none';
 
-    const productObjData = JSON.parse(localStorage.getItem('products-data'));
-    const supplierObjData = JSON.parse(localStorage.getItem('suppliers-data'));
+    // const productObjData = JSON.parse(localStorage.getItem('products-data'));
+    // const supplierObjData = JSON.parse(localStorage.getItem('suppliers-data'));
 
 
-    const supplierNames = supplierObjData.map(obj => ({ id: obj.id, name: obj.name }));
-    const productNames =  productObjData.map(obj => ({ id: obj.id, name: obj.name }));
+    const supplierNames = suppliersObjectData.map(obj => ({ id: obj.id, name: obj.name }));
+    const productNames = productsObjectData.map(obj => ({ id: obj.id, name: obj.name }));
 
     const data_lists = {
       product: productNames,
@@ -302,11 +320,24 @@ purchaseBtn.addEventListener('click', function () {
         remarks: purchaseHTMLForm.querySelector('#remark').value,
       };
 
-      const rowRawData = await window.electronAPI.fetchData('add-purchase-data', formValues);
+      
 
-      // const res = JSON.parse(rowRawData);
-      // rowList[0] = res[0].id;
-      // supplierTableData.push(rowList);
+      const purchaseObj = await window.electronAPI.fetchData('add-purchase-data', formValues);
+
+      const purchaseId = JSON.parse(purchaseObj)[0].id;
+
+      const stockData = {
+        product_id: formValues.product_id,
+        supplier_id: formValues.supplier_id,
+        quantity: formValues.quantity,
+        purchase_id: purchaseId,
+        remarks: ''
+      };
+
+      const stockObj = await window.electronAPI.fetchData('add-stock-data', stockData);
+
+
+    
 
       mainContainer.innerHTML = '';
 

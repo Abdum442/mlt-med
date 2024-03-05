@@ -83,11 +83,13 @@ addData('retailers');
 addData('products');
 addData('purchase');
 addData('sales');
+addData('stock');
 
 // modifyData('users');
 modifyData('suppliers');
 modifyData('retailers');
 modifyData('products');
+modifyData('stock');
 
 
 // deleteData('users');
