@@ -37,6 +37,9 @@ app.put('/products/:id', db.productData.updateProduct)
 app.delete('/products/:id', db.productData.deleteProduct)
 
 app.get('/stock', db.stockData.getStock);
+app.post('/stock', db.stockData.addStock);
+app.put('/stock/:id', db.stockData.updateStock);
+
 
 app.get('/sales', db.salesData.getSales);
 app.post('/sales', db.salesData.addSales);

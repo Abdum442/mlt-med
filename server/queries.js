@@ -225,6 +225,33 @@ const getStock = (request, response) => {
     response.status(200).json(results.rows)
   })
 }
+const addStock = (request, response) => {
+  const { product_id, quantity, purchase_id, supplier_id, remarks } = request.body
+
+  pool.query('INSERT INTO company_stock (product_id, quantity, purchase_id, supplier_id, remarks) VALUES ($1, $2, $3, $4, $5) RETURNING product_id',
+    [product_id, quantity, purchase_id, supplier_id, remarks], (error, results) => {
+      if (error) {
+        throw error
+      }
+      response.status(201).send(`Stock added with product ID: ${results.rows}`)
+    })
+}
+
+const updateStock = (request, response) => {
+  const iD = parseInt(request.params.id)
+  const { product_id, quantity, purchase_id, supplier_id, remarks } = request.body
+
+  pool.query(
+    'UPDATE company_stock SET quantity = $2, purchase_id = $3, supplier_id = $4, remarks = $5  WHERE product_id = $1',
+    [product_id, quantity, purchase_id, supplier_id, remarks],
+    (error, results) => {
+      if (error) {
+        throw error
+      }
+      response.status(200).send(`Product modified with ID: ${product_id}`)
+    }
+  )
+}
 
 const getSales = (request, response) => {
   pool.query('SELECT * FROM sales ORDER BY id ASC', (error, results) => {
@@ -298,7 +325,9 @@ const productData = {
 }
 
 const stockData = {
-  getStock
+  getStock,
+  addStock,
+  updateStock
 }
 
 const salesData = {
