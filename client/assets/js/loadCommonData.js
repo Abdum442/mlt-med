@@ -1,3 +1,10 @@
+const customerMgtMenu = document.getElementById('customerMgt');
+const inventoryMgtMenu = document.getElementById('inventoryMgt');
+const transactionMgtMenu = document.getElementById('transactionMgt');
+const financialReportMgtMenu = document.getElementById('customerMgt');
+const settingMenu = document.getElementById('setting');
+
+
 const frequentData = async function () {
   const raw_users_data = await window.electronAPI.fetchData('fetch-users-data');
   localStorage.setItem('users-data', raw_users_data);
@@ -22,11 +29,11 @@ const frequentData = async function () {
 
 };
 
-
-
-setInterval(() => {
-  frequentData();
-}, 1000);
+customerMgtMenu.addEventListener('click', frequentData);
+inventoryMgtMenu.addEventListener('click', frequentData);
+transactionMgtMenu.addEventListener('click', frequentData);
+financialReportMgtMenu.addEventListener('click', frequentData);
+settingMenu.addEventListener('click', frequentData);
 
 
 

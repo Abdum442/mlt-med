@@ -275,6 +275,7 @@ const createWindow = () => {
       nodeIntegration: true,
     },
   });
+  win.maximize()
 
   win.loadFile('index.html');
 

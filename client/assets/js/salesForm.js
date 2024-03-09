@@ -22,7 +22,7 @@ function showSalesForm(data_names) {
     { label: 'Remark:', type: 'text', name: 'remark' },
   ];
 
-  formFields[0].options = data_names.product.map(pro => [pro.name + ', ' + pro.description + ', ' + pro.id]);
+  formFields[0].options = data_names.product.map(pro => [pro.name + ', ' + 'Qty: ' + pro.quantity + ', ' + pro.id]);
   formFields[1].options = data_names.retailer.map(ret => [ret.name + ', ' + ret.id]);
   formFields[1].options.push(['None']);
 

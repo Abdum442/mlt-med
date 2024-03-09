@@ -83,6 +83,7 @@ productBtn.addEventListener('click', function () {
       mainContainer.innerHTML = '';
 
       setTimeout(() => {
+        inventoryMgtMenu.click();
         productBtn.click();
       }, 1000);
     });
@@ -174,6 +175,7 @@ productBtn.addEventListener('click', function () {
 
           mainContainer.innerHTML = '';
           setTimeout(() => {
+            inventoryMgtMenu.click();
             productBtn.click();
           }, 1000);
         });
@@ -186,6 +188,7 @@ productBtn.addEventListener('click', function () {
 
         mainContainer.innerHTML = '';
         setTimeout(() => {
+          inventoryMgtMenu.click()
           productBtn.click();
         }, 1000);
       });
@@ -200,17 +203,6 @@ stockMgtBtn.addEventListener('click', function () {
 
   const stockObjData = JSON.parse(localStorage.getItem('stock-data'));
   const productObjData = JSON.parse(localStorage.getItem('products-data'));
-
-  // const stockTableData = stockObjData.map(obj => {
-  //   let prodName;
-  //   for (const prod of productObjData) {
-  //     if ( obj.id == prod.id) {
-  //       prodName = prod.name;
-  //       break;
-  //     }
-  //   }
-  //   return [obj.id, obj.quantity, obj.purchase, obj.supplier_id, obj.remarks]
-  // });
 
   const productMap = new Map(productObjData.map(prod => [prod.id, prod.name]));
 
@@ -231,6 +223,8 @@ stockMgtBtn.addEventListener('click', function () {
 
 });
 
+ExpiryDateBtn.addEventListener('click', trackExpiryDate);
+
 
 //========================utility functions====================
 function formatDate(dateString) {
@@ -249,4 +243,39 @@ function formatDate(dateString) {
   const formattedDate = formatter.format(dateObject);
 
   return formattedDate;
+}
+
+function trackExpiryDate() {
+  pageTitle.innerHTML = 'Tracking Expiry Date';
+  const expiryDateTableHeader = ['ID', 'Item', 'Expiry Date', 'Status'];
+  const productObjData = JSON.parse(localStorage.getItem('products-data'));
+
+  const expiryDateTableData = productObjData.map(product => {
+    return [product.id, product.name, product.expiry_date, ""];
+  });
+
+  commonData.tableHeader = expiryDateTableHeader;
+  commonData.tableData = expiryDateTableData;
+
+  const expiryDateTable = new CreateTableFromData(commonData);
+
+  expiryDateTable.renderTable();
+
+  mainContainer.querySelectorAll('table tbody tr').forEach(function (tr) {
+    const expiry_date = new Date(tr.cells[2].textContent);
+    const today = new Date();
+    tr.cells[2].textContent = formatDate(expiry_date);
+
+    const timeRemaining = Math.floor((expiry_date - today) / (1000 * 60 * 60 * 24));
+
+    if (timeRemaining < 30) {
+      tr.cells[3].innerHTML = `<span class="status return">Expired / Expiring Soon</span>`;
+    } else if (timeRemaining < 60) {
+      tr.cells[3].innerHTML = `<span class="status pending">Near Expiry</span>`;
+    } else {
+      tr.cells[3].innerHTML = `<span class="status delivered">Full Shelf Life</span>`;
+    }
+  });
+  
+
 }

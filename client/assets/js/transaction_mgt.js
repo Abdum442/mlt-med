@@ -30,6 +30,8 @@ salesBtn.addEventListener('click', function () {
   const productsObjectData = JSON.parse(localStorage.getItem('products-data'));
   const retailersObjectData = JSON.parse(localStorage.getItem('retailers-data'));
 
+
+
   const salesObjectData = JSON.parse(localStorage.getItem('sales-data'));
 
 
@@ -49,7 +51,7 @@ salesBtn.addEventListener('click', function () {
       }
     }
     return [sales.id, formatDate(sales.sale_date), itemName, retailerName, 
-            sales.quantity_sold, sales.payment_method, sales.amount_received, sales.remarks]
+            sales.quantity_sold, sales.payment_method, sales.amount_received.toLocaleString(), sales.remarks]
   });
 
   addNewBtn.style.display = 'block';
@@ -67,11 +69,26 @@ salesBtn.addEventListener('click', function () {
     const productObjData = JSON.parse(localStorage.getItem('products-data'));
     const retailerObjData = JSON.parse(localStorage.getItem('retailers-data'));
 
+    const stockObjData = JSON.parse(localStorage.getItem('stock-data'));
+
+    const stockMap = new Map(stockObjData.map(stock => [stock.product_id, {
+      quantity: stock.quantity, purchase_id: stock.purchase_id,
+      supplier_id: stock.supplier_id, remarks: stock.remarks
+    }]));
+
     // const productMap = new Map(productObjData.map(pro => [pro.id, pro.name]));
 
 
+
     const retailerNames = retailerObjData.map(obj => ({ name: obj.name, id: obj.id  }));
-    const productNames = productObjData.map(obj => ({ name: obj.name, description: obj.description, id: obj.id}));
+    const productNames = productObjData.map(obj => {
+      if (stockMap.get(obj.id)) {
+        return { name: obj.name, description: obj.description, quantity: stockMap.get(parseInt(obj.id)).quantity, id: obj.id };
+      } else {
+        return { name: obj.name, description: obj.description, quantity: 'Out of Stock', id: obj.id };
+      }
+    });
+
 
     const data_lists = {
       product: productNames,
@@ -86,39 +103,41 @@ salesBtn.addEventListener('click', function () {
 
     pageTitle.innerHTML = 'Sales Registration Form';
 
-    salesHTMLForm.querySelector('#productId_input').addEventListener('change', function (event) {
-      // event.stopPropagation();
 
+    function updateAmount() {
       const proGroup = salesHTMLForm.querySelector('#productId_input').value.split(',');
       productId = proGroup[proGroup.length - 1].trim();
-
       for (const product of productObjData) {
         if (product.id == productId) {
-          unit_price = Number(product.saling_price);
+          unit_price = parseFloat(product.saling_price);
         }
       }
-       
-      salesHTMLForm.querySelector('#unit').value = unit_price;
+      quantity = parseInt(salesHTMLForm.querySelector('#quantity').value);
 
-      salesHTMLForm.querySelector('#quantity').addEventListener('change', function (event) {
-        // event.stopPropagation();
-
-        quantity = parseInt(salesHTMLForm.querySelector('#quantity').value);
+      if (!isNaN(unit_price) && !isNaN(quantity)) {
 
         amount_paid = unit_price * quantity;
 
         salesHTMLForm.querySelector('#fullAmount').value = (0.98 * amount_paid).toFixed(2);
         salesHTMLForm.querySelector('#taxWithheld').value = (0.02 * amount_paid).toFixed(2);
+      } 
+    }
 
-      });
+    salesHTMLForm.querySelector('#productId_input').addEventListener('change', function() { 
+      updateAmount();
+      salesHTMLForm.querySelector('#unit').value = unit_price;  
     });
+
+    salesHTMLForm.querySelector('#quantity').addEventListener('change', updateAmount);
+
+    salesHTMLForm.querySelector('#salesDate').value = new Date().toISOString().slice(0, 10);
 
     salesHTMLForm.querySelector('#amountReceived').addEventListener('change', function () {
       const pay_amount = Number(salesHTMLForm.querySelector('#amountReceived').value);
-      salesHTMLForm.querySelector('#remark').value = `To Receive: ${(0.98 * amount_paid - pay_amount).toFixed(2)}`;
+      const less = (0.98 * amount_paid - pay_amount).toFixed(2);
+
+      salesHTMLForm.querySelector('#remark').value = (less < 5) ? 'Received in full' : `To Receive: ${less.toLocaleString()}`;
     });
-
-
 
 
 
@@ -135,8 +154,8 @@ salesBtn.addEventListener('click', function () {
           address: '',
           remark: ''
         }
-        const retText = await window.electronAPI.fetchData('add-retailers-data', supplierValues);
-        retailerId = JSON.parse(supText)[0].id;
+        const retText = await window.electronAPI.fetchData('add-retailers-data', retailerValues);
+        retailerId = JSON.parse(retText)[0].id;
       } else {
         const retailerPair = salesHTMLForm.querySelector('#retailerId_input').value.split(',');
         retailerId = retailerPair[retailerPair.length - 1];
@@ -179,6 +198,7 @@ salesBtn.addEventListener('click', function () {
       mainContainer.innerHTML = '';
 
       setTimeout(() => {
+        transactionMgtMenu.click();
         salesBtn.click();
       }, 1000);
     });
@@ -206,7 +226,7 @@ purchaseBtn.addEventListener('click', function () {
       }
     }
     return [purchase.id, formatDate(purchase.purchase_date), itemName, supplierName,
-      purchase.quantity, purchase.payment_method, purchase.amount_paid, purchase.tax_withheld, purchase.remarks];
+      purchase.quantity, purchase.payment_method, purchase.amount_paid.toLocaleString(), purchase.tax_withheld.toLocaleString(), purchase.remarks];
   });
 
   addNewBtn.style.display = 'block';
@@ -243,27 +263,29 @@ purchaseBtn.addEventListener('click', function () {
 
     pageTitle.innerHTML = 'Purchase Registration Form';
 
-    purchaseHTMLForm.querySelector('#unit').addEventListener('change', function (event) {
-      // event.stopPropagation();
+    function updateAmount() {
 
-      unit_price = Number(purchaseHTMLForm.querySelector('#unit').value);
+      unit_price = parseFloat(purchaseHTMLForm.querySelector('#unit').value);
 
-      purchaseHTMLForm.querySelector('#quantity').addEventListener('change', function (event) {
-        // event.stopPropagation();
+      quantity = parseInt(purchaseHTMLForm.querySelector('#quantity').value);
 
-        quantity = parseInt(purchaseHTMLForm.querySelector('#quantity').value);
+
+      if (!isNaN(unit_price) && !isNaN(quantity)) {
 
         amount_paid = unit_price * quantity;
 
         purchaseHTMLForm.querySelector('#fullAmount').value = (0.98 * amount_paid).toFixed(2);
         purchaseHTMLForm.querySelector('#taxWithheld').value = (0.02 * amount_paid).toFixed(2);
+      }
+    }
 
-      });
-    });
+    purchaseHTMLForm.querySelector('#unit').addEventListener('change', updateAmount);
+    purchaseHTMLForm.querySelector('#quantity').addEventListener('change', updateAmount);
 
     purchaseHTMLForm.querySelector('#amountPaid').addEventListener('change', function () {
       const payment_amount = Number(purchaseHTMLForm.querySelector('#amountPaid').value);
-      purchaseHTMLForm.querySelector('#remark').value = `To be paid: ${(0.98 * amount_paid - payment_amount).toFixed(2)}`; 
+      const less = (0.98 * amount_paid - payment_amount).toFixed(2)
+      purchaseHTMLForm.querySelector('#remark').value = (less < 5) ? 'Paid in full' : `To be paid: ${less}`; 
     });
 
     
@@ -312,11 +334,11 @@ purchaseBtn.addEventListener('click', function () {
       const formValues = {
         product_id: productId[0].id,
         supplier_id: supplierId,
-        quantity: purchaseHTMLForm.querySelector('#quantity').value,
+        quantity: Number(purchaseHTMLForm.querySelector('#quantity').value),
         purchase_date: purchaseHTMLForm.querySelector('#purchaseDate').value,
         payment_method: purchaseHTMLForm.querySelector('#paymentMtd').value,
-        amount_paid: purchaseHTMLForm.querySelector('#amountPaid').value,
-        tax_withheld: purchaseHTMLForm.querySelector('#taxWithheld').value,
+        amount_paid: Number(purchaseHTMLForm.querySelector('#amountPaid').value),
+        tax_withheld: Number(purchaseHTMLForm.querySelector('#taxWithheld').value),
         remarks: purchaseHTMLForm.querySelector('#remark').value,
       };
 
@@ -342,6 +364,7 @@ purchaseBtn.addEventListener('click', function () {
       mainContainer.innerHTML = '';
 
       setTimeout(() => {
+        transactionMgtMenu.click();
         purchaseBtn.click();
       }, 1000);
     });
