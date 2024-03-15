@@ -1,8 +1,18 @@
 const customerMgtMenu = document.getElementById('customerMgt');
 const inventoryMgtMenu = document.getElementById('inventoryMgt');
 const transactionMgtMenu = document.getElementById('transactionMgt');
-const financialReportMgtMenu = document.getElementById('customerMgt');
+const financialReportMgtMenu = document.getElementById('financialRreportMgt');
 const settingMenu = document.getElementById('setting');
+
+const mainContainer = document.getElementById('mainContainer');
+
+// transactionMgtMenu.parentElement.addEventListener('click', function () {
+//   alert('transaction menu is clicked');
+// })
+const user = false;
+if (user){
+  transactionMgtMenu.style.display = 'none';
+}
 
 
 const frequentData = async function () {
@@ -27,6 +37,14 @@ const frequentData = async function () {
   const raw_purchase_data = await window.electronAPI.fetchData('fetch-purchase-data');
   localStorage.setItem('purchase-data', raw_purchase_data);
 
+  const raw_expenses_data = await window.electronAPI.fetchData('fetch-expenses-data');
+  localStorage.setItem('expenses-data', raw_expenses_data);
+
+  const raw_loans_data = await window.electronAPI.fetchData('fetch-loans-data');
+  localStorage.setItem('loans-data', raw_loans_data);
+
+  const raw_debit_data = await window.electronAPI.fetchData('fetch-debit-data');
+  localStorage.setItem('debit-data', raw_debit_data);
 };
 
 customerMgtMenu.addEventListener('click', frequentData);

@@ -27,6 +27,8 @@ function showPurchaseForm(data_names) {
   formFields[2].options = data_names.supplier.map(obj => [obj.name + "  " + obj.id]);
   formFields[2].options.push(['None']);
 
+
+
   
 
   formFields.forEach(field => {
@@ -80,7 +82,6 @@ function showPurchaseForm(data_names) {
       input.name = field.name;
       formRow.appendChild(input);
     }
-
     purchaseForm.appendChild(formRow);
   });
 
@@ -109,6 +110,7 @@ function showPurchaseForm(data_names) {
   mainContainer.innerHTML = '';
 
   mainContainer.appendChild(formContainer);
+  purchaseForm.querySelector('#unit').setAttribute('placeholder', `* Unit Price is required`)
 
   const ids = [formFields[2].name];
   manageDataLists(ids);

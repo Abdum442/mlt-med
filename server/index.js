@@ -48,6 +48,18 @@ app.post('/sales', db.salesData.addSales);
 app.get('/purchase', db.purchaseData.getPurchase);
 app.post('/purchase', db.purchaseData.addPurchase);
 
+app.get('/expenses', db.expenseData.getExpenses);
+app.post('/expenses', db.expenseData.addExpenses);
+
+app.get('/loans', db.loansData.getLoans);
+app.post('/loans', db.loansData.addLoans);
+
+app.get('/debit', db.debitData.getDebit);
+app.post('/debit', db.debitData.addDebit);
+
+app.get('/banks', db.bankData.getBankDetails);
+app.post('/banks', db.bankData.addBankDetails);
+
 app.listen(port, () => {
   console.log(`App running on port ${port}.`)
 })

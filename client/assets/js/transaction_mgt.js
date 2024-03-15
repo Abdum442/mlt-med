@@ -66,6 +66,8 @@ salesBtn.addEventListener('click', function () {
 
   addNewBtn.addEventListener('click', function (event) {
 
+
+    addNewBtn.style.display = 'none';
     const productObjData = JSON.parse(localStorage.getItem('products-data'));
     const retailerObjData = JSON.parse(localStorage.getItem('retailers-data'));
 
@@ -82,8 +84,12 @@ salesBtn.addEventListener('click', function () {
 
     const retailerNames = retailerObjData.map(obj => ({ name: obj.name, id: obj.id  }));
     const productNames = productObjData.map(obj => {
-      if (stockMap.get(obj.id)) {
-        return { name: obj.name, description: obj.description, quantity: stockMap.get(parseInt(obj.id)).quantity, id: obj.id };
+      if (stockMap.get(parseInt(obj.id)) !== undefined) {
+        if (parseInt(stockMap.get(parseInt(obj.id)).quantity) > 0){
+          return { name: obj.name, description: obj.description, quantity: stockMap.get(parseInt(obj.id)).quantity, id: obj.id };
+        } else {
+          return { name: obj.name, description: obj.description, quantity: 'Out of Stock', id: obj.id };
+        }
       } else {
         return { name: obj.name, description: obj.description, quantity: 'Out of Stock', id: obj.id };
       }
@@ -118,7 +124,7 @@ salesBtn.addEventListener('click', function () {
 
         amount_paid = unit_price * quantity;
 
-        salesHTMLForm.querySelector('#fullAmount').value = (0.98 * amount_paid).toFixed(2);
+        // salesHTMLForm.querySelector('#fullAmount').value = (0.98 * amount_paid).toFixed(2);
         salesHTMLForm.querySelector('#taxWithheld').value = (0.02 * amount_paid).toFixed(2);
       } 
     }
@@ -130,11 +136,19 @@ salesBtn.addEventListener('click', function () {
 
     salesHTMLForm.querySelector('#quantity').addEventListener('change', updateAmount);
 
+    salesHTMLForm.querySelector('#taxWithheld').addEventListener('change', function() {
+      const withheld = salesHTMLForm.querySelector('#taxWithheld').value;
+      if (!isNaN(withheld)){
+        salesHTMLForm.querySelector('#fullAmount').value = amount_paid - parseFloat(withheld);
+      }
+    });
+
     salesHTMLForm.querySelector('#salesDate').value = new Date().toISOString().slice(0, 10);
 
     salesHTMLForm.querySelector('#amountReceived').addEventListener('change', function () {
       const pay_amount = Number(salesHTMLForm.querySelector('#amountReceived').value);
-      const less = (0.98 * amount_paid - pay_amount).toFixed(2);
+      const full_amount = Number(salesHTMLForm.querySelector('#fullAmount').value)
+      const less = (full_amount - pay_amount).toFixed(2);
 
       salesHTMLForm.querySelector('#remark').value = (less < 5) ? 'Received in full' : `To Receive: ${less.toLocaleString()}`;
     });
@@ -191,14 +205,11 @@ salesBtn.addEventListener('click', function () {
         remarks: stockMap.get(id).remarks
       }
 
-      console.log('stock Data', stockData);
-
       const product_id = await window.electronAPI.fetchData('modify-stock-data', stockData);
 
       mainContainer.innerHTML = '';
-
+      transactionMgtMenu.click();
       setTimeout(() => {
-        transactionMgtMenu.click();
         salesBtn.click();
       }, 1000);
     });
@@ -260,6 +271,9 @@ purchaseBtn.addEventListener('click', function () {
     let unit_price; let quantity; let amount_paid;
 
     const purchaseHTMLForm = document.getElementById('purchaseForm');
+
+    purchaseHTMLForm.querySelector('#unit').required = true;
+    purchaseHTMLForm.querySelector('#unit').title = "Unit price is required";
 
     pageTitle.innerHTML = 'Purchase Registration Form';
 
@@ -325,7 +339,7 @@ purchaseBtn.addEventListener('click', function () {
         remarks: purchaseHTMLForm.querySelector('#remark').value,
       };
 
-      const productText = await window.electronAPI.fetchData('add-products-data', productValues);
+      
 
       const productId = JSON.parse(productText)
 
@@ -355,6 +369,8 @@ purchaseBtn.addEventListener('click', function () {
         purchase_id: purchaseId,
         remarks: ''
       };
+
+      const productText = await window.electronAPI.fetchData('add-products-data', productValues);
 
       const stockObj = await window.electronAPI.fetchData('add-stock-data', stockData);
 

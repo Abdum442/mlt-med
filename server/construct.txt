@@ -67,7 +67,7 @@ CREATE TABLE sales (
   quantity_sold INTEGER,
   sale_date DATE,
   payment_method VARCHAR(100),
-  amount_received VARCHAR(100),
+  amount_received NUMERIC(10, 2),
   remarks VARCHAR(100)
 );
 

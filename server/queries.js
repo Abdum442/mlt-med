@@ -295,6 +295,93 @@ const addPurchase = (request, response) => {
     })
 }
 
+//========================expenses====================================
+const getExpenses = (request, response) => {
+  pool.query('SELECT * FROM expenses ORDER BY id ASC', (error, results) => {
+    if (error) {
+      throw error
+    }
+    response.status(200).json(results.rows)
+  })
+}
+
+const addExpenses = (request, response) => {
+  const { description, amount, expense_date, payment_method, remarks } = request.body
+
+  pool.query('INSERT INTO expenses (description, amount, expense_date, payment_method, remarks) VALUES ($1, $2, $3, $4, $5) RETURNING id',
+    [description, amount, expense_date, payment_method, remarks], (error, results) => {
+      if (error) {
+        throw error
+      }
+      response.status(201).send(results.rows)
+    })
+}
+
+//========================Company Loans============================
+const getLoans = (request, response) => {
+  pool.query('SELECT * FROM company_loans ORDER BY id ASC', (error, results) => {
+    if (error) {
+      throw error
+    }
+    response.status(200).json(results.rows)
+  })
+}
+
+const addLoans = (request, response) => {
+  const { purpose, amount, duration_days, start_date, end_date, remarks } = request.body
+
+  pool.query('INSERT INTO company_loans (purpose, amount, duration_days, start_date, end_date, remarks) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id',
+    [purpose, amount, duration_days, start_date, end_date, remarks], (error, results) => {
+      if (error) {
+        throw error
+      }
+      response.status(201).send(results.rows)
+    })
+}
+//========================Company Debit============================
+const getDebit = (request, response) => {
+  pool.query('SELECT * FROM company_debit ORDER BY id ASC', (error, results) => {
+    if (error) {
+      throw error
+    }
+    response.status(200).json(results.rows)
+  })
+}
+
+const addDebit = (request, response) => {
+  const { purpose, amount, interest_rate, payment_terms, remarks } = request.body
+
+  pool.query('INSERT INTO company_debit (purpose, amount, interest_rate, payment_terms, remarks) VALUES ($1, $2, $3, $4, $5) RETURNING id',
+    [purpose, amount, interest_rate, payment_terms, remarks], (error, results) => {
+      if (error) {
+        throw error
+      }
+      response.status(201).send(results.rows)
+    })
+}
+
+//========================Bank Details============================
+const getBankDetails = (request, response) => {
+  pool.query('SELECT * FROM bank_details ORDER BY id ASC', (error, results) => {
+    if (error) {
+      throw error
+    }
+    response.status(200).json(results.rows)
+  })
+}
+
+const addBankDetails = (request, response) => {
+  const { account_holder, bank_name, account_number, remarks } = request.body
+
+  pool.query('INSERT INTO bank_details (account_holder, bank_name, account_number, remarks) VALUES ($1, $2, $3, $4) RETURNING id',
+    [account_holder, bank_name, account_number, remarks], (error, results) => {
+      if (error) {
+        throw error
+      }
+      response.status(201).send(results.rows)
+    })
+}
+
 const userData = {
   getUsers,
   getUserById,
@@ -340,6 +427,26 @@ const purchaseData = {
   addPurchase
 }
 
+const expenseData = {
+  getExpenses,
+  addExpenses
+}
+
+const loansData = {
+  getLoans,
+  addLoans
+}
+
+const debitData = {
+  getDebit,
+  addDebit
+}
+
+const bankData = {
+  getBankDetails,
+  addBankDetails
+}
+
 module.exports = {
   userData,
   supplierData,
@@ -347,5 +454,9 @@ module.exports = {
   productData,
   stockData,
   salesData,
-  purchaseData
+  purchaseData,
+  expenseData,
+  loansData,
+  debitData,
+  bankData
 }

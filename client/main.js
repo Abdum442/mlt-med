@@ -76,6 +76,11 @@ fetchData('products');
 fetchData('stock');
 fetchData('sales');
 fetchData('purchase');
+fetchData('expenses');
+fetchData('loans');
+fetchData('debit');
+fetchData('banks');
+
 
 // addData('users');
 addData('suppliers');
@@ -84,6 +89,10 @@ addData('products');
 addData('purchase');
 addData('sales');
 addData('stock');
+addData('expenses');
+addData('loans');
+addData('debit');
+addData('banks');
 
 // modifyData('users');
 modifyData('suppliers');
