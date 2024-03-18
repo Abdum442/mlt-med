@@ -253,7 +253,7 @@ purchaseBtn.addEventListener('click', function () {
   addNewBtn.addEventListener('click', function (event) {
     event.stopPropagation();
     addNewBtn.style.display = 'none';
-
+    pageTitle.innerHTML = 'Purchase Registration Form';
     // const productObjData = JSON.parse(localStorage.getItem('products-data'));
     // const supplierObjData = JSON.parse(localStorage.getItem('suppliers-data'));
 
@@ -268,14 +268,10 @@ purchaseBtn.addEventListener('click', function () {
 
     purchaseForm.showPurchaseForm(data_lists);
 
+
     let unit_price; let quantity; let amount_paid;
 
     const purchaseHTMLForm = document.getElementById('purchaseForm');
-
-    purchaseHTMLForm.querySelector('#unit').required = true;
-    purchaseHTMLForm.querySelector('#unit').title = "Unit price is required";
-
-    pageTitle.innerHTML = 'Purchase Registration Form';
 
     function updateAmount() {
 
@@ -386,6 +382,196 @@ purchaseBtn.addEventListener('click', function () {
     });
   });
 });
+
+function updateSales() {
+  addNewBtn.style.display = 'block';
+  pageTitle.innerHTML = 'Sales Report';
+
+  const productsObjectData = JSON.parse(localStorage.getItem('products-data'));
+  const retailersObjectData = JSON.parse(localStorage.getItem('retailers-data'));
+  const salesObjectData = JSON.parse(localStorage.getItem('sales-data'));
+
+
+  const salesTableData = salesObjectData.map(sales => {
+    const iD = sales.id;
+    let itemName;
+    let retailerName;
+    for (const product of productsObjectData) {
+      if (sales.product_id == product.id) {
+        itemName = product.name;
+      }
+    }
+
+    for (const retailer of retailersObjectData) {
+      if (sales.retailer_id == retailer.id) {
+        retailerName = retailer.name;
+      }
+    }
+    return [sales.id, formatDate(sales.sale_date), itemName, retailerName,
+    sales.quantity_sold, sales.payment_method, sales.amount_received.toLocaleString(), sales.remarks]
+  });
+  commonData.tableHeader = salesTableHeader;
+  commonData.tableData = salesTableData;
+
+  const salesHTMLtable = new CreateTableFromData(commonData);
+
+  salesHTMLtable.renderTable(); 
+}
+
+async function registerSales() {
+  addNewBtn.style.display = 'none';
+
+  const productObjData = JSON.parse(localStorage.getItem('products-data'));
+  const retailerObjData = JSON.parse(localStorage.getItem('retailers-data'));
+
+  const stockObjData = JSON.parse(localStorage.getItem('stock-data'));
+
+  const stockMap = new Map(stockObjData.map(stock => [stock.product_id, {
+    quantity: stock.quantity, purchase_id: stock.purchase_id,
+    supplier_id: stock.supplier_id, remarks: stock.remarks
+  }]));
+
+  const productMap = new Map(productObjData.map(product => [product.id, {
+    quantity: stock.quantity, purchase_id: stock.purchase_id,
+    supplier_id: stock.supplier_id, remarks: stock.remarks
+  }]));
+
+  // const productMap = new Map(productObjData.map(pro => [pro.id, pro.name]));
+
+
+
+  const retailerNames = retailerObjData.map(obj => ({ name: obj.name, id: obj.id }));
+
+  const productNames = productObjData.map(obj => {
+    if (stockMap.get(parseInt(obj.id)) !== undefined) {
+      if (parseInt(stockMap.get(parseInt(obj.id)).quantity) > 0) {
+        return { name: obj.name, description: obj.description, quantity: stockMap.get(parseInt(obj.id)).quantity, id: obj.id };
+      } else {
+        return { name: obj.name, description: obj.description, quantity: 'Out of Stock', id: obj.id };
+      }
+    } else {
+      return { name: obj.name, description: obj.description, quantity: 'Out of Stock', id: obj.id };
+    }
+  });
+
+
+  const data_lists = {
+    product: productNames,
+    retailer: retailerNames
+  }
+
+  salesForm.showSalesForm(data_lists);
+
+  let unit_price; let quantity; let amount_paid; let productId;
+
+  const salesHTMLForm = document.getElementById('salesForm');
+
+  pageTitle.innerHTML = 'Sales Registration Form';
+
+
+  function updateAmount() {
+    const proGroup = salesHTMLForm.querySelector('#productId_input').value.split(',');
+    productId = proGroup[proGroup.length - 1].trim();
+    for (const product of productObjData) {
+      if (product.id == productId) {
+        unit_price = parseFloat(product.saling_price);
+      }
+    }
+    quantity = parseInt(salesHTMLForm.querySelector('#quantity').value);
+
+    if (!isNaN(unit_price) && !isNaN(quantity)) {
+
+      amount_paid = unit_price * quantity;
+
+      salesHTMLForm.querySelector('#taxWithheld').value = (0.02 * amount_paid).toFixed(2);
+      salesHTMLForm.querySelector('#unit').value = unit_price;
+    }
+  }
+
+  salesHTMLForm.querySelector('#productId_input').addEventListener('change', updateAmount);
+
+  salesHTMLForm.querySelector('#quantity').addEventListener('change', updateAmount);
+
+  salesHTMLForm.querySelector('#taxWithheld').addEventListener('change', function () {
+    const withheld = salesHTMLForm.querySelector('#taxWithheld').value;
+    if (!isNaN(withheld)) {
+      salesHTMLForm.querySelector('#fullAmount').value = amount_paid - parseFloat(withheld);
+    }
+  });
+
+  salesHTMLForm.querySelector('#salesDate').value = new Date().toISOString().slice(0, 10);
+
+  salesHTMLForm.querySelector('#amountReceived').addEventListener('change', function () {
+    const pay_amount = Number(salesHTMLForm.querySelector('#amountReceived').value);
+    const full_amount = Number(salesHTMLForm.querySelector('#fullAmount').value)
+    const less = (full_amount - pay_amount).toFixed(2);
+
+    salesHTMLForm.querySelector('#remark').value = (less < 5) ? 'Received in full' : `To Receive: ${less.toLocaleString()}`;
+  });
+
+  const saveBtn = salesHTMLForm.parentNode.querySelector('#save_btn');
+
+  saveBtn.addEventListener('click', async function (event) {
+    event.stopPropagation();
+
+    let retailerId; let retailerName;
+
+    if (salesHTMLForm.querySelector('#retailerId_input').value == 'None') {
+      newRetailer = salesHTMLForm.querySelector('#newRetailer').value;
+      const retailerValues = {
+        retailerName: newRetailer,
+        contactInfo: '',
+        address: '',
+        remark: ''
+      }
+      const retText = await window.electronAPI.fetchData('add-retailers-data', retailerValues);
+      retailerId = JSON.parse(retText)[0].id;
+    } else {
+      const retailerPair = salesHTMLForm.querySelector('#retailerId_input').value.split(',');
+      retailerId = retailerPair[retailerPair.length - 1];
+    }
+
+
+
+    const formValues = {
+      product_id: productId,
+      retailer_id: retailerId,
+      quantity_sold: salesHTMLForm.querySelector('#quantity').value,
+      sale_date: salesHTMLForm.querySelector('#salesDate').value,
+      payment_method: salesHTMLForm.querySelector('#paymentMtd').value,
+      amount_received: salesHTMLForm.querySelector('#amountReceived').value,
+      tax_withheld: salesHTMLForm.querySelector('#taxWithheld').value,
+      remarks: salesHTMLForm.querySelector('#remark').value,
+    };
+
+    const salesId = await window.electronAPI.fetchData('add-sales-data', formValues);
+
+    const stockObjData = JSON.parse(localStorage.getItem('stock-data'));
+
+    const stockMap = new Map(stockObjData.map(stock => [stock.product_id, {
+      quantity: stock.quantity, purchase_id: stock.purchase_id,
+      supplier_id: stock.supplier_id, remarks: stock.remarks
+    }]));
+    const id = parseInt(productId);
+
+    const stockData = {
+      id: id,
+      product_id: id,
+      supplier_id: stockMap.get(id).supplier_id,
+      quantity: parseInt(stockMap.get(id).quantity) - parseInt(formValues.quantity_sold),
+      purchase_id: parseInt(stockMap.get(id).purchase_id),
+      remarks: stockMap.get(id).remarks
+    }
+
+    const product_id = await window.electronAPI.fetchData('modify-stock-data', stockData);
+
+    mainContainer.innerHTML = '';
+    transactionMgtMenu.click();
+    setTimeout(() => {
+      salesBtn.click();
+    }, 1000);
+  });
+}
 
 //========================utility functions====================
 function formatDate(dateString) {

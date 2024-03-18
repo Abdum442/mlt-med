@@ -93,6 +93,15 @@ function showProductForm(data_names) {
   buttonContainer.appendChild(exitButton);
 
   formContainer.appendChild(productForm);
+
+  const errorDisplayer = document.createElement('div');
+  errorDisplayer.className = 'error-display';
+  errorDisplayer.style.display = 'none';
+  const errorList = document.createElement('ul');
+
+  errorDisplayer.appendChild(errorList);
+  formContainer.appendChild(errorDisplayer);
+
   formContainer.appendChild(buttonContainer);
 
   const mainContainer = document.getElementById('mainContainer');
