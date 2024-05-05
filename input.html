@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Receipt - Tech Haven</title>
+  <style>
+    * {
+      box-sizing: border-box;  
+    }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 8px;
+    }
+
+    .container {
+      width: 100%;
+      height: 100vh;
+      border: 2px solid navy;
+    }
+
+    .tab {
+      overflow: hidden;
+      background-color: navy;
+       
+    }
+
+    .tab button {
+      width: 100px;
+      background-color: inherit;
+      float: left;
+      outline: none;
+      cursor: pointer;
+      padding: 14px 16px;
+      transition: 0.3s;
+      font-size: 20px;
+      color: white;
+      /* border-top: 2px solid navy;
+      border-left: 2px solid navy;
+      border-right: 2px solid navy; */
+      border: none;
+    }
+
+    .tab button:hover {
+      background-color: white;
+      color: navy;
+    }
+
+    .tab button.active {
+      background-color: white;
+      color: navy;
+    }
+
+    .tab-content {
+      display: none;
+      width: 80%;
+      padding: 10px 15px;
+    }
+
+.row {
+  display: -ms-flexbox; /* IE10 */
+  display: flex;
+  -ms-flex-wrap: wrap; /* IE10 */
+  flex-wrap: wrap;
+  margin: 0 -16px;
+}
+
+.col-25 {
+  -ms-flex: 25%; /* IE10 */
+  flex: 25%;
+}
+
+.col-50 {
+  -ms-flex: 50%; /* IE10 */
+  flex: 50%;
+}
+
+.col-75 {
+  -ms-flex: 75%; /* IE10 */
+  flex: 75%;
+}
+
+.col-25,
+.col-50,
+.col-75 {
+  padding: 0 16px;
+}
+
+.form-container {
+  background-color: #f2f2f2;
+  padding: 5px 20px 15px 20px;
+  border: 1px solid lightgrey;
+  border-radius: 3px;
+}
+
+input[type=text] {
+  width: 100%;
+  margin-bottom: 20px;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+}
+
+label {
+  margin-bottom: 10px;
+  display: block;
+}
+
+.btn {
+  background-color: #04AA6D;
+  color: white;
+  padding: 12px;
+  margin: 10px 0;
+  border: none;
+  width: 100%;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 17px;
+}
+
+.btn:hover {
+  background-color: #45a049;
+}
+
+a {
+  color: #2196F3;
+}
+
+hr {
+  border: 1px solid lightgrey;
+}
+
+span.price {
+  float: right;
+  color: grey;
+}
+.form-container textarea {
+  resize: vertical;
+  margin-bottom: 20px;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  min-height: 50px;
+}
+
+.modal {
+  display: none;
+  /* Hidden by default */
+  position: fixed;
+  /* Stay in place */
+  z-index: 1;
+  /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%;
+  /* Full width */
+  height: 100%;
+  /* Full height */
+  overflow: auto;
+  /* Enable scroll if needed */
+  background-color: rgb(0, 0, 0);
+  /* Fallback color */
+  background-color: rgba(0, 0, 0, 0.4);
+  /* Black w/ opacity */
+  padding-top: 40px;
+  padding-left: 60px;
+  padding-right: 60px;
+}
+
+.modal-content {
+  position: relative;
+  background-color: #fefefe;
+  margin: 5% auto 15% auto; /* 5% from the top, 15% from the bottom and centered */
+  padding: 50px 50px;
+  border: 1px solid #888;
+  width: 70%; /* Could be more or less, depending on screen size */
+}
+
+.modal .close {
+   position: absolute;
+  right: 20px;
+  top: 20px;
+  color: #000;
+  font-size: 35px;
+  font-weight: bold;
+  background-color: rgb(216, 228, 248);
+  padding: 0 7px;
+  border-radius: 4px;
+}
+
+.modal .close:hover,
+.modal .close:focus {
+  color: red;
+  cursor: pointer;
+}
+
+/* Responsive layout - when the screen is less than 800px wide, make the two columns stack on top of each other instead of next to each other (also change the direction - make the "cart" column go on top) */
+@media (max-width: 800px) {
+  .row {
+    flex-direction: column;
+  }
+  .col-25 {
+    margin-bottom: 20px;
+  }
+}
+  </style>
+</head>
+
+<body>
+<div class="form-container">
+  <div class="row">
+    <div class="col-50">
+      <h3>Item Details</h3>
+      <label for="product-name">Name</label>
+      <input type="text" id="product-name" name="productName">
+      <label for="product-description">Description</label>
+      <textarea name="productDescription" id="product-description" style="width:100%; height:50px;resize:vertical;"></textarea>
+    </div>
+    <div class="col-50">
+      <h3>Unit Prices</h3>
+      <label for="supplier-tin">Purchasing Price</label>
+      <input type="text" id="supplier-tin" name="supplierTIN">
+      <label for="supplier-licence">Selling Price</label>
+      <input type="text" id="supplier-licence" name="supplierLicence">
+    </div>
+  
+  </div>
+  <label for="product-remark">Remarks</label>
+  <textarea name="productRemark" id="product-remark" style="width:100%; height:100px"></textarea>
+  <div class="row" style="margin-top:20px">
+    <div class="col-50">
+      <button class="btn">Save</button>
+    </div>
+    <div class="col-50">
+      <button class="btn" style="background-color:red">Exit</button>
+    </div>
+  </div>
+</div>
+
+
+
+<script type="module" src="./supplier_page.js"></script>
+</body

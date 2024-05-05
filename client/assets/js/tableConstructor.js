@@ -10,7 +10,7 @@ function CreateTableFromData(combined_data) {
                       <div class="num_rows">
 		                    <div class="form-group">
                         <span>Show </span>
-			 		                <select class  ="form-control" name="state" id="maxRows">
+			 		                <select class="form-control" name="state" id="maxRows">
 						                <option value="10">10</option>
 						                <option value="20">20</option>
 						                <option value="50">50</option>

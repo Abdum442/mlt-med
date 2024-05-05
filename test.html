@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    * {
+      font-family: "Ubuntu", sans-serif;
+      /* margin: 0;
+      padding: 0; */
+      box-sizing: border-box;
+    }
+
+    :root {
+      --blue: #2a2185;
+      --white: #fff;
+      --gray: #f5f5f5;
+      --black1: #222;
+      --black2: #999;
+    }
+
+    /* Float two columns side by side */
+    .sales-column {
+      float: left;
+      padding: 0 5px;
+    }
+    .sales-first-col {
+      width: 40%;
+    }
+    .sales-second-col {
+      width: 60%;
+    }
+    /* Remove extra left and right margins, due to padding */
+    .sales-row-arrange {
+      margin: 0;
+      /* Adjusted to have similar gaps between rows */
+      overflow: hidden;
+      /* Clearfix */
+    }
+
+    /* Style the tab */
+    .sales-tab {
+      overflow: hidden;
+      border: 1px solid #ccc;
+      background-color: #f1f1f1;
+    }
+
+    .sales-card-header {
+      overflow: hidden;
+      border: 1px solid #ccc;
+      background-color: #f1f1f1;
+      font-size: 17px;
+      padding: 20px 20px;
+      font-weight: bold;
+    }
+
+    /* Style the buttons inside the tab */
+    .sales-tab button {
+      background-color: inherit;
+      float: left;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      padding: 20px 16px;
+      transition: 0.3s;
+      font-size: 17px;
+      font-weight: bold;
+    }
+
+    /* Change background color of buttons on hover */
+    .sales-tab button:hover {
+      background-color: #ddd;
+    }
+
+    /* Create an active/current tablink class */
+    .sales-tab button.sales-active {
+      background-color: #ccc;
+    }
+
+    /* Style the tab content */
+    .sales-tabcontent {
+      display: none;
+      padding: 6px 12px;
+      -webkit-animation: fadeEffect 1s;
+      animation: fadeEffect 1s;
+    }
+
+    /* Fade in tabs */
+    @-webkit-keyframes fadeEffect {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes fadeEffect {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    /* Responsive columns */
+    @media screen and (max-width: 600px) {
+      .sales-column {
+        width: 100%;
+        display: block;
+        margin-bottom: 20px;
+      }
+    }
+
+    /* Style the counter cards */
+    .sales-card {
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+      padding: 5px 0 5px 0;
+      margin: 0px 0;
+      text-align: left;
+      background-color: #fff;
+      border-radius: 3px;
+      /* Adjusted height */
+    }
+
+    .sales-row-arrange.sales-first-row .sales-column.sales-first-col #sales-product-card {
+      min-height: 55vh;
+    } 
+    .sales-row-arrange.sales-first-row .sales-column.sales-first-col #sales-customer-card {
+      min-height: 45vh;
+    }
+    .sales-row-arrange.sales-first-row .sales-column.sales-second-col .sales-card:first-child {
+      min-height: 81vh;
+    }
+
+    .sales-row-arrange.sales-first-row .sales-column.sales-second-col #sales-button-card {
+      min-height: 19vh;
+    }
+    /* .sales-row-arrange .sales-first-row .sales-column .sales-second-col .sales-card:nth-child(even) .sales-row {
+      margin: 0 -10px;
+    } */
+    .sales-row {
+      /* display: -ms-flexbox; */
+      /* IE10 */
+      display: flex;
+      /* -ms-flex-wrap: wrap; */
+      /* IE10 */
+      flex-wrap: wrap;
+      margin: 10px -16px;
+    }
+
+    .sales-row .sales-col-25 {
+      /* -ms-flex: 25%; */
+      /* IE10 */
+      flex: 30%;
+    }
+
+    .sales-col-50 {
+      /* -ms-flex: 50%; */
+      /* IE10 */
+      flex: 50%;
+    }
+
+    .sales-col-75 {
+      /* -ms-flex: 75%; */
+      /* IE10 */
+      flex: 70%;
+    }
+
+    .sales-col-25,
+    .sales-col-50,
+    .sales-col-75 {
+      padding: 0 16px;
+    }
+
+    .sales-container {
+      /* background-color: #f2f2f2; */
+      padding: 5px 20px 15px 20px;
+      /* border: 1px solid lightgrey; */
+      border-radius: 3px;
+    }
+
+    input[type=text] {
+      width: 100%;
+      margin-bottom: 20px;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+    }
+
+    /* input[type=checkbox] {
+      line-height: 100px;
+    } */
+
+    label {
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .sales-icon-container {
+      margin-bottom: 20px;
+      padding: 40px 0;
+      font-size: 16px;
+    }
+
+    .sales-table-container {
+      overflow-x: auto;
+      overflow-y: auto;
+      max-width: 100%;
+      max-height: 60vh;
+    }
+
+    .sales-btn {
+      background-color: #04AA6D;
+      color: var(--white);
+      padding: 12px;
+      /* margin: 10px 0; */
+      border: none;
+      width: 100%;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 17px;
+    }
+
+    #sales-checkout-btn {
+      background-color: var(--blue);
+      color: var(--white);
+    }
+
+    #sales-print-btn {
+      background-color: #2196F3;
+    }
+
+    #sales-exit-btn {
+      background-color: red;
+    }
+
+    .sales-btn:hover {
+      opacity: 0.8;
+    }
+
+    a {
+      color: #2196F3;
+    }
+
+    hr {
+      border: 1px solid lightgrey;
+    }
+
+    span.price {
+      float: right;
+      color: grey;
+    }
+
+    /* Responsive layout - when the screen is less than 800px wide, make the two columns stack on top of each other instead of next to each other (also change the direction - make the "cart" column go on top) */
+    @media (max-width: 800px) {
+      .sales-row {
+        flex-direction: column-reverse;
+      }
+
+      .sales-col-25 {
+        margin-bottom: 20px;
+      }
+    }
+#sales-current-order col-50 {
+  overflow-x: auto;
+  overflow-y: auto;
+  max-height: 400px;
+}
+
+.sales-details table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  /* white-space: nowrap; */
+}
+
+.sales-details table thead td {
+  font-weight: 600;
+}
+
+.sales-details table tbody tr {
+  color: var(--black1);
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.sales-details table thead:last-child tr {
+  border-top: 2px solid rgba(0, 0, 0, 0.5);
+}
+
+/* .details table thead:last-child tr td {
+  text-align: end;
+} */
+
+.sales-details table tbody tr:hover {
+  background: var(--blue);
+  color: var(--white);
+}
+
+.sales-details table tr td {
+  padding: 10px;
+  text-align: start;
+  /* max-width: 200px; */
+  /* overflow: hidden; */
+  /* text-overflow: ellipsis; */
+}
+
+.sales-modal {
+  display: none;
+  /* Hidden by default */
+  position: fixed;
+  /* Stay in place */
+  z-index: 1;
+  /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%;
+  /* Full width */
+  height: 100%;
+  /* Full height */
+  overflow: auto;
+  /* Enable scroll if needed */
+  /* background-color: rgb(0, 0, 0); */
+  /* Fallback color */
+  background-color: rgba(0, 0, 0, 0.4);
+  /* Black w/ opacity */
+  /* padding-top: 80px; */
+  /* padding-left: 60px;
+  padding-right: 60px; */
+}
+
+
+
+.sales-modal-container {
+  position: relative;
+  background-color: var(--white);
+  width: 100%;
+  margin: auto;
+  padding: 0 20px;
+  /* 5% from the top, 15% from the bottom and centered */
+  border: 5px solid var(--black2);
+  /* width: 70%; */
+  /* color: var(--blue); */
+  /* Could be more or less, depending on screen size */
+}
+
+.sales-receipt {
+      width: 100%;
+      /* border: 1px solid #ddd; */
+      padding: 20px;
+      border-radius: 2px;
+      height: 100vh;
+      margin: 0;
+    }
+
+.sales-receipt .sales-close {
+  position: absolute;
+  right: 30px;
+  top: 25px;
+  color: #000;
+  font-size: 35px;
+  font-weight: bold;
+  background-color: rgb(216, 228, 248);
+  padding: 0 7px;
+  border-radius: 4px;
+} 
+
+.sales-receipt .sales-close:hover,
+.sales-receipt .sales-close:focus {
+  color: red;
+  cursor: pointer;
+}
+
+    .sales-receipt .sales-header {
+      width: 100%;
+      text-align: center;
+    }
+
+    .sales-receipt .sales-store-info,
+    .sales-receipt .sales-customer-info {
+      margin-bottom: 20px;
+    }
+
+    .sales-receipt .sales-table {
+      width: 98%;
+      border-collapse: collapse;
+    }
+
+    .sales-receipt .sales-table td {
+      padding: 5px;
+      border: 2px solid #868282;
+      text-align: left;
+    }
+
+    .sales-receipt .sales-table tfoot td {
+      border: 0 solid white;
+      background-color: white;
+    }
+
+    .sales-receipt .sales-table thead tr td {
+      background-color: #f2f2f2;
+    }
+
+    .sales-receipt .sales-total {
+      font-weight: bold;
+    }
+
+    .sales-receipt .sales-table thead tr td {
+      font-weight: bold;
+    }
+
+    .sales-receipt td.sales-text-right {
+      text-align: right;
+    }
+    .sales-receipt .sales-table tr.sales-empty-tr {
+      height: 10px;
+    }
+
+    .sales-print-btn {
+      width: 70%;
+
+      margin: 20px auto;
+      text-align: center;
+      
+    }
+
+    .sales-print-btn button {
+      background-color: #04AA6D;
+      color: var(--white);
+      padding: 12px;
+      /* margin: 10px 0; */
+      border: none;
+      width: 50%;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 17px;
+    }
+
+    @media print {
+      .sales-details,
+      .sales-modal .sales-close,
+      .sales-print-btn {
+        display: none;
+      }
+    }
+
+
+
+  </style>
+</head>
+
+<body>
+  <div id="sales-main-container" class="sales-details"></div>
+  <div class="sales-modal" id="sales-modal"></div>
+
+  <!-- <script type="module" src="./node_modules/jspdf-invoice-template/dist/index.js"></script> -->
+  <script type="module" src="./sales_page.js"></script>
+  
+
+
+
+  <script>
+    // const customerWithholdCheck = document.getElementById('withhold-check');
+    // customerWithholdCheck.addEventListener('click', withholdStatus);
+    // function withholdStatus() {}
+
+    // function openCity(evt, cityName) {
+    //   var i, tabcontent, tablinks;
+    //   tabcontent = document.getElementsByClassName("tabcontent");
+    //   for (i = 0; i < tabcontent.length; i++) {
+    //     tabcontent[i].style.display = "none";
+    //   }
+    //   tablinks = document.getElementsByClassName("tablinks");
+    //   for (i = 0; i < tablinks.length; i++) {
+    //     tablinks[i].className = tablinks[i].className.replace(" active", "");
+    //   }
+    //   document.getElementById(cityName).style.display = "block";
+    //   evt.currentTarget.className += " active";
+    // }
+  </script>
+
+  
+
+</body>
+
+</html>

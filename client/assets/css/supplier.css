@@ -1,0 +1,201 @@
+:root {
+  --blue: #2a2185;
+  --white: #fff;
+  --gray: #f5f5f5;
+  --black1: #222;
+  --black2: #999;
+}
+#main-container .mainContainer {
+  width: 100%;
+  height: 100vh;
+  /* padding: 20px; */
+  /* box-shadow: 0 7px 25px rgba(0, 0, 0, 0.08); */
+  /* border-radius: 20px; */
+}
+#main-container .tab {
+  overflow: hidden;
+  background-color: navy;
+  /* border-top: 2px solid navy; */
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+}
+#main-container .tab button {
+  width: 50%;
+  background-color: inherit;
+  float: left;
+  outline: none;
+  cursor: pointer;
+  /* padding: 14px 16px; */
+  padding: 25px 16px;
+  transition: 0.3s;
+  font-size: 25px;
+  font-weight: bold;
+  color: white;
+  /* border-top: 2px solid navy;
+      border-left: 2px solid navy;
+      border-right: 2px solid navy; */
+  border: none;
+
+  
+}
+
+#main-container .tab button:hover {
+  background-color: var(--black2);
+  color: var(--white);
+}
+#main-container .tab button.active {
+  background-color: var(--gray);
+  color: var(--blue);
+}
+h1, h2, h3 {
+  margin: 20px 0;
+}#recent_orders .tab-content {
+  display: none;
+  width: 100%;
+  padding: 10px 15px;
+}
+#recent_orders .row {
+  display: -ms-flexbox;
+  /* IE10 */
+  display: flex;
+  -ms-flex-wrap: wrap;
+  /* IE10 */
+  flex-wrap: wrap;
+  margin: 0 -16px;
+}
+#recent_orders .col-25 {
+  -ms-flex: 25%;
+  /* IE10 */
+  flex: 25%;
+}
+#recent_orders .col-50 {
+  -ms-flex: 50%;
+  /* IE10 */
+  flex: 50%;
+}
+#recent_orders .col-75 {
+  -ms-flex: 75%;
+  /* IE10 */
+  flex: 75%;
+}
+#recent_orders .col-25,#recent_orders .col-50,#recent_orders .col-75 {
+  padding: 0 16px;
+}
+#recent_orders .form-container {
+  background-color: #f2f2f2;
+  width: 80%;
+  float: left;
+  padding: 5px 20px 15px 20px;
+  border: 1px solid lightgrey;
+  border-radius: 3px;
+}
+#recent_orders .modal .form-container{
+  width: 100%;
+}
+#recent_orders input[type=text] {
+  width: 100%;
+  margin-bottom: 20px;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+}
+#recent_orders textarea {
+  resize: vertical;
+  margin-bottom: 20px;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  min-height: 50px;
+}
+
+#recent_orders label {
+  margin-bottom: 10px;
+  display: block;
+}
+#recent_orders .btn {
+  background-color: #04AA6D;
+  color: white;
+  padding: 12px;
+  margin: 10px 0;
+  border: none;
+  width: 100%;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 17px;
+}
+#recent_orders .btn:hover {
+  background-color: #45a049;
+}
+#recent_orders a {
+  color: #2196F3;
+}
+#recent_orders hr {
+  border: 1px solid lightgrey;
+}
+#recent_orders span.price {
+  float: right;
+  color: grey;
+}
+#recent_orders .modal {
+  display: none;
+  /* Hidden by default */
+  position: fixed;
+  /* Stay in place */
+  z-index: 10;
+  /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%;
+  /* Full width */
+  height: 100%;
+  /* Full height */
+  overflow: auto;
+  /* Enable scroll if needed */
+  background-color: rgb(0, 0, 0);
+  /* Fallback color */
+  background-color: rgba(0, 0, 0, 0.4);
+  /* Black w/ opacity */
+  padding-top: 40px;
+  padding-left: 60px;
+  padding-right: 60px;
+}#recent_orders .modal .form-container {
+  float: none;
+}
+
+#recent_orders .modal-content {
+  position: relative;
+  background-color: #fefefe;
+  margin: 5% auto 15% auto;
+  /* 5% from the top, 15% from the bottom and centered */
+  padding: 50px 50px;
+  border: 1px solid #888;
+  width: 70%;
+  /* Could be more or less, depending on screen size */
+}
+
+#recent_orders .modal .close {
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  color: #000;
+  font-size: 35px;
+  font-weight: bold;
+  background-color: rgb(216, 228, 248);
+  padding: 0 7px;
+  border-radius: 4px;
+}
+#recent_orders .modal .close:hover,#recent_orders .modal .close:focus {
+  color: red;
+  cursor: pointer;
+}
+
+/* Responsive layout - when the screen is less than 800px wide, make the two columns stack on top of each other instead of next to each other (also change the direction - make the "cart" column go on top) */
+@media (max-width: 800px) {
+#recent_orders .row {
+    flex-direction: column;
+  }
+
+  #recent_orders .col-25 {
+    margin-bottom: 20px;
+  }
+}

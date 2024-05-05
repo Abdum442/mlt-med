@@ -1,4 +1,5 @@
 const Pool = require('pg').Pool
+
 const pool = new Pool({
   user: 'mlt',
   host: 'localhost',
@@ -48,12 +49,12 @@ const getSuppliers = (request, response) => {
 }
 
 const addSupplier = (request, response) => {
-  const { supplierName, contactInfo, address, taxInfo, LicenceNumber, remark } = request.body
+  const { supplierName, contactInfo, address, taxInfo, licenceNumber, remark } = request.body
 
   // console.log('Supplier Name: ', supplierName);
 
   pool.query('INSERT INTO suppliers (name, contactinfo, address, taxinfo, licencenumber, remark) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id', 
-    [supplierName, contactInfo, address, taxInfo, LicenceNumber, remark], (error, results) => {
+    [supplierName, contactInfo, address, taxInfo, licenceNumber, remark], (error, results) => {
     if (error) {
       throw error
     }
@@ -63,11 +64,11 @@ const addSupplier = (request, response) => {
 
 const updateSupplier = (request, response) => {
   const iD = parseInt(request.params.id)
-  const { id, supplierName, contactInfo, address, taxInfo, LicenceNumber, remark } = request.body
+  const { id, supplierName, contactInfo, address, taxInfo, licenceNumber, remark } = request.body
 
   pool.query(
     'UPDATE suppliers SET name = $1, contactinfo = $2, address = $3, taxinfo = $4, licencenumber = $5, remark = $6  WHERE id = $7',
-    [supplierName, contactInfo, address, taxInfo, LicenceNumber, remark, iD],
+    [supplierName, contactInfo, address, taxInfo, licenceNumber, remark, iD],
     (error, results) => {
       if (error) {
         throw error
@@ -127,12 +128,12 @@ const getRetailers = (request, response) => {
 }
 
 const addRetailer = (request, response) => {
-  const { retailerName, contactInfo, address, remark } = request.body
+  const { retailerName, contactInfo, address, taxInfo, licenceNumber, remark } = request.body
 
   // console.log('request: ', request.body);
 
-  pool.query('INSERT INTO retailers (name, contact, address, remarks) VALUES ($1, $2, $3, $4) RETURNING id',
-    [retailerName, contactInfo, address, remark], (error, results) => {
+  pool.query('INSERT INTO retailers (name, contact, address, tinnumber, licencenumber, remarks) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id',
+    [retailerName, contactInfo, address, taxInfo, licenceNumber, remark], (error, results) => {
       if (error) {
         throw error
       }
@@ -142,11 +143,11 @@ const addRetailer = (request, response) => {
 
 const updateRetailer = (request, response) => {
   const iD = parseInt(request.params.id)
-  const { id, retailerName, contactInfo, address, remark } = request.body
+  const { id, retailerName, contactInfo, address, taxInfo, licenceNumber, remark } = request.body
 
   pool.query(
-    'UPDATE retailers SET name = $1, contact = $2, address = $3, remarks = $4  WHERE id = $5',
-    [retailerName, contactInfo, address, remark, iD],
+    'UPDATE retailers SET name = $1, contact = $2, address = $3, tinnumber =$4, licencenumber = $5, remarks = $6  WHERE id = $7',
+    [retailerName, contactInfo, address, taxInfo, licenceNumber, remark, iD],
     (error, results) => {
       if (error) {
         throw error
@@ -190,13 +191,13 @@ const addProduct = (request, response) => {
 }
 const updateProduct = (request, response) => {
   const iD = parseInt(request.params.id)
-  const { id, name, description, purchase_price, saling_price, expiry_date, supplier_id, remarks } = request.body
+  const { id, productName, productDescription, sellingPrice, productRemark } = request.body
 
   // console.log('Expiry Date : ', [iD, name, purchase_price, saling_price, expiry_date, supplier_id, remarks]);
 
   pool.query(
-    'UPDATE products SET name = $1, description = $2, purchase_price = $3, saling_price = $4, expiry_date = $5, supplier_id = $6, remarks = $7  WHERE id = $8',
-    [name, description, purchase_price, saling_price, expiry_date, supplier_id, remarks, iD],
+    'UPDATE products SET name = $1, description = $2, saling_price = $3, remarks = $4  WHERE id = $5',
+    [productName, productDescription, sellingPrice, productRemark, iD],
     (error, results) => {
       if (error) {
         throw error
@@ -382,6 +383,19 @@ const addBankDetails = (request, response) => {
     })
 }
 
+const getSalesOrderData = (request, response) => {
+  pool.query('SELECT * FROM sales_order ORDER BY id ASC', (error, results) => {
+    if (error) {
+      throw error
+    }
+    response.status(200).json(results.rows)
+  })
+}
+
+const salesOrder = {
+  getSalesOrderData
+}
+
 const userData = {
   getUsers,
   getUserById,
@@ -458,5 +472,6 @@ module.exports = {
   expenseData,
   loansData,
   debitData,
-  bankData
+  bankData,
+  salesOrder
 }

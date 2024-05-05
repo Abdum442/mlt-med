@@ -73,7 +73,7 @@ viewSupplierBtn.addEventListener('click', function (){
 
   
 
-  mainContainer.querySelectorAll('table tbody tr').forEach(function (tr) {
+  mainContainer.querySelectorAll('#table-container table tbody tr').forEach(function (tr) {
 
     const rowData = {};
 
@@ -89,7 +89,7 @@ viewSupplierBtn.addEventListener('click', function (){
     tr.querySelector(".drop-btn").addEventListener('click', function (event) {
       event.stopPropagation();
 
-      const dropContent = tr.querySelector("td .drop-btn").nextElementSibling;
+      const dropContent = tr.querySelector("td .drop-content").nextElementSibling;
 
       dropContent.classList.add('show');
 

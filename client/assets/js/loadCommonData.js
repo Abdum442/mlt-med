@@ -6,6 +6,8 @@ const settingMenu = document.getElementById('setting');
 
 const mainContainer = document.getElementById('mainContainer');
 
+const modalLoader = document.getElementById('modal-loader');
+
 // transactionMgtMenu.parentElement.addEventListener('click', function () {
 //   alert('transaction menu is clicked');
 // })
@@ -16,6 +18,7 @@ if (user){
 
 
 const frequentData = async function () {
+  modalLoader.style.display = 'block';
   const raw_users_data = await window.electronAPI.fetchData('fetch-users-data');
   localStorage.setItem('users-data', raw_users_data);
 
@@ -45,6 +48,10 @@ const frequentData = async function () {
 
   const raw_debit_data = await window.electronAPI.fetchData('fetch-debit-data');
   localStorage.setItem('debit-data', raw_debit_data);
+
+  const raw_sales_order_data = await window.electronAPI.fetchData('fetch-orders-data');
+  localStorage.setItem('orders-data', raw_sales_order_data);
+  modalLoader.style.display = 'none';
 };
 
 customerMgtMenu.addEventListener('click', frequentData);

@@ -1,217 +1,188 @@
 import { CreateTableFromData, clickable_dropdown_btn } from "./tableConstructor.js";
-import { productForm } from './productForm.js';
 
 const inventoryMgtMenu = document.getElementById('inventoryMgt');
 
-const productBtn = document.getElementById('productBtn');
-const stockMgtBtn = document.getElementById('stockBtn');
-const ExpiryDateBtn = document.getElementById('expiryDateBtn');
+let rowData = {}; 
 
-const mainContainer = document.getElementById('mainContainer');
-const addNewBtn = document.getElementById('add_new');
+inventoryMgtMenu.addEventListener('click', function () {
+  const inventoryContent = document.body.querySelector('.details .recentOrders');
+  inventoryContent.innerHTML = '';
 
-const pageTitle = document.querySelector('#recent_orders .cardHeader h2');
+  const tabContainer = inventoryContainer();
+  const productModal = createProductModal();
 
-const productsTableHeader = ['ID', 'Name', 'Description', 'Selling Price',
-  'Expiry Date', 'Remarks'];
+  const productContent = tabContainer.querySelector('#product-content');
+  const stockContent = tabContainer.querySelector('#stock-content');
+  const expiryContent = tabContainer.querySelector('#expiry-content');
 
-let commonData = {
-  tableId: "mainContainer",
-  tableHeader: [],
-  tableData: []
-};
+  inventoryContent.appendChild(tabContainer);
+  inventoryContent.appendChild(productModal);
 
-productBtn.addEventListener('click', function () {
+  manageTabEvents(tabContainer);
+
+  productDetails(productContent, productModal);
+  stockDetails(stockContent);
+  expiryDateDetails(expiryContent);
+  productModal.querySelector('.product-save').addEventListener('click', function () {
+    saveProductDetails(productModal);
+  });
+});
+
+function manageTabs(tabId, contId) {
+  const tab = document.getElementById(tabId);
+  const tabCont = document.getElementById(contId);
+  var i, tabLinks, tabContents;
+  tabLinks = document.getElementsByClassName('tab-link');
+  tabContents = document.getElementsByClassName('tab-content')
+  for (i = 0; i < tabLinks.length; i++) {
+    tabLinks[i].classList.remove('active');
+    tabContents[i].style.display = 'none';
+  }
+  tab.classList.add('active');
+  tabCont.style.display = 'block';
+}
+
+function manageTabEvents(tab_cont) {
+  const productTab = tab_cont.querySelector('#product');
+  const stockTab = tab_cont.querySelector('#stock');
+  const expiryTab = tab_cont.querySelector('#expiry');
+
+  productTab.addEventListener('click', function () {
+    manageTabs('product', 'product-content')
+  });
+  stockTab.addEventListener('click', function () {
+    manageTabs('stock', 'stock-content')
+  });
+  expiryTab.addEventListener('click', function () {
+    manageTabs('expiry', 'expiry-content')
+  });
+
+  productTab.click();
+}
+
+function inventoryContainer() {
+  const tabContainer = document.createElement('div');
+  tabContainer.className = 'tab-container';
+  tabContainer.id = "inventory-container"
+
+  tabContainer.innerHTML = `<div class="tab">
+              <button class="tab-link" id="product">Products</button>
+              <button class="tab-link" id="stock">Stock Level</button>
+              <button class="tab-link" id="expiry"> Expiry Date Tracker</button>
+            </div>
+            <div class="tab-content" id="product-content">
+              <h2>Product</h2>
+            </div>
+            <div class="tab-content" id="stock-content">
+              <h2>Stock Level</h2>
+            </div>
+            <div class="tab-content" id="expiry-content">
+              <h2>Expiry Date Tracker</h2>
+            </div>`;
+  return tabContainer;
+}
+
+function productDetails(product_tab, product_modal) {
+  product_tab.innerHTML = '';
+  const productsTableHeader = ['ID', 'Name', 'Description', 'Selling Price',
+    'Expiry Date', 'Remarks'];
+
+  let commonData = {
+    tableId: "product-content",
+    tableHeader: productsTableHeader,
+    tableData: []
+  };
+
   const productsRawData = localStorage.getItem('products-data');
 
   const productsObjData = JSON.parse(productsRawData);
+  
+  const productMap = new Map(productsObjData.map(item => [parseInt(item.id), item.purchase_price]));
 
-  const productsTableData = productsObjData.map(obj => [obj.id, obj.name, obj.description, obj.saling_price,
-    formatDate(obj.expiry_date), obj.remarks]);
-  addNewBtn.style.display = 'block';
-  pageTitle.innerHTML = 'Product List';
+  const productsTableData = productsObjData.map(obj => [obj.id, obj.name, obj.description, formatNumber(parseFloat(obj.saling_price)),
+  formatDate(obj.expiry_date), obj.remarks]);
 
-  commonData.tableHeader = productsTableHeader;
   commonData.tableData = productsTableData;
 
   const productsHTMLtable = new CreateTableFromData(commonData);
 
   productsHTMLtable.renderTable();
 
-  clickable_dropdown_btn(mainContainer.querySelector('table'));
+  clickable_dropdown_btn(product_tab.querySelector('table'));
 
-  addNewBtn.addEventListener('click', function (event) {
-    event.stopPropagation();
-    addNewBtn.style.display = 'none';
-
-    const suppliersRawData = localStorage.getItem('suppliers-data');
-
-    const supplierObjData = JSON.parse(suppliersRawData);
-
-    const supplierNames = supplierObjData.map(obj => ({id: obj.id, name: obj.name}));
-
-    productForm.showProductForm(supplierNames);
-
-    const productHTMLForm = document.getElementById('productForm');
-
-    productHTMLForm.parentNode.querySelector('#modify_btn').style.display = 'none'
-
-    pageTitle.innerHTML = 'Product Registration Form';
-
-    productHTMLForm.parentNode.querySelector('#save_btn').addEventListener('click', async function (event) {
+  product_tab.querySelectorAll('table tbody tr').forEach(function (tr) {
+    // console.log(tr.cells[0].textContent, tr.cells[4].textContent);
+    tr.querySelector("td .drop-btn").addEventListener('click', function (event) {
       event.stopPropagation();
 
-      const supplierPair = productHTMLForm.querySelector('#supplierId_input').value.split(/\s+/);
-      const supplierId = supplierPair[supplierPair.length - 1];
+      rowData['id'] = tr.cells[0].textContent;
+      rowData['productName'] = tr.cells[1].textContent;
+      rowData['productDescription'] = tr.cells[2].textContent;
+      rowData['sellingPrice'] = reformatNumber(tr.cells[3].textContent);
+      rowData['expiryDate'] = tr.cells[4].textContent;
+      rowData['remark'] = tr.cells[5].textContent;
+      rowData['purchasePrice'] = productMap.get(parseInt(rowData.id));
 
-      const formValues = {
-        name: productHTMLForm.querySelector('#productName').value,
-        description: productHTMLForm.querySelector('#description').value,
-        supplier_id: supplierId,
-        purchase_price: productHTMLForm.querySelector('#purchasePrice').value,
-        saling_price: productHTMLForm.querySelector('#SellingPrice').value,
-        expiry_date: productHTMLForm.querySelector('#expiryDate').value,
-        remarks: productHTMLForm.querySelector('#remark').value,
-      };
-
-      const rowRawData = await window.electronAPI.fetchData('add-products-data', formValues);
-
-      // const res = JSON.parse(rowRawData);
-      // rowList[0] = res[0].id;
-      // supplierTableData.push(rowList);
-
-      mainContainer.innerHTML = '';
-
-      setTimeout(() => {
-        inventoryMgtMenu.click();
-        productBtn.click();
-      }, 1000);
-    });
-  });
-
-  mainContainer.querySelectorAll('table tbody tr').forEach(function (tr) {
-
-    const rowData = {};
-
-    for (const product of productsObjData) {
-      const expDate = new Date(product.expiry_date);
-      // console.log('date : ', expDate.toISOString().slice(0, 10));
-      if (product.id == tr.cells[0].textContent) {
-        rowData['id'] = product.id;
-        rowData['name'] = product.name;
-        rowData['description'] = product.description;
-        rowData['purchase_price'] = product.purchase_price;
-        rowData['saling_price'] = product.saling_price;
-        rowData['expiry_date'] = expDate.toISOString().slice(0, 10);
-        rowData['remarks'] = product.remarks;
-        rowData['supplier_id'] = product.supplier_id;
-      }
-    }
-
-    
-
-    tr.querySelector(".drop-btn").addEventListener('click', function (event) {
-      event.stopPropagation();
-
-      const dropContent = tr.querySelector("td .drop-btn").nextElementSibling;
+      const dropContent = tr.cells[6].querySelector("td .dropdown-btn .drop-content");
 
       dropContent.classList.add('show');
 
-
-
-      const modifyBtn = tr.querySelector("td .modify");
-      // console.log("modify btn: ", modifyBtn);
-
+      const modifyBtn = dropContent.querySelector(".modify");
       const deleteBtn = dropContent.querySelector('.delete');
+
+      deleteBtn.style.display = 'none';
 
       modifyBtn.addEventListener('click', function (event) {
         event.stopPropagation();
-        mainContainer.style.display = 'none';
+        product_modal.querySelector('[name="productName"]').value = rowData.productName;
+        product_modal.querySelector('[name="productDescription"]').value = rowData.productDescription;
+        const purchasePrice = Number(rowData.purchasePrice);
+        product_modal.querySelector('[name="purchasePrice"]').value = formatNumber(purchasePrice);
+        product_modal.querySelector('[name="sellingPrice"]').value = rowData.sellingPrice;
+        product_modal.querySelector('[name="productRemark"]').value = rowData.remark;
 
-        console.log('rowData: ', rowData);
-
-        addNewBtn.click();
-
-        const productHTMLForm = mainContainer.querySelector('#productForm');
-        // console.log(supplierForm)
-
-
-        productHTMLForm.querySelector('[name="productName"]').value = rowData.name;
-        productHTMLForm.querySelector('[name="description"]').value = rowData.description;
-        productHTMLForm.querySelector('[name="purchasePrice"]').value = rowData.purchase_price;
-        productHTMLForm.querySelector('[name="SellingPrice"]').value = rowData.saling_price;
-        productHTMLForm.querySelector('#expiryDate').value = rowData.expiry_date;
-        productHTMLForm.querySelector('[name="remark"]').value = rowData.remarks;
-        productHTMLForm.querySelector('#supplierId_input').value = rowData.supplier_id;
-
-
-
-
-        productHTMLForm.parentNode.querySelector('#save_btn').style.display = 'none';
-
-        productHTMLForm.parentNode.querySelector('#modify_btn').style.display = 'block';
-
-        mainContainer.style.display = 'block';
-
-        productHTMLForm.parentNode.querySelector('#modify_btn').addEventListener('click', async function () {
-
-        const supplierPair = productHTMLForm.querySelector('#supplierId_input').value.split(/\s+/);
-        const supplierId = supplierPair[supplierPair.length - 1];
-
-        const formValues = {
-          id: rowData.id,
-          name: productHTMLForm.querySelector('#productName').value,
-          description: productHTMLForm.querySelector('#description').value,
-          supplier_id: supplierId,
-          purchase_price: productHTMLForm.querySelector('#purchasePrice').value,
-          saling_price: productHTMLForm.querySelector('#SellingPrice').value,
-          expiry_date: productHTMLForm.querySelector('#expiryDate').value,
-          remarks: productHTMLForm.querySelector('#remark').value,
-        };
-
-        
-
-          const id = await window.electronAPI.fetchData('modify-products-data', formValues);
-
-          mainContainer.innerHTML = '';
-          setTimeout(() => {
-            inventoryMgtMenu.click();
-            productBtn.click();
-          }, 1000);
-        });
+        product_modal.querySelector('[name="purchasePrice"]').disabled = true;
+        product_modal.style.display = 'block';
       });
+      // deleteBtn.addEventListener('click', async function (event) {
+      //   event.stopPropagation();
 
-      deleteBtn.addEventListener('click', async function (event) {
-        event.stopPropagation();
+      //   const dataID = { id: rowData.id };
+      //   const id = await window.electronAPI.fetchData('delete-suppliers-data', dataID);
+      //   alert(`Supplier with id: ${id} is deleted`);
+      //   viewTab.click();
+      //   setTimeout(() => {
+      //     customerMgt.click();
+      //     viewSupplierBtn.click();
+      //   }, 1000);
+      // });
 
-        const id = window.electronAPI.fetchData('delete-products-data', rowData);
-
-        mainContainer.innerHTML = '';
-        setTimeout(() => {
-          inventoryMgtMenu.click()
-          productBtn.click();
-        }, 1000);
-      });
+      // dropContent.classList.remove('show');
     });
   });
-});
-const stockTableHeader = ['Item Name', 'Quantity', 'Purchase ID', 'Supplier', 'Remarks'];
 
-stockMgtBtn.addEventListener('click', function () {
-  pageTitle.innerHTML = 'Company Stock';
-  mainContainer.innerHTML = '';
+}
+
+function stockDetails(stock_tab) {
+  stock_tab.innerHTML = '';
+  const stockTableHeader = ['Item Name', 'Quantity', 'Purchase ID', 'Supplier', 'Remarks'];
+
+  let commonData = {
+    tableId: "stock-content",
+    tableHeader: stockTableHeader,
+    tableData: []
+  };
 
   const stockObjData = JSON.parse(localStorage.getItem('stock-data'));
   const productObjData = JSON.parse(localStorage.getItem('products-data'));
 
-  const productMap = new Map(productObjData.map(prod => [prod.id, prod.name]));
+  const productMap = new Map(productObjData.map(prod => [parseInt(prod.id), prod.name]));
 
   const stockTableData = stockObjData.map(obj => {
-    const prodName = productMap.get(obj.product_id);
+    const prodName = productMap.get(parseInt(obj.product_id));
     return [prodName, obj.quantity, obj.purchase_id, obj.supplier_id, obj.remarks];
   });
 
-  addNewBtn.style.display = 'block';
 
   commonData.tableHeader = stockTableHeader;
   commonData.tableData = stockTableData;
@@ -219,19 +190,121 @@ stockMgtBtn.addEventListener('click', function () {
   const stockHTMLtable = new CreateTableFromData(commonData);
 
   stockHTMLtable.renderTable();
+}
+
+function expiryDateDetails (expiry_tab) {
+  expiry_tab.innerHTML = '';
+
+  let commonData = {
+    tableId: "expiry-content",
+    tableHeader: '',
+    tableData: []
+  };
+
+    const expiryDateTableHeader = ['ID', 'Item', 'Expiry Date', 'Status'];
+
+    const productObjData = JSON.parse(localStorage.getItem('products-data'));
+
+    const expiryDateTableData = productObjData.map(product => {
+      return [product.id, product.name, formatDate(product.expiry_date), ""];
+    });
+
+    commonData.tableHeader = expiryDateTableHeader;
+    commonData.tableData = expiryDateTableData;
+
+    const expiryDateTable = new CreateTableFromData(commonData);
+
+    expiryDateTable.renderTable();
+
+    expiry_tab.querySelectorAll('table tbody tr').forEach(function (tr) {
+      const expiry_date = new Date(tr.cells[2].textContent);
+
+      // console.log(tr.cells[0].textContent, tr.cells[2].textContent);
+      const today = new Date();
+      const timeRemaining = Math.floor((expiry_date - today) / (1000 * 60 * 60 * 24));
+
+      if (timeRemaining < 30) {
+        tr.cells[3].innerHTML = `<span class="status return">Expired / Expiring Soon</span>`;
+      } else if (timeRemaining < 60) {
+        tr.cells[3].innerHTML = `<span class="status pending">Near Expiry</span>`;
+      } else {
+        tr.cells[3].innerHTML = `<span class="status delivered">Full Shelf Life</span>`;
+      }
+    });
+} 
+
+function createProductModal() {
+  const modal = document.createElement('div');
+  modal.className = 'modal';
+  modal.id = 'product-modal'
+  modal.innerHTML =
+    `<div class="modal-content">
+      <span onclick="document.getElementById('product-modal').style.display='none'" class="close" title="Close Modal">&times;</span>
+      <h2>Edit Item Info</h2>
+      <div class="form-container">
+        <div class="row">
+          <div class="col-50">
+            <h3>Item Details</h3>
+            <label for="product-name">Name</label>
+            <input type="text" id="product-name" name="productName">
+            <label for="product-description">Description</label>
+            <textarea name="productDescription" id="product-description" style="width:100%; height:50px;resize:vertical;"></textarea>
+          </div>
+          <div class="col-50">
+            <h3>Unit Prices</h3>
+            <label for="purchase-price">Purchasing Price</label>
+            <input type="text" id="purchase-price" name="purchasePrice">
+            <label for="selling-price">Selling Price</label>
+            <input type="text" id="selling-price" name="sellingPrice">
+          </div>
+        </div>
+        <label for="product-remark">Remarks</label>
+        <textarea name="productRemark" id="product-remark" style="width:100%; height:100px"></textarea>
+        <div class="row" style="margin-top:20px">
+          <div class="col-50">
+            <button class="btn product-save">Save</button>
+          </div>
+          <div class="col-50">
+            <button onclick="document.getElementById('product-modal').style.display='none'" class="btn" style="background-color:red">Exit</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  return modal;
+}
+
+async function saveProductDetails(product_modal) {
+
+  const formData = {};
+
+  formData['id'] = rowData.id;
+  formData['productName'] = product_modal.querySelector('[name="productName"]').value;
+  formData['productDescription'] = product_modal.querySelector('[name="productDescription"]').value;
+  const selling_price = parseInt(product_modal.querySelector('[name="sellingPrice"]').value)
+  formData['sellingPrice'] = selling_price;
+  formData['productRemark'] = product_modal.querySelector('[name="productRemark"]').value;
+  console.log('remark: ', formData.productRemark);
 
 
-});
 
-ExpiryDateBtn.addEventListener('click', trackExpiryDate);
+  const id = await window.electronAPI.fetchData('modify-products-data', formData);
 
+  product_modal.style.display = 'none';
+} 
 
-//========================utility functions====================
+function formatNumber(number) {
+  return number.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionsDigits: 2 })
+}
+function reformatNumber(text) {
+  const number = text.replace(/,/g, "");
+  return parseFloat(number);
+}
+
+// //========================utility functions====================
 function formatDate(dateString) {
-  // Parse the date string using Date.parse() for better compatibility
+
   const dateObject = new Date(dateString);
 
-  // Define default formatting options
   const options = {
     year: 'numeric',
     month: '2-digit',
@@ -245,37 +318,3 @@ function formatDate(dateString) {
   return formattedDate;
 }
 
-function trackExpiryDate() {
-  pageTitle.innerHTML = 'Tracking Expiry Date';
-  const expiryDateTableHeader = ['ID', 'Item', 'Expiry Date', 'Status'];
-  const productObjData = JSON.parse(localStorage.getItem('products-data'));
-
-  const expiryDateTableData = productObjData.map(product => {
-    return [product.id, product.name, product.expiry_date, ""];
-  });
-
-  commonData.tableHeader = expiryDateTableHeader;
-  commonData.tableData = expiryDateTableData;
-
-  const expiryDateTable = new CreateTableFromData(commonData);
-
-  expiryDateTable.renderTable();
-
-  mainContainer.querySelectorAll('table tbody tr').forEach(function (tr) {
-    const expiry_date = new Date(tr.cells[2].textContent);
-    const today = new Date();
-    tr.cells[2].textContent = formatDate(expiry_date);
-
-    const timeRemaining = Math.floor((expiry_date - today) / (1000 * 60 * 60 * 24));
-
-    if (timeRemaining < 30) {
-      tr.cells[3].innerHTML = `<span class="status return">Expired / Expiring Soon</span>`;
-    } else if (timeRemaining < 60) {
-      tr.cells[3].innerHTML = `<span class="status pending">Near Expiry</span>`;
-    } else {
-      tr.cells[3].innerHTML = `<span class="status delivered">Full Shelf Life</span>`;
-    }
-  });
-  
-
-}

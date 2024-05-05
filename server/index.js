@@ -60,6 +60,8 @@ app.post('/debit', db.debitData.addDebit);
 app.get('/banks', db.bankData.getBankDetails);
 app.post('/banks', db.bankData.addBankDetails);
 
+app.get('/orders', db.salesOrder.getSalesOrderData);
+
 app.listen(port, () => {
   console.log(`App running on port ${port}.`)
 })

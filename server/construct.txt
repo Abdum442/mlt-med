@@ -99,6 +99,18 @@ CREATE TABLE company_debit(
   remarks VARCHAR(100)
 );
 
+CREATE TABLE sales_order(
+  id SERIAL PRIMARY KEY,
+  customer_id INTEGER REFERENCES retailers(id) ON UPDATE CASCADE,
+  order_date DATE,
+  total_amount NUMERIC(10, 2),
+  checkout_status BOOLEAN 
+);
+
+
+// To alter an existing TABLE - add column
+ALTER TABLE table_name ADD COLUMN column_name VARCHAR(100);
+
 
 
 

@@ -69,6 +69,22 @@ const addData = (urlRout) => {
   });
 };
 
+const salesReportWindow = () => {
+  ipcMain.handle('open-sales-window', (event, data) => {
+    const salesWin = new BrowserWindow({
+      width: 1200,
+      height: 2000,
+      webPreferences: {
+        preload: path.join(__dirname, 'preload.js'),
+        nodeIntegration: true,
+      },
+    });
+    // salesWin.maximize()
+
+    salesWin.loadFile(data.file);
+  })
+}
+
 fetchData('users');
 fetchData('suppliers');
 fetchData('retailers');
@@ -80,6 +96,8 @@ fetchData('expenses');
 fetchData('loans');
 fetchData('debit');
 fetchData('banks');
+
+fetchData('orders');
 
 
 // addData('users');
@@ -106,172 +124,8 @@ deleteData('suppliers');
 deleteData('retailers');
 deleteData('products');
 
+salesReportWindow();
 
-// const fetchSupplierReply = (_event, _data) => {
-//   _event.reply('fetch-suppliers-data-response', _data);
-// };
-
-// const fetchSupplierData = async (event, data) => {
-//   try { 
-//     const response = await axios.get(`${serverUrl}/suppliers`, data);
-//     event.reply('fetch-suppliers-data-response', response.data);
-//     // fetchSupplierReply(event, response.data);
-
-//   } catch (error) {
-//     if (error.code === 'ECONNRESET' || error.code === 'ECONNABORTED') {
-//       console.error('Connection error:', error.message);
-//     } else {
-//       console.error('Other error:', error);
-//     }
-//     console.error(error);
-//   }
-// };
-
-// const addSupplierReply = (_event, _data) => {
-//   _event.reply('add-supplier-data-response', _data);
-// };
-
-// const addSupplierData = async (event, data) => {
-//   try {
-//     const response = await axios.post(`${serverUrl}/suppliers`, data);
-//     event.reply('add-supplier-data-response', response.data);
-//     // addSupplierReply(event, response.data);
-
-//   } catch (error) {
-//     if (error.code === 'ECONNRESET' || error.code === 'ECONNABORTED') {
-//       console.error('Connection error:', error.message);
-//     } else {
-//       console.error('Other error:', error);
-//     }
-//     console.error(error);
-//   }
-// };
-
-// const modifySupplierReply = (_event, _data) => {
-//   _event.reply('modify-supplier-data-response', _data);
-// };
-
-// const modifySupplierData = async (event, data) => {
-//   try {
-//     const response = await axios.put(`${serverUrl}/suppliers/${parseInt(data.id)}`, data);
-//     event.reply('modify-supplier-data-response', response.data);
-
-//     // modifySupplierReply(event, response.data);
-
-//   } catch (error) {
-//     if (error.code === 'ECONNRESET' || error.code === 'ECONNABORTED') {
-//       console.error('Connection error:', error.message);
-//     } else {
-//       console.error('Other error:', error);
-//     }
-//     console.error(error);
-//   }
-// };
-
-// const deleteSupplierReply = (_event, _data) => {
-//   _event.reply('delete-supplier-data-response', _data);
-// };
-
-// const deleteSupplierData =  async (event, data) => {
-//   try {
-//     const response = await axios.delete(`${serverUrl}/suppliers/${parseInt(data.id)}`, data);
-//     event.reply('delete-supplier-data-response', response.data);
-
-//     // deleteSupplierReply(event, response.data);
-
-//   } catch (error) {
-//     if (error.code === 'ECONNRESET' || error.code === 'ECONNABORTED') {
-//       console.error('Connection error:', error.message);
-//     } else {
-//       console.error('Other error:', error);
-//     }
-//     console.error(error);
-//   }
-// };
-
-// //---------------Retailer Data------------------------------------------
-
-// const fetchRetailerReply = (_event, _data) => {
-//   _event.reply('fetch-retailer-data-response', _data);
-// };
-
-// const fetchRetailerData = async (event, args) => {
-//   try {
-//     const response = await axios.get(`${serverUrl}/retailers`);
-
-//     event.reply('fetch-retailer-data-response', response.data);
-//     // fetchRetailerReply(event, response.data);
-
-//   } catch (error) {
-//     console.error(error);
-//   }
-// };
-
-// const addRetailerReply = (_event, _data) => {
-//   _event.reply('add-retailer-data-response', _data);
-// };
-
-// const addRetailerData = async (event, data) => {
-//   try {
-//     const response = await axios.post(`${serverUrl}/retailers`, data);
-
-//     event.reply('add-retailer-data-response', response.data);
-
-//     // addRetailerReply(event, response.data);
-
-//   } catch (error) {
-//     if (error.code === 'ECONNRESET' || error.code === 'ECONNABORTED') {
-//       console.error('Connection error:', error.message);
-//     } else {
-//       console.error('Other error:', error);
-//     }
-//     console.error(error);
-//   }
-// };
-
-// const modifyRetailerReply = (_event, _data) => {
-//   _event.reply('modify-retailer-data-response', _data);
-// };
-
-// const modifyRetailerData = async (event, data) => {
-//   try {
-//     const response = await axios.put(`${serverUrl}/retailers/${parseInt(data.id)}`, data);
-
-//     event.reply('modify-retailer-data-response', response.data);
-
-//     // modifyRetailerReply('modify-retailer-data-response', response.data);
-
-//   } catch (error) {
-//     if (error.code === 'ECONNRESET' || error.code === 'ECONNABORTED') {
-//       console.error('Connection error:', error.message);
-//     } else {
-//       console.error('Other error:', error);
-//     }
-//     console.error(error);
-//   }
-// };
-
-// const deleteRetailerReply = (_event, _data) => {
-//   _event.reply('delete-retailer-data-response', _data);
-// };
-
-// const deleteRetailerData = async (event, data) => {
-//   try {
-//     const response = await axios.delete(`${serverUrl}/retailers/${parseInt(data.id)}`, data);
-
-//     event.reply('delete-retailer-data-response', response.data);
-
-
-
-//   } catch (error) {
-//     if (error.code === 'ECONNRESET' || error.code === 'ECONNABORTED') {
-//       console.error('Connection error:', error.message);
-//     } else {
-//       console.error('Other error:', error);
-//     }
-//     console.error(error);
-//   }
-// }
 
 
 
@@ -288,27 +142,7 @@ const createWindow = () => {
 
   win.loadFile('index.html');
 
-  // fetchData('users');
-
-  // //--------------Suppliers Data-------------------------------
-
-  // fetchData('suppliers');
-
-  // addData('suppliers');
-
-  // modifyData('suppliers');
-
-  // deleteData('suppliers');
-
-
-  // // -----------------------Retailer--------------------------
-  // fetchData('retailers');
-
-  // addData('retailers')
-
-  // modifyData('retailers');
- 
-  // deleteData('retailers');
+  
 }
 
 

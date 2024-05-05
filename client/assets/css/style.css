@@ -372,13 +372,8 @@ body {
 
 /* ================== Order Details List ============== */
 .details {
-  position: relative;
   width: 100%;
   padding: 20px;
-  display: grid;
-  grid-template-columns: 3fr 1fr;
-  grid-gap: 30px;
-  /* margin-top: 10px; */
 }
 
 .details .recentOrders {
@@ -386,7 +381,7 @@ body {
   display: grid;
   min-height: 100px;
   background: var(--white);
-  padding: 20px;
+  /* padding: 20px; */
   box-shadow: 0 7px 25px rgba(0, 0, 0, 0.08);
   border-radius: 20px;
 }
@@ -444,6 +439,11 @@ body {
   border: 1px solid var(--black2);
 }
 
+#supplier-table{
+  width: 100%;
+  padding: 20px 8px;
+}
+
 .details table {
   width: 100%;
   border-collapse: collapse;
@@ -456,21 +456,21 @@ body {
   font-weight: 600;
 }
 
-.details .recentOrders table tbody tr {
+.details table tbody tr {
   color: var(--black1);
   border-top: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-.details .recentOrders table tr:last-child {
+.details table tr:last-child {
   border-bottom: none;
 }
 
-.details .recentOrders table tbody tr:hover {
+.details table tbody tr:hover {
   background: var(--blue);
   color: var(--white);
 }
 
-.details .recentOrders table tr td {
+.details table tr td {
   padding: 10px;
   text-align: start;
   /* max-width: 200px; */
@@ -720,5 +720,295 @@ body {
     position: fixed;
     right: 0;
     left: initial;
+  }
+}
+
+/* Float two columns side by side */
+.column {
+  float: left;
+  padding: 0 5px;
+}
+
+.first-col {
+  width: 40%;
+}
+
+.second-col {
+  width: 60%;
+}
+
+/* Remove extra left and right margins, due to padding */
+.row-arrange {
+  margin: 10px 0;
+  /* Adjusted to have similar gaps between rows */
+  overflow: hidden;
+  /* Clearfix */
+}
+
+/* Style the tab */
+.row-arrange .tab {
+  overflow: hidden;
+  border: 1px solid #ccc;
+  background-color: #f1f1f1;
+}
+
+.row-arrange .card-header {
+  overflow: hidden;
+  border: 1px solid #ccc;
+  background-color: #f1f1f1;
+  font-size: 16px;
+  padding: 14px 20px;
+  font-weight: bold;
+}
+
+/* Style the buttons inside the tab */
+.row-arrange .tab button {
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+  font-size: 17px;
+}
+
+/* Change background color of buttons on hover */
+.row-arrange .tab button:hover {
+  background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+.row-arrange .tab button.active {
+  background-color: #ccc;
+}
+
+/* Style the tab content */
+.row-arrange .tabcontent {
+  display: none;
+  padding: 6px 12px;
+  -webkit-animation: fadeEffect 1s;
+  animation: fadeEffect 1s;
+}
+
+/* Fade in tabs */
+@-webkit-keyframes fadeEffect {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeEffect {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* Responsive columns */
+@media screen and (max-width: 600px) {
+  .column {
+    width: 100%;
+    display: block;
+    margin-bottom: 20px;
+  }
+}
+
+/* Style the counter cards */
+.sales-card {
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  padding: 5px 0 5px 0;
+  margin: 0px 0;
+  text-align: left;
+  background-color: #fff;
+  border-radius: 3px;
+  /* Adjusted height */
+}
+
+.row-arrange.first-row .column.first-col .sales-card:nth-child(odd) {
+  height: 60vh;
+}
+
+.row-arrange.first-row .column.first-col .sales-card:nth-child(even) {
+  height: 40vh;
+}
+
+.row-arrange.first-row .column.second-col .sales-card {
+  height: 100vh;
+}
+
+.row {
+  /* display: -ms-flexbox; */
+  /* IE10 */
+  display: flex;
+  /* -ms-flex-wrap: wrap; */
+  /* IE10 */
+  flex-wrap: wrap;
+  margin: 10px -16px;
+}
+
+.row .col-25 {
+  /* -ms-flex: 25%; */
+  /* IE10 */
+  flex: 30%;
+}
+
+.row .col-50 {
+  /* -ms-flex: 50%; */
+  /* IE10 */
+  flex: 50%;
+}
+
+.row .col-75 {
+  /* -ms-flex: 75%; */
+  /* IE10 */
+  flex: 70%;
+}
+
+.row .col-25,
+.row .col-50,
+.row .col-75 {
+  padding: 0 16px;
+}
+
+.sales-container {
+  /* background-color: #f2f2f2; */
+  padding: 5px 20px 15px 20px;
+  /* border: 1px solid lightgrey; */
+  border-radius: 3px;
+}
+
+.sales-container input[type=text] {
+  width: 100%;
+  margin-bottom: 20px;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+}
+
+.sales-container label {
+  margin-bottom: 10px;
+  display: block;
+}
+
+.sales-container .icon-container {
+  margin-bottom: 20px;
+  padding: 40px 0;
+  font-size: 16px;
+}
+
+.sales-container .btn {
+  background-color: #04AA6D;
+  color: white;
+  padding: 12px;
+  margin: 10px 0;
+  border: none;
+  width: 100%;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 17px;
+}
+
+.sales-container .btn:hover {
+  background-color: #45a049;
+}
+
+.sales-container a {
+  color: #2196F3;
+}
+
+.sales-container hr {
+  border: 1px solid lightgrey;
+}
+
+.sales-container span.price {
+  float: right;
+  color: grey;
+}
+
+/* Responsive layout - when the screen is less than 800px wide, make the two columns stack on top of each other instead of next to each other (also change the direction - make the "cart" column go on top) */
+@media (max-width: 400px) {
+  .row {
+    flex-direction: column-reverse;
+  }
+
+  .sales-container .col-25 {
+    margin-bottom: 20px;
+  }
+}
+
+.add-new-sales button {
+  position: relative;
+  background-color: #039862;
+  margin-bottom: 12px;
+  border: none;
+  cursor: pointer;
+  padding: 16px 20px;
+  font-size: 17px;
+  font-weight: bold;
+  color: var(--white);
+  border-radius: 5px;
+}
+
+.add-new-sales button:hover {
+  background-color: #3d5b50;
+}
+
+#modal-loader {
+  display: none;
+  position: fixed;
+  /* To prevent elements behind the modal from being clickable */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.1);
+  /* Semi-transparent background */
+  z-index: 100;
+  /* Ensure the modal is on top of other elements */
+}
+
+.loader {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 1;
+  width: 120px;
+  height: 120px;
+  margin: -76px 0 0 -76px;
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid blue;
+  border-right: 16px solid green;
+  border-bottom: 16px solid red;
+  border-left: 16px solid white;
+  -webkit-animation: spin 2s linear infinite;
+  animation: spin 2s linear infinite;
+}
+
+@-webkit-keyframes spin {
+  0% {
+    -webkit-transform: rotate(0deg);
+  }
+
+  100% {
+    -webkit-transform: rotate(360deg);
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
   }
 }
