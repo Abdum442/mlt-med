@@ -43,6 +43,8 @@ app.put('/stock/:id', db.stockData.updateStock);
 
 app.get('/sales', db.salesData.getSales);
 app.post('/sales', db.salesData.addSales);
+app.delete('/sales/:id', db.salesData.deleteSales);
+
 
 
 app.get('/purchase', db.purchaseData.getPurchase);
@@ -61,6 +63,9 @@ app.get('/banks', db.bankData.getBankDetails);
 app.post('/banks', db.bankData.addBankDetails);
 
 app.get('/orders', db.salesOrder.getSalesOrderData);
+app.post('/orders', db.salesOrder.addSalesOrderData);
+app.delete('/orders/:id', db.salesOrder.deleteSalesOrderData)
+
 
 app.listen(port, () => {
   console.log(`App running on port ${port}.`)

@@ -112,6 +112,8 @@ addData('loans');
 addData('debit');
 addData('banks');
 
+addData('orders');
+
 // modifyData('users');
 modifyData('suppliers');
 modifyData('retailers');
@@ -123,6 +125,9 @@ modifyData('stock');
 deleteData('suppliers');
 deleteData('retailers');
 deleteData('products');
+deleteData('sales');
+
+deleteData('orders');
 
 salesReportWindow();
 

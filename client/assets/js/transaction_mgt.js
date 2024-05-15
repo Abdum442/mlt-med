@@ -34,15 +34,20 @@ salesMainBtn.addEventListener('click', function () {
   const tableContainer = document.createElement('div');
   tableContainer.id = 'sales-table-container';
 
-  console.log(tableContainer);
   salesContent.innerHTML = '';
   salesContent.appendChild(newSalesBtn);
   salesContent.appendChild(tableContainer);
 
+  const orderTableContainer = document.createElement('div');
+  orderTableContainer.id = 'order-table-container';
+
+  orderContent.innerHTML = '';
+  orderContent.appendChild(orderTableContainer);
+
   manageTabEvents(tabContainer);
 
   salesDetails(tableContainer);
-  orderDetails(orderContent, salesModal);
+  orderDetails(orderTableContainer, salesModal);
 
 
 });
@@ -120,29 +125,30 @@ function salesDetails(sales_tab) {
 
   const retailerMap = new Map(retailerObjData.map(retailer => 
     [parseInt(retailer.id), retailer.name]));
-
-
-
-  const salesTableData = salesObjData.map(obj => {
-    const product_id = parseInt(obj.product_id);
-    const item_name = productMap.get(product_id).name;
-    const customer_name = retailerMap.get(parseInt(obj.retailer_id));
-    const unit_price_number = parseFloat(productMap.get(product_id).sellingPrice);
-    const unit_price_formatted = formatNumber(parseFloat(unit_price_number));
-    const sales_date_formatted = formatDate(obj.sale_date);
-    const quantity_sold = obj.quantity_sold;
-    const quantity_sold_number = parseInt(quantity_sold);
-    const total_price_number = unit_price_number * quantity_sold_number;
-    const total_price_formatted = formatNumber(total_price_number);
-    return [obj.id, sales_date_formatted, customer_name, obj.order_id, item_name, unit_price_formatted, quantity_sold,
-      total_price_formatted, obj.remarks];
-  });
+    let salesTableData = [];
+    for ( const sales of salesObjData) {
+      if (sales.checkout_status === 'sold') {
+        const product_id = parseInt(sales.product_id);
+        const item_name = productMap.get(product_id).name;
+        const customer_name = retailerMap.get(parseInt(sales.retailer_id));
+        const unit_price_number = parseFloat(productMap.get(product_id).sellingPrice);
+        const unit_price_formatted = formatNumber(parseFloat(unit_price_number));
+        const sales_date_formatted = formatDate(sales.sale_date);
+        const quantity_sold = sales.quantity_sold;
+        const quantity_sold_number = parseInt(quantity_sold);
+        const total_price_number = unit_price_number * quantity_sold_number;
+        const total_price_formatted = formatNumber(total_price_number);
+        const salesData = [sales.id, sales_date_formatted, customer_name, sales.order_id, item_name, unit_price_formatted, quantity_sold,
+          total_price_formatted, sales.remarks];
+        salesTableData.push(salesData);
+      }
+    }
 
   commonData.tableData = salesTableData;
 
-  const productsHTMLtable = new CreateTableFromData(commonData);
+  const salesHTMLtable = new CreateTableFromData(commonData);
 
-  productsHTMLtable.renderTable();
+  salesHTMLtable.renderTable();
 }
 
 function orderDetails(order_tab, sales_modal) {
@@ -150,7 +156,7 @@ function orderDetails(order_tab, sales_modal) {
   const orderTableHeader = ['ID', 'Date', 'Customer Name', 'Total Amount', 'Tax Withheld', 'Amount Paid', 'Amount Remaining'];
 
   let commonData = {
-    tableId: "order-content",
+    tableId: "order-table-container",
     tableHeader: orderTableHeader,
     tableData: []
   };
@@ -162,19 +168,21 @@ function orderDetails(order_tab, sales_modal) {
     return [parseInt(retailer.id), retailer.name];
   }))
 
-  const orderTableData = orderObjData.map(obj => {
-    if (obj.checkout_status) {
-      const customer_name = retailerMap.get(parseInt(obj.customer_name));
-      const order_date = formatDate(obj.order_date);
-      const total_amount = formatNumber(parseFloat(obj.total_amount));
-      const amount_paid = formatNumber(parseFloat(obj.amount_paid));
-      const amount_remaining = formatNumber(parseFloat(obj.amount_remaining));
-      const tax_withheld = formatNumber(parseFloat(obj.tax_withheld));
-      return [obj.id, order_date, customer_name, total_amount, tax_withheld, 
-        amount_paid, amount_remaining];
-    } 
-  });
+  let orderTableData = [];
 
+  for ( const order of orderObjData ) {
+    if (order.checkout_status === 'sold') {
+      const customer_name = retailerMap.get(parseInt(order.customer_id));
+      const order_date = formatDate(order.order_date);
+      const total_amount = formatNumber(parseFloat(order.total_amount));
+      const amount_paid = formatNumber(parseFloat(order.amount_paid));
+      const amount_remaining = formatNumber(parseFloat(order.amount_remaining));
+      const tax_withheld = formatNumber(parseFloat(order.tax_withheld));
+      const orderData = [order.id, order_date, customer_name, total_amount, tax_withheld,
+        amount_paid, amount_remaining];
+      orderTableData.push(orderData);
+    } 
+  }
   commonData.tableData = orderTableData;
 
   const orderHTMLtable = new CreateTableFromData(commonData);

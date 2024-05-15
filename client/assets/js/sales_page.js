@@ -2,17 +2,17 @@ const mainContainer = document.getElementById('sales-main-container');
 
 const modalContainer = document.getElementById('sales-modal');
 
-const customerDetails = [
-  { id: "0", name: 'Walking', tin_number: '' },
-  { id: "1", name: 'Dischem Ltd', tin_number: '1234gt3' },
-  { id: '2', name: 'Beovac Trading PLC', tin_number: '' },
-  { id: '3', name: 'Kare Pharmaceuticals PLC', tin_number: '9087UY' },
-  { id: '4', name: 'GD Importr PLC', tin_number: '4675YHF' },
-  { id: '5', name: 'Ashenafi Alle Import Trading', tin_number: '6473WFRDY' },
-  { id: '6', name: 'VALDES PLC', tin_number: '345309YHTF' },
-  { id: '7', name: 'BDU', tin_number: 'KJ987645' },
-  { id: "8", name: 'ADDIS PHARMACEUTICAL FACTORY PLC', tin_number: '' },
-];
+// const customerDetails = [
+//   { id: "0", name: 'Walking', tin_number: '' },
+//   { id: "1", name: 'Dischem Ltd', tin_number: '1234gt3' },
+//   { id: '2', name: 'Beovac Trading PLC', tin_number: '' },
+//   { id: '3', name: 'Kare Pharmaceuticals PLC', tin_number: '9087UY' },
+//   { id: '4', name: 'GD Importr PLC', tin_number: '4675YHF' },
+//   { id: '5', name: 'Ashenafi Alle Import Trading', tin_number: '6473WFRDY' },
+//   { id: '6', name: 'VALDES PLC', tin_number: '345309YHTF' },
+//   { id: '7', name: 'BDU', tin_number: 'KJ987645' },
+//   { id: "8", name: 'ADDIS PHARMACEUTICAL FACTORY PLC', tin_number: '' },
+// ];
 
 // const medicinalProducts = [
 //   { id: "1001", name: "Paracetamol 500mg Tablets", stockLevel: '100', expiryDate: "2025-01-31", price: '45' },
@@ -30,40 +30,35 @@ const customerDetails = [
 //   { id: "1010", name: "Amoxicillin 500mg Capsules", stockLevel: '60', expiryDate: "2024-12-06", price: '45' }
 // ];
 
-const medicinalProducts = getProductData();
 
 
+function makeSalesPage(product_data, customer_data) {
+  mainContainer.innerHTML = '';
+  modalContainer.innerHTML = '';
 
+  
 
-const salesPageData = {
-  container: mainContainer,
-  modal: modalContainer,
-  customerData: customerDetails,
-  productData: medicinalProducts
-} 
-makeSalesPage(salesPageData);
+  const salesPage = makeGrid(modalContainer);
+  mainContainer.appendChild(salesPage);
 
-function makeSalesPage(sales_data) {
-  const container = sales_data.container;
-  const productData = sales_data.productData;
-  const customerDetails = sales_data.customerData;
-  const modal = sales_data.modal;
-
-  const productMap = createProductMap(productData);
-
-  const salesPage = makeGrid(productMap, customerDetails, modal);
-  container.appendChild(salesPage);
   salesPage.querySelector('#sales-order-tab').click();
+
+  document.getElementById('sales-item-name').addEventListener('input', function () {
+    manageProductInfo(product_data);
+  })
+  populateProductNameOptions(product_data);
+
+  document.getElementById('sales-customer-name').addEventListener('input', manageCustomerInfo);
+  populateCustomerNameOptions(customer_data);
+
+  document.getElementById('sales-add-order').addEventListener('click', function () {
+    orderTable(product_data);
+  });
+
+  
 }
 
 function getProductData() {
-
-  // const raw_products_data = await window.electronAPI.fetchData('fetch-products-data');
-  // localStorage.setItem('products-data', raw_products_data);
-
-  // const raw_stock_data = await window.electronAPI.fetchData('fetch-stock-data');
-  // localStorage.setItem('stock-data', raw_stock_data);
-
   const productsObjectData = JSON.parse(localStorage.getItem('products-data'));
   const stockObjectData = JSON.parse(localStorage.getItem('stock-data'));
 
@@ -73,13 +68,12 @@ function getProductData() {
     
 
     const matchStockObj = stockObjectData.find(obj => obj.product_id === prodObj.id);
-    console.log('matching customer with id :', prodObj.id, 'is : ', matchStockObj);
     const combProdObj = {
       id: prodObj.id,
       name: prodObj.name,
       stockLevel: matchStockObj.quantity,
       price: prodObj.saling_price,
-      expiryDate: prodObj.expiry_date 
+      expiryDate: formatDate(prodObj.expiry_date) 
     };
     
     productData.push(combProdObj);
@@ -87,9 +81,25 @@ function getProductData() {
   return productData;
 }
 
+function getCustomerData () {
+  const customerObjectData = JSON.parse(localStorage.getItem('retailers-data'));
+  const customerData = [];
+
+  for (const customerObj of customerObjectData) {
+    const custObj = {
+      id: customerObj.id,
+      name: customerObj.name,
+      tin_number: customerObj.tinnumber
+    };
+
+    customerData.push(custObj);
+  }
+  return customerData;
+}
 
 
-function makeGrid(product_map, customer_data, modal) {
+
+function makeGrid(modal) {
   const gridContainer = document.createElement('div');
 
   gridContainer.className = 'sales-row-arrange sales-first-row';
@@ -97,8 +107,8 @@ function makeGrid(product_map, customer_data, modal) {
   const firstColumn = document.createElement('div');
   firstColumn.className = 'sales-column sales-first-col';
 
-  const productCard = makeProductCard(product_map);
-  const customerCard = makeCustomerCard(customer_data);
+  const productCard = makeProductCard();
+  const customerCard = makeCustomerCard();
 
   firstColumn.appendChild(productCard);
   firstColumn.appendChild(customerCard);
@@ -122,7 +132,7 @@ function makeGrid(product_map, customer_data, modal) {
   return gridContainer;
 }
 
-function makeProductCard(productData) {
+function makeProductCard() {
   const productCard = document.createElement('div');
   productCard.className = 'sales-card';
   productCard.id = 'sales-product-card';
@@ -131,7 +141,7 @@ function makeProductCard(productData) {
   productCardHeader.innerHTML = `Product Info`;
   productCard.appendChild(productCardHeader);
 
-  const productInput = productInfo(productData);
+  const productInput = productInfo();
   productCard.appendChild(productInput);
 
   return productCard;
@@ -139,7 +149,7 @@ function makeProductCard(productData) {
 
 
 
-function makeCustomerCard(customerData) {
+function makeCustomerCard() {
   const customerCard = document.createElement('div');
   customerCard.className = 'sales-card';
   customerCard.id = 'sales-customer-card';
@@ -149,7 +159,7 @@ function makeCustomerCard(customerData) {
 
   customerCard.appendChild(customerCardHeader);
 
-  const customerInput = customerInfo(customerData);
+  const customerInput = customerInfo();
 
   customerCard.appendChild(customerInput);
 
@@ -266,7 +276,6 @@ function makeButtonsCard(modal) {
   printBtn.className = 'sales-btn';
 
   printBtn.addEventListener('click', function () {
-
     openModal(modal);
   })
 
@@ -347,7 +356,7 @@ function makeHoldTab() {
 
 }
 
-function customerInfo(customerData) {
+function customerInfo() {
   const container = document.createElement('div');
   container.className = 'sales-container';
 
@@ -371,21 +380,11 @@ function customerInfo(customerData) {
   customerInput.setAttribute('list', 'sales-customer-list');
   customerInput.setAttribute('placeholder', 'Search..');
 
-  customerInput.addEventListener('input', manageCustomerInfo);
-
   const customerNameDataList = document.createElement('datalist');
   customerNameDataList.name = 'sales-customer-name';
   customerNameDataList.id = 'sales-customer-list';
 
-  customerData.forEach(customer => {
-    const option = document.createElement('option');
-    option.text = customer.name;
-    option.value = customer.name;
-    option.setAttribute('data-id', customer.id);
-    option.setAttribute('data-tin', customer.tin_number);
-
-    customerNameDataList.appendChild(option);
-  });
+  
 
   const hiddenInputId = document.createElement('input');
   hiddenInputId.type = 'hidden';
@@ -429,7 +428,7 @@ function customerInfo(customerData) {
 
 }
 
-function productInfo(product_map) {
+function productInfo() {
   const container = document.createElement('div');
   container.className = 'sales-container';
 
@@ -453,24 +452,11 @@ function productInfo(product_map) {
   nameInput.setAttribute('list', 'sales-item-list');
   nameInput.setAttribute('placeholder', 'Search..');
 
-  nameInput.addEventListener('input', function () {
-    manageProductInfo(product_map);
-  });
-
   col75.appendChild(nameInput);
 
   const nameDataList = document.createElement('datalist');
   nameDataList.name = 'sales-item-name';
   nameDataList.id = 'sales-item-list';
-
-  const productNames = Array.from(product_map.keys()); // Get all unique medicine names
-
-  for (const name of productNames) {
-    const optionElement = document.createElement("option");
-    optionElement.value = name;
-    optionElement.textContent = name;
-    nameDataList.appendChild(optionElement);
-  }
 
   col75.appendChild(nameDataList);
 
@@ -519,22 +505,19 @@ function productInfo(product_map) {
   submitBtn.id = 'sales-add-order';
   submitBtn.className = 'sales-btn';
 
-  submitBtn.addEventListener('click', function () {
-    orderTable(product_map);
-  });
-
   container.appendChild(submitBtn);
 
   return container;
 }
 
-function orderTable(product_map) {
+function orderTable(product_data) {
   const productNameInput = document.getElementById('sales-item-name');
   const stockLevelInput = document.getElementById('sales-stock-level');
   // const stockLevelDataList = document.getElementById('sales-stock-list');
   const productQuantity = document.getElementById('sales-product-quantity');
   const currentOrderDiv = document.getElementById('sales-current-order');
   const itemName = productNameInput.value;
+  const product_map = createProductMap(product_data);
   const productList = product_map.get(itemName);
 
   const totalStock = productList.reduce((sum, product) => sum + parseInt(product.stockLevel), 0);
@@ -641,9 +624,13 @@ function orderTable(product_map) {
       gradTotalCell.textContent = formatNumber(tot);
     }
     if(tbody.querySelectorAll('tr').length) {
-      gradTotalCell.previousElementSibling.style.color = 'black';
+      gradTotalCell.parentNode.querySelectorAll('td').forEach(td => {
+        td.style.color = 'black';
+      });
     } else {  
-      gradTotalCell.parentNode.parentNode.style.display = 'white';
+      gradTotalCell.parentNode.querySelectorAll('td').forEach(td => {
+        td.style.color = 'white';
+      });
     }
   }
 
@@ -804,7 +791,7 @@ function manageCustomerInfo() {
   const customerTinNumberInput = document.getElementById('sales-tin-number');
   const customerIdInput = document.getElementById('sales-customer-id');
   const options = customerDataList.options;
-  const selectedCustomerName = customerNameInput.value;
+  const selectedCustomerName = customerNameInput.value.trim();
   customerTinNumberInput.disable = false;
   for (let i = 0; i < options.length; i++) {
     if (options[i].value === selectedCustomerName) {
@@ -821,24 +808,24 @@ function manageCustomerInfo() {
   }
 }
 
-function manageProductInfo(product_map) {
+function manageProductInfo(product_data) {
   const stockLevelInput = document.getElementById('sales-stock-level');
   // const stockLevelDataList = document.getElementById('sales-stock-list');
   let productStocks = [];
   const productNameInput = document.getElementById('sales-item-name');
   const selectedProductName = productNameInput.value;
-  // console.log('product name: ', selectedProductName);
-
+  const product_map = createProductMap(product_data);
   const productList = product_map.get(selectedProductName);
-  // console.log('product list : ', productList);
-
-  const totalStock = productList.reduce((sum, product) => sum + parseInt(product.stockLevel), 0);
-
-  if (totalStock <= 0) {
-    stockLevelInput.value = 'Out of Stock';
+  if ( productList ){
+    const totalStock = productList.reduce((sum, product) => 
+      sum + parseInt(product.stockLevel), 0);
+    if (totalStock <= 0) {
+      stockLevelInput.value = 'Out of Stock';
+    } else {
+      stockLevelInput.value = totalStock + "";
+    }
   } else {
-    stockLevelInput.value = totalStock + "";
-    
+    stockLevelInput.value = '';
   }
   stockLevelInput.disabled = true;  
 }
@@ -869,6 +856,36 @@ function manageTabs(tabId) {
   }
 }
 
+function populateProductNameOptions(product_data) {
+  const nameDataList = document.getElementById('sales-item-list');
+  nameDataList.innerHTML = '';
+
+  const product_map = createProductMap(product_data);
+
+  const productNames = Array.from(product_map.keys()); // Get all unique medicine names
+
+  for (const name of productNames) {
+    const optionElement = document.createElement("option");
+    optionElement.value = name;
+    optionElement.textContent = name;
+    nameDataList.appendChild(optionElement);
+  }
+}
+
+function populateCustomerNameOptions(customer_data) {
+  const customerNameDataList = document.getElementById('sales-customer-list');
+  customerNameDataList.innerHTML = '';
+  customer_data.forEach(customer => {
+    const option = document.createElement('option');
+    option.text = customer.name;
+    option.value = customer.name;
+    option.setAttribute('data-id', customer.id);
+    option.setAttribute('data-tin', customer.tin_number);
+
+    customerNameDataList.appendChild(option);
+  });
+}
+
 function openModal(modal) {
   const reportModal = printSalesReport();
   modal.innerHTML = '';
@@ -888,6 +905,23 @@ function formatNumber(number) {
 function reformatNumber(text) {
   const number = text.replace(/,/g, "");
   return parseFloat(number);
+}
+
+function formatDate(dateString) {
+
+  const dateObject = new Date(dateString);
+
+  const options = {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour12: false
+  };
+
+  const formatter = new Intl.DateTimeFormat(navigator.language, options);
+  const formattedDate = formatter.format(dateObject);
+
+  return formattedDate;
 }
 
 function createProductMap(products) {
@@ -910,5 +944,10 @@ function createProductMap(products) {
 }
 
 const salesPage = {
-
+  makeSalesPage,
+  getProductData,
+  getCustomerData,
+  createProductMap
 }
+
+export { salesPage }

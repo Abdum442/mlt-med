@@ -264,15 +264,26 @@ const getSales = (request, response) => {
 }
 
 const addSales = (request, response) => {
-  const { product_id, retailer_id, quantity_sold, sale_date, payment_method, amount_received, tax_withheld, remarks } = request.body
+  const { product_id, retailer_id, quantity_sold, sale_date, payment_method, amount_received, tax_withheld, checkout_status, order_id, remarks } = request.body
 
-  pool.query('INSERT INTO sales (product_id, retailer_id, quantity_sold, sale_date, payment_method, amount_received, tax_withheld, remarks) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id',
-    [product_id, retailer_id, quantity_sold, sale_date, payment_method, amount_received, tax_withheld, remarks], (error, results) => {
+  pool.query('INSERT INTO sales (product_id, retailer_id, quantity_sold, sale_date, payment_method, amount_received, tax_withheld, checkout_status, order_id, remarks) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id',
+    [product_id, retailer_id, quantity_sold, sale_date, payment_method, amount_received, tax_withheld, checkout_status, order_id, remarks], (error, results) => {
       if (error) {
         throw error
       }
-      response.status(201).send(`User added with ID: ${results.rows}`)
+      response.status(201).send(results.rows)
     })
+}
+
+const deleteSales = (request, response) => {
+  const id = parseInt(request.params.id)
+
+  pool.query('DELETE FROM sales WHERE id = $1', [id], (error, results) => {
+    if (error) {
+      throw error
+    }
+    response.status(200).send(`Item sales deleted with ID: ${id}`)
+  })
 }
 
 const getPurchase = (request, response) => {
@@ -392,8 +403,33 @@ const getSalesOrderData = (request, response) => {
   })
 }
 
+const addSalesOrderData = (request, response) => {
+  const { customer_id, order_date, total_amount, amount_paid, amount_remaining, checkout_status, tax_withheld } = request.body
+
+  pool.query('INSERT INTO sales_order (customer_id, order_date, total_amount, amount_paid, amount_remaining, checkout_status, tax_withheld) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id',
+    [customer_id, order_date, total_amount, amount_paid, amount_remaining, checkout_status, tax_withheld], (error, results) => {
+      if (error) {
+        throw error
+      }
+      response.status(201).send(results.rows)
+    })
+}
+
+const deleteSalesOrderData = (request, response) => {
+  const id = parseInt(request.params.id)
+
+  pool.query('DELETE FROM sales_order WHERE id = $1', [id], (error, results) => {
+    if (error) {
+      throw error
+    }
+    response.status(200).send(`Order Sales deleted with ID: ${id}`)
+  })
+}
+
 const salesOrder = {
-  getSalesOrderData
+  getSalesOrderData,
+  addSalesOrderData,
+  deleteSalesOrderData
 }
 
 const userData = {
@@ -433,7 +469,8 @@ const stockData = {
 
 const salesData = {
   getSales,
-  addSales
+  addSales,
+  deleteSales
 }
 
 const purchaseData = {
