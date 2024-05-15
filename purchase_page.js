@@ -137,10 +137,10 @@ function makeGrid(modal) {
 function makeProductCard() {
   const productCard = document.createElement('div');
   productCard.className = 'sales-card';
-  productCard.id = 'sales-product-card';
+  productCard.id = 'purchase-product-card';
   const productCardHeader = document.createElement('div');
   productCardHeader.className = 'sales-card-header';
-  productCardHeader.innerHTML = `Product Info`;
+  productCardHeader.innerHTML = `Product Details`;
   productCard.appendChild(productCardHeader);
 
   const productInput = productInfo();
@@ -434,77 +434,167 @@ function productInfo() {
   const container = document.createElement('div');
   container.className = 'sales-container';
 
-  const outerRow = document.createElement('div');
-  outerRow.className = 'sales-row';
+  const productNameRow = document.createElement('div');
+  productNameRow.className = 'sales-row';
 
-  container.appendChild(outerRow);
+  container.appendChild(productNameRow);
 
-  const col75 = document.createElement('div');
-  col75.className = 'sales-col-75';
+  const productNameCol75 = document.createElement('div');
+  productNameCol75.className = 'sales-col-75';
 
   const nameLabel = document.createElement('label');
-  nameLabel.setAttribute('for', 'sales-item-name');
-  nameLabel.textContent = 'Item';
+  nameLabel.setAttribute('for', 'purchase-item-name');
+  nameLabel.textContent = 'Item Name';
 
-  col75.appendChild(nameLabel);
+  productNameCol75.appendChild(nameLabel);
 
-  const nameInput = document.createElement('input');
-  nameInput.type = 'text';
-  nameInput.id = 'sales-item-name';
-  nameInput.setAttribute('list', 'sales-item-list');
-  nameInput.setAttribute('placeholder', 'Search..');
+  const productNameInput = document.createElement('input');
+  productNameInput.type = 'text';
+  productNameInput.id = 'purchase-item-name';
+  productNameInput.setAttribute('list', 'purchase-item-list');
+  productNameInput.setAttribute('placeholder', 'Search..');
 
-  col75.appendChild(nameInput);
+  productNameCol75.appendChild(productNameInput);
 
-  const nameDataList = document.createElement('datalist');
-  nameDataList.name = 'sales-item-name';
-  nameDataList.id = 'sales-item-list';
+  const productNameDataList = document.createElement('datalist');
+  productNameDataList.name = 'purchase-item-name';
+  productNameDataList.id = 'purchase-item-list';
 
-  col75.appendChild(nameDataList);
+  productNameCol75.appendChild(productNameDataList);
 
-  outerRow.appendChild(col75);
+  productNameRow.appendChild(productNameCol75);
 
-  const quantityLabel = document.createElement('label');
-  quantityLabel.setAttribute('for', 'sales-product-quantity');
-  quantityLabel.textContent = 'Quantity';
+  // const quantityLabel = document.createElement('label');
+  // quantityLabel.setAttribute('for', 'sales-product-quantity');
+  // quantityLabel.textContent = 'Quantity';
 
-  col75.appendChild(quantityLabel);
+  // col75.appendChild(quantityLabel);
 
 
-  const quantityInput = document.createElement('input');
-  quantityInput.type = 'text';
-  quantityInput.id = 'sales-product-quantity';
+  // const quantityInput = document.createElement('input');
+  // quantityInput.type = 'text';
+  // quantityInput.id = 'sales-product-quantity';
 
-  col75.appendChild(quantityInput);
+  // col75.appendChild(quantityInput);
 
 
   //===========col-25=========
-  const col25 = document.createElement('div');
-  col25.className = 'sales-col-25';
+  const productNameCol25 = document.createElement('div');
+  productNameCol25.className = 'sales-col-25';
+
+  
 
   const stockLabel = document.createElement('label');
   stockLabel.setAttribute('for', 'sales-stock-level');
-  stockLabel.textContent = 'Stock Level';
+  stockLabel.textContent = 'Add New';
+  stockLabel.style.color = 'white';
 
-  col25.appendChild(stockLabel);
-
-
-  const stockInput = document.createElement('input');
-  stockInput.type = 'text';
-  // stockInput.setAttribute('placeholder', 'Choose..');
-  stockInput.id = 'sales-stock-level';
-  stockInput.name = 'sales-stock-level';
+  productNameCol25.appendChild(stockLabel);
 
 
-  col25.appendChild(stockInput);
+
+  const AddNewProductBtn = document.createElement('input');
+  AddNewProductBtn.value = 'Add New';
+  AddNewProductBtn.type = 'button';
+  AddNewProductBtn.id = 'purchase-add-new-product';
+  AddNewProductBtn.className = 'sales-btn add-new';
+  AddNewProductBtn.style.backgroundColor = '#2a2185';
+
+  productNameCol25.appendChild(AddNewProductBtn);
+
+  productNameRow.appendChild(productNameCol25);
+
+  
+  const productDescriptionLabel = document.createElement('label');
+  productDescriptionLabel.setAttribute('for', 'purchase-product-description');
+  productDescriptionLabel.textContent = 'Description  |  Unit';
+
+  container.appendChild(productDescriptionLabel);
 
 
-  outerRow.appendChild(col25);
+  const productDescriptionInput = document.createElement('input');
+  productDescriptionInput.type = 'text';
+  productDescriptionInput.id = 'purchase-product-description';
+
+  container.appendChild(productDescriptionInput);
+
+
+  const productQuantitiesRow = document.createElement('div');
+  productQuantitiesRow.className = 'sales-row';
+
+  container.appendChild(productQuantitiesRow);
+
+  const expiryDateCol50 = document.createElement('div');
+  expiryDateCol50.className = 'sales-col-25';
+
+  const expiryDateLabel = document.createElement('label');
+  expiryDateLabel.setAttribute('for', 'purchase-item-expiry');
+  expiryDateLabel.textContent = 'Expiry Date';
+
+  expiryDateCol50.appendChild(expiryDateLabel);
+
+  const expiryDateInput = document.createElement('input');
+  expiryDateInput.type = 'date';
+  expiryDateInput.id = 'purchase-item-name';
+
+  expiryDateCol50.appendChild(expiryDateInput);
+
+  productQuantitiesRow.appendChild(expiryDateCol50);
+
+  const quantityCol25 = document.createElement('div');
+  quantityCol25.className = 'sales-col-25';
+
+  const productQuantityLabel = document.createElement('label');
+  productQuantityLabel.setAttribute('for', 'purchase-item-quantity');
+  productQuantityLabel.textContent = 'Quantity';
+
+  quantityCol25.appendChild(productQuantityLabel);
+
+  const productQuantityInput = document.createElement('input');
+  productQuantityInput.type = 'text';
+  productQuantityInput.id = 'purchase-item-name';
+
+  quantityCol25.appendChild(productQuantityInput);
+
+  productQuantitiesRow.appendChild(quantityCol25);
+
+  const priceCol25 = document.createElement('div');
+  priceCol25.className = 'sales-col-25';
+
+  const productPriceLabel = document.createElement('label');
+  productPriceLabel.setAttribute('for', 'purchase-item-quantity');
+  productPriceLabel.textContent = 'Unit Price';
+
+  priceCol25.appendChild(productPriceLabel);
+
+  const productPriceInput = document.createElement('input');
+  productPriceInput.type = 'text';
+  productPriceInput.id = 'purchase-item-price';
+
+  priceCol25.appendChild(productPriceInput);
+
+  productQuantitiesRow.appendChild(priceCol25);
+
+
+
+  // const stockInput = document.createElement('input');
+  // stockInput.type = 'text';
+  // // stockInput.setAttribute('placeholder', 'Choose..');
+  // stockInput.id = 'sales-stock-level';
+  // stockInput.name = 'sales-stock-level';
+
+
+  // col25.appendChild(stockInput);
+
+  
+
+
+  
 
   const submitBtn = document.createElement('input');
   submitBtn.value = 'Add to order';
   submitBtn.type = 'submit';
-  submitBtn.id = 'sales-add-order';
+  submitBtn.id = 'purchase-add-order';
   submitBtn.className = 'sales-btn';
 
   container.appendChild(submitBtn);
