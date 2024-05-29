@@ -55,7 +55,7 @@ const frequentData = async function () {
 };
 
 customerMgtMenu.addEventListener('click', frequentData);
-inventoryMgtMenu.addEventListener('click', frequentData);
+// inventoryMgtMenu.addEventListener('click', frequentData);
 transactionMgtMenu.addEventListener('click', frequentData);
 financialReportMgtMenu.addEventListener('click', frequentData);
 settingMenu.addEventListener('click', frequentData);

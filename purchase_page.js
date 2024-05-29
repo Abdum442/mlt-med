@@ -1,6 +1,11 @@
 const mainContainer = document.getElementById('sales-main-container');
 
 const modalContainer = document.getElementById('sales-modal');
+const productModalContainer = document.getElementById('product-modal-container');
+
+const productModal = createProductModal();
+productModalContainer.appendChild(productModal);
+
 
 const customerDetails = [
   { id: "0", name: 'Walking', tin_number: '' },
@@ -15,19 +20,19 @@ const customerDetails = [
 ];
 
 const medicinalProducts = [
-  { id: "1001", name: "Paracetamol 500mg Tablets", stockLevel: '100', expiryDate: "2025-01-31", price: '45' },
-  { id: "1011", name: "Paracetamol 500mg Tablets", stockLevel: '67', expiryDate: "2024-01-31", price: '45' },
-  { id: "1002", name: "Aspirin 300mg Tablets", stockLevel: '50', expiryDate: "2024-08-14", price: '45' },
-  { id: "1003", name: "Ibuprofen 200mg Tablets", stockLevel: '75', expiryDate: "2024-11-21", price: '45' },
-  { id: "1004", name: "Diphenhydramine 25mg Capsules", stockLevel: '20', expiryDate: "2025-04-12", price: '45' },
-  { id: "1005", name: "Loperamide 2mg Capsules", stockLevel: '45', expiryDate: "2024-09-27", price: '45' },
-  { id: "1012", name: "Loperamide 2mg Capsules", stockLevel: '90', expiryDate: "2025-09-27", price: '45' },
-  { id: "1013", name: "Loperamide 2mg Capsules", stockLevel: '60', expiryDate: "2024-11-27", price: '45' },
-  { id: "1006", name: "Clotrimazole 1% Cream", stockLevel: '30', expiryDate: "2025-03-08", price: '45' },
-  { id: "1007", name: "Salbutamol Inhaler (100mcg)", stockLevel: '25', expiryDate: "2024-10-10", price: '45' },
-  { id: "1008", name: "Miconazole 2% Cream", stockLevel: '15', expiryDate: "2024-07-19", price: '45' },
-  { id: "1009", name: "Prednisolone 5mg Tablets", stockLevel: '80', expiryDate: "2025-02-17", price: '45' },
-  { id: "1010", name: "Amoxicillin 500mg Capsules", stockLevel: '60', expiryDate: "2024-12-06", price: '45' }
+  { id: "1001", name: "Paracetamol 500mg Tablets", stockLevel: '100', expiryDate: "2025-01-31", price: '45', description: "A common painkiller used to treat aches and pains. It can also be used to reduce a high temperature." },
+  { id: "1011", name: "Paracetamol 500mg Tablets", stockLevel: '67', expiryDate: "2024-01-31", price: '45', description: "A common painkiller used to treat aches and pains. It can also be used to reduce a high temperature." },
+  { id: "1002", name: "Aspirin 300mg Tablets", stockLevel: '50', expiryDate: "2024-08-14", price: '45', description: "Used to reduce pain, fever, or inflammation. It is also used as an anti-inflammatory or a blood thinner." },
+  { id: "1003", name: "Ibuprofen 200mg Tablets", stockLevel: '75', expiryDate: "2024-11-21", price: '45', description: "A nonsteroidal anti-inflammatory drug (NSAID) that is used for treating pain, fever, and inflammation." },
+  { id: "1004", name: "Diphenhydramine 25mg Capsules", stockLevel: '20', expiryDate: "2025-04-12", price: '45', description: "An antihistamine used to relieve symptoms of allergy, hay fever, and the common cold." },
+  { id: "1005", name: "Loperamide 2mg Capsules", stockLevel: '45', expiryDate: "2024-09-27", price: '45', description: "Used to treat sudden diarrhea (including traveler's diarrhea). It works by slowing down the movement of the gut." },
+  { id: "1012", name: "Loperamide 2mg Capsules", stockLevel: '90', expiryDate: "2025-09-27", price: '45', description: "Used to treat sudden diarrhea (including traveler's diarrhea). It works by slowing down the movement of the gut." },
+  { id: "1013", name: "Loperamide 2mg Capsules", stockLevel: '60', expiryDate: "2024-11-27", price: '45', description: "Used to treat sudden diarrhea (including traveler's diarrhea). It works by slowing down the movement of the gut." },
+  { id: "1006", name: "Clotrimazole 1% Cream", stockLevel: '30', expiryDate: "2025-03-08", price: '45', description: "An antifungal cream used to treat fungal skin infections such as athlete's foot, jock itch, ringworm, and yeast infections." },
+  { id: "1007", name: "Salbutamol Inhaler (100mcg)", stockLevel: '25', expiryDate: "2024-10-10", price: '45', description: "A bronchodilator used to relieve symptoms of asthma and chronic obstructive pulmonary disease (COPD)." },
+  { id: "1008", name: "Miconazole 2% Cream", stockLevel: '15', expiryDate: "2024-07-19", price: '45', description: "An antifungal cream used to treat fungal infections of the skin such as athlete's foot, jock itch, and ringworm." },
+  { id: "1009", name: "Prednisolone 5mg Tablets", stockLevel: '80', expiryDate: "2025-02-17", price: '45', description: "A corticosteroid drug that prevents the release of substances in the body that cause inflammation. It is used to treat a variety of conditions." },
+  { id: "1010", name: "Amoxicillin 500mg Capsules", stockLevel: '60', expiryDate: "2024-12-06", price: '45', description: "An antibiotic used to treat a wide variety of bacterial infections. It works by stopping the growth of bacteria." }
 ];
 
 makeSalesPage(medicinalProducts, customerDetails);
@@ -43,19 +48,40 @@ function makeSalesPage(product_data, customer_data) {
   const salesPage = makeGrid(modalContainer);
   mainContainer.appendChild(salesPage);
 
-  salesPage.querySelector('#sales-order-tab').click();
+  const addNewProductBtn = document.getElementById('purchase-add-new-product');
 
-  document.getElementById('sales-item-name').addEventListener('input', function () {
-    manageProductInfo(product_data);
-  })
+  addNewProductBtn.addEventListener('click', () => {
+    console.log('add product btn is click')
+    productModalContainer.style.display = 'block';
+});
+
+  salesPage.querySelector('#sales-order-tab').click();
   populateProductNameOptions(product_data);
+  productModalContainer.querySelector('.product-save').addEventListener('click', function () {
+    appendOption();
+    productModalContainer.style.display = 'none';
+  });
+
+  // document.getElementById('sales-item-name').addEventListener('input', function () {
+  //   manageProductInfo(product_data);
+  // })
+  // populateProductNameOptions(product_data);
 
   document.getElementById('sales-customer-name').addEventListener('input', manageCustomerInfo);
   populateCustomerNameOptions(customer_data);
 
-  document.getElementById('sales-add-order').addEventListener('click', function () {
+  document.getElementById('purchase-add-order').addEventListener('click', function () {
     orderTable(product_data);
+    eraseProductInfo();
   });
+
+  document.getElementById('sales-exit-btn').addEventListener('click', function () {
+    eraseProductInfo();
+    eraseCustomerInfo();
+    wipeOutOrderTable();
+    populateCustomerNameOptions(customer_data);
+    populateProductNameOptions(product_data);
+  })
 
 
 }
@@ -157,7 +183,7 @@ function makeCustomerCard() {
   customerCard.id = 'sales-customer-card';
   const customerCardHeader = document.createElement('div');
   customerCardHeader.className = 'sales-card-header';
-  customerCardHeader.innerHTML = `Customer Info`;
+  customerCardHeader.innerHTML = `Supplier Info`;
 
   customerCard.appendChild(customerCardHeader);
 
@@ -189,7 +215,7 @@ function makeTabsCard() {
   holdBtn.className = 'sales-tablinks';
   holdBtn.id = 'sales-hold-tab';
   holdBtn.textContent = 'Hold';
-  tab.appendChild(holdBtn);
+  // tab.appendChild(holdBtn);
 
   tabsCard.appendChild(tab);
 
@@ -198,13 +224,13 @@ function makeTabsCard() {
 
   tabsCard.appendChild(orderHoldContent);
 
-  orderBtn.addEventListener('click', function () {
-    manageTabs('sales-order-tab');
-  });
+  // orderBtn.addEventListener('click', function () {
+  //   manageTabs('sales-order-tab');
+  // });
 
-  holdBtn.addEventListener('click', function () {
-    manageTabs('sales-hold-tab')
-  })
+  // holdBtn.addEventListener('click', function () {
+  //   manageTabs('sales-hold-tab')
+  // })
 
 
   return tabsCard;
@@ -287,9 +313,10 @@ function makeButtonsCard(modal) {
   exitBtn.id = 'sales-exit-btn';
   exitBtn.className = 'sales-btn';
 
-  leftCol1.appendChild(checkoutBtn);
-  leftCol2.appendChild(saveBtn);
-  rightCol1.appendChild(printBtn);
+  // leftCol1.appendChild(checkoutBtn);
+  leftCol1.appendChild(saveBtn);
+  leftCol2.appendChild(printBtn);
+  // rightCol1.appendChild(printBtn);
   rightCol2.appendChild(exitBtn);
 
 
@@ -326,11 +353,11 @@ function makeOrderTab() {
   const thead = document.createElement('thead');
 
   thead.innerHTML = `<tr>
-                        <td>ID</td>
-                        <td>Name</td>
+                        <td>Item Description</td>
                         <td>Expiry Date</td>
+                        <td>Unit</td>
+                        <td>Price</td>
                         <td>Quantity</td>
-                        <td>Unit Price</td>
                         <td class='sales-text-right'>Total Price</td>
                         <td class="action">Action</td>
                       </tr>`;
@@ -408,8 +435,8 @@ function customerInfo() {
   col75.appendChild(customerNameDataList);
   col75.appendChild(hiddenInputId);
 
-  col75.appendChild(tinNumberLabel);
-  col75.appendChild(tinNumberInput);
+  // col75.appendChild(tinNumberLabel);
+  // col75.appendChild(tinNumberInput);
 
   rowOuter.appendChild(col75);
 
@@ -445,6 +472,7 @@ function productInfo() {
   const nameLabel = document.createElement('label');
   nameLabel.setAttribute('for', 'purchase-item-name');
   nameLabel.textContent = 'Item Name';
+  
 
   productNameCol75.appendChild(nameLabel);
 
@@ -457,10 +485,15 @@ function productInfo() {
   productNameCol75.appendChild(productNameInput);
 
   const productNameDataList = document.createElement('datalist');
-  productNameDataList.name = 'purchase-item-name';
+  productNameDataList.name = 'purchase-item-list';
   productNameDataList.id = 'purchase-item-list';
 
+  const hiddenDescription = document.createElement('input');
+  hiddenDescription.type = 'hidden';
+  hiddenDescription.id = 'purchase-hidden-description';
+
   productNameCol75.appendChild(productNameDataList);
+  productNameCol75.appendChild(hiddenDescription);
 
   productNameRow.appendChild(productNameCol75);
 
@@ -509,14 +542,26 @@ function productInfo() {
   productDescriptionLabel.setAttribute('for', 'purchase-product-description');
   productDescriptionLabel.textContent = 'Description  |  Unit';
 
+  productDescriptionLabel.style.display = 'none';
+
   container.appendChild(productDescriptionLabel);
 
 
-  const productDescriptionInput = document.createElement('input');
-  productDescriptionInput.type = 'text';
+  const productDescriptionInput = document.createElement('textarea');
+  productDescriptionInput.name = 'purchase-product-description';
   productDescriptionInput.id = 'purchase-product-description';
+  productDescriptionInput.style.height = '80px';
+  productDescriptionInput.style.width = '100%';
+  productDescriptionInput.style.resize = 'vertical';
+  productDescriptionInput.style.marginBottom = '20px';
+  productDescriptionInput.style.padding = '10px';
+  productDescriptionInput.style.lineHeight = '1.5';
+
+  productDescriptionInput.style.display = 'none';
 
   container.appendChild(productDescriptionInput);
+
+  
 
 
   const productQuantitiesRow = document.createElement('div');
@@ -535,7 +580,7 @@ function productInfo() {
 
   const expiryDateInput = document.createElement('input');
   expiryDateInput.type = 'date';
-  expiryDateInput.id = 'purchase-item-name';
+  expiryDateInput.id = 'purchase-item-expiry';
 
   expiryDateCol50.appendChild(expiryDateInput);
 
@@ -552,7 +597,7 @@ function productInfo() {
 
   const productQuantityInput = document.createElement('input');
   productQuantityInput.type = 'text';
-  productQuantityInput.id = 'purchase-item-name';
+  productQuantityInput.id = 'purchase-item-quantity';
 
   quantityCol25.appendChild(productQuantityInput);
 
@@ -562,7 +607,7 @@ function productInfo() {
   priceCol25.className = 'sales-col-25';
 
   const productPriceLabel = document.createElement('label');
-  productPriceLabel.setAttribute('for', 'purchase-item-quantity');
+  productPriceLabel.setAttribute('for', 'purchase-item-price');
   productPriceLabel.textContent = 'Unit Price';
 
   priceCol25.appendChild(productPriceLabel);
@@ -603,135 +648,111 @@ function productInfo() {
 }
 
 function orderTable(product_data) {
-  const productNameInput = document.getElementById('sales-item-name');
-  const stockLevelInput = document.getElementById('sales-stock-level');
-  // const stockLevelDataList = document.getElementById('sales-stock-list');
-  const productQuantity = document.getElementById('sales-product-quantity');
+  const productNameInput = document.getElementById('purchase-item-name');
+  const productQuantityInput = document.getElementById('purchase-item-quantity');
+  const productUnitPriceInput = document.getElementById('purchase-item-price');
+  const productExpiryDateInput = document.getElementById('purchase-item-expiry');
+
   const currentOrderDiv = document.getElementById('sales-current-order');
-  const itemName = productNameInput.value;
-  const product_map = createProductMap(product_data);
-  const productList = product_map.get(itemName);
 
-  const totalStock = productList.reduce((sum, product) => sum + parseInt(product.stockLevel), 0);
+  const itemName = productNameInput.value.trim();
+  const itemQuantity = productQuantityInput.value.trim();
+  const itemUnitPrice = productUnitPriceInput.value.trim();
+  const itemExpiryDate = productExpiryDateInput.value;
 
-  stockLevelInput.value = totalStock;
+  if (itemName === "") {
+    alert(`Choose a valid Item Description`);
+    return;
+  } 
 
-  const quantity = document.getElementById("sales-product-quantity").value;
-  if (quantity > totalStock) {
-    alert(`Insufficient stock for "${itemName}". Only ${totalStock} available.`);
-  } else {
-    let orderList = [];
-    let remainingOrder = quantity;
+  if(itemQuantity === "") {
+    alert('Enter a valid positive integer for quantity');
+    return;
+  }
 
-    const selectedItem = {};
-
-    for (const product of productList.sort(compareExpiry)) {
-      if (remainingOrder === 0) {
-        break;
-      }
-      const quantityToTake = Math.min(remainingOrder, product.stockLevel);
-      if (quantityToTake <= 0) {
-        continue;
-      }
-      const selectedItem = {};
-      selectedItem['name'] = itemName;
-      remainingOrder -= quantityToTake;
-      selectedItem['quantity'] = quantityToTake + '';
-      product.stockLevel = (parseInt(product.stockLevel) - quantityToTake) + '';
-      selectedItem['expiryDate'] = product.expiryDate;
-      selectedItem['iD'] = product.id;
-      selectedItem['price'] = product.price;
-      selectedItem['total'] = (Number(product.price) * Number(quantityToTake)) + '';
-      orderList.push(selectedItem);
-    }
-
-    productNameInput.value = '';
-    productQuantity.value = '';
-    stockLevelInput.value = '';
-    const tbody = currentOrderDiv.querySelector('table tbody');
-    const gradTotalCell = document.getElementById('sales-grad-total');
-
-    for (const orderItem of orderList) {
-      const data = [orderItem.iD, orderItem.name,
-      orderItem.expiryDate, orderItem.quantity,
-      formatNumber(Number(orderItem.price))]
-      const tot = formatNumber(Number(orderItem.total));
-
-      const row = document.createElement('tr');
-      data.forEach(value => {
-        const td = document.createElement('td');
-        td.textContent = value;
-        row.appendChild(td);
-      });
-      const td = document.createElement('td');
-      td.className = 'sales-text-right';
-      td.textContent = tot;
-      row.appendChild(td);
-      const tdBtn = document.createElement('td');
-      tdBtn.className = 'action'
-      const actionBtn = dropDownBtn();
-
-      tdBtn.appendChild(actionBtn);
-      row.appendChild(tdBtn);
-
-
-
-      tbody.appendChild(row);
-      getGrandTotal();
-    }
-    tbody.querySelectorAll('tr').forEach(tr => {
-      const dropDownBtn = tr.querySelector('td .dropdown-btn');
-      const dropContent = dropDownBtn.querySelector('.drop-content');
-      const modifyBtn = dropContent.querySelector('a.modify');
-      const deleteBtn = dropContent.querySelector('a.delete');
-
-      modifyBtn.addEventListener('click', function () {
-        for (const product of productList) {
-          if (product.id === tr.cells[0].textContent) {
-            product.stockLevel = (parseInt(product.stockLevel) + parseInt(tr.cells[3].textContent)) + '';
-          }
-        }
-        productNameInput.value = tr.cells[1].textContent;
-        tbody.removeChild(tr);
-        getGrandTotal();
-        simulateChangeEvent(productNameInput);
-      });
-
-      deleteBtn.addEventListener('click', function () {
-        for (const product of productList) {
-          if (product.id === tr.cells[0].textContent) {
-            product.stockLevel = (parseInt(product.stockLevel) + parseInt(tr.cells[3].textContent)) + '';
-          }
-        }
-        tbody.removeChild(tr);
-        getGrandTotal();
-      });
-
-    });
-    function getGrandTotal() {
-      let tot = 0;
-      tbody.querySelectorAll('tr').forEach(tr => {
-        tot += reformatNumber(tr.cells[5].textContent);
-      });
-      gradTotalCell.textContent = formatNumber(tot);
-    }
-    if (tbody.querySelectorAll('tr').length) {
-      gradTotalCell.parentNode.querySelectorAll('td').forEach(td => {
-        td.style.color = 'black';
-      });
-    } else {
-      gradTotalCell.parentNode.querySelectorAll('td').forEach(td => {
-        td.style.color = 'white';
-      });
-    }
+  if (itemUnitPrice === '') {
+    alert('Enter a valid Unit Price');
+    return;
+  }
+  if(itemExpiryDate === '') {
+    alert('Date input field cannot be empty');
+    return;
   }
 
 
+  const tbody = currentOrderDiv.querySelector('table tbody');
+
+  const gradTotalCell = document.getElementById('sales-grad-total');
+
+  const itemTotal = parseFloat(itemUnitPrice) * parseInt(itemQuantity); 
+
+  const data = [itemName, formatDate(itemExpiryDate),
+  '', parseInt(itemQuantity), formatNumber(parseFloat(itemUnitPrice))]
+  const tot = formatNumber(Number(itemTotal));
+
+  const row = document.createElement('tr');
+  data.forEach(value => {
+    const td = document.createElement('td');
+    td.textContent = value;
+    row.appendChild(td);
+  });
+  const td = document.createElement('td');
+  td.className = 'sales-text-right';
+  td.textContent = tot;
+  row.appendChild(td);
+  const tdBtn = document.createElement('td');
+  tdBtn.className = 'action'
+  const actionBtn = dropDownBtn();
+
+  tdBtn.appendChild(actionBtn);
+  row.appendChild(tdBtn);
 
 
-  function simulateChangeEvent(element) {
-    const changeEvent = new Event('input', { bubbles: true });
-    element.dispatchEvent(changeEvent);
+
+  tbody.appendChild(row);
+  getGrandTotal();
+
+  tbody.querySelectorAll('tr').forEach(tr => {const dropDownBtn = row.querySelector('td .dropdown-btn');
+    const dropContent = dropDownBtn.querySelector('.drop-content');
+    const modifyBtn = dropContent.querySelector('a.modify');
+    const deleteBtn = dropContent.querySelector('a.delete');
+
+    modifyBtn.addEventListener('click', function () {
+      productNameInput.value = tr.cells[0].textContent;
+      productExpiryDateInput.value = formatDate(itemExpiryDate);
+      productQuantityInput.value = itemQuantity;
+      productUnitPriceInput.value = itemUnitPrice;
+      tbody.removeChild(tr);
+      getGrandTotal();
+      simulateChangeEvent(productNameInput);
+    });
+
+    deleteBtn.addEventListener('click', function () {
+      tbody.removeChild(tr);
+      productNameInput.value = '';
+      productExpiryDateInput.value = '';
+      productQuantityInput.value = '';
+      productUnitPriceInput.value = '';
+      getGrandTotal();
+    });
+  });
+
+  function getGrandTotal() {
+    let tot = 0;
+    tbody.querySelectorAll('tr').forEach(tr => {
+      tot += reformatNumber(tr.cells[5].textContent);
+    });
+    gradTotalCell.textContent = formatNumber(tot);
+  }
+
+  if (tbody.querySelectorAll('tr').length) {
+    gradTotalCell.parentNode.querySelectorAll('td').forEach(td => {
+      td.style.color = 'black';
+    });
+  } else {
+    gradTotalCell.parentNode.querySelectorAll('td').forEach(td => {
+      td.style.color = 'white';
+    });
   }
 
   function dropDownBtn() {
@@ -774,7 +795,7 @@ function printSalesReport() {
   const header = document.createElement('div');
   header.className = 'sales-header';
 
-  header.innerHTML = `<span onclick="document.querySelector('.sales-modal').style.display='none'"
+  header.innerHTML = `<span onclick="document.querySelector('#sales-modal').style.display='none'"
                          class="sales-close" title="Close Receipt">&times;</span>
                       <h1>MLT Trading PLC</h1>
                       <p>Kebele 06, Bahir Dar</p>
@@ -788,12 +809,11 @@ function printSalesReport() {
 
   const customerInfo = document.createElement('div');
   const customerName = document.getElementById('sales-customer-name').value;
-  const customerTIN = document.getElementById('sales-tin-number').value;
+  // const customerTIN = document.getElementById('sales-tin-number').value;
   const isWithhold = document.getElementById('sales-withhold').checked;
   customerInfo.className = 'sales-customer-info';
 
-  customerInfo.innerHTML = `<p>Customer Name: <span id="sales-customerName">${customerName}</span></p>
-                            <p>TIN Number: <span id="sales-customer-tin">${customerTIN}</span></p>`
+  customerInfo.innerHTML = `<p>Customer Name: <span id="sales-customerName">${customerName}</span></p>`
 
   const table = document.createElement('table');
   table.className = 'sales-table';
@@ -880,20 +900,20 @@ function printSalesReport() {
 function manageCustomerInfo() {
   const customerDataList = document.getElementById('sales-customer-list');
   const customerNameInput = document.getElementById('sales-customer-name');
-  const customerTinNumberInput = document.getElementById('sales-tin-number');
+  // const customerTinNumberInput = document.getElementById('sales-tin-number');
   const customerIdInput = document.getElementById('sales-customer-id');
   const options = customerDataList.options;
   const selectedCustomerName = customerNameInput.value.trim();
-  customerTinNumberInput.disable = false;
+  // customerTinNumberInput.disable = false;
   for (let i = 0; i < options.length; i++) {
     if (options[i].value === selectedCustomerName) {
       customerIdInput.value = options[i].dataset.id;
-      customerTinNumberInput.value = options[i].dataset.tin;
-      customerTinNumberInput.disable = true;
+      // customerTinNumberInput.value = options[i].dataset.tin;
+      // customerTinNumberInput.disable = true;
       break;
     } else if (selectedCustomerName === '') {
-      customerTinNumberInput.value = '';
-      customerTinNumberInput.disable = true;
+      // customerTinNumberInput.value = '';
+      // customerTinNumberInput.disable = true;
       break;
     }
 
@@ -933,7 +953,6 @@ function manageTabs(tabId) {
   document.getElementById('sales-order-tab').classList.remove('sales-active');
   document.getElementById('sales-hold-tab').classList.remove('sales-active');
   if (tabId === 'sales-order-tab') {
-
     document.getElementById('sales-order-tab').classList.add('sales-active');
     currentOrder.style.display = 'block';
     buttonCard.style.display = 'block';
@@ -949,7 +968,10 @@ function manageTabs(tabId) {
 }
 
 function populateProductNameOptions(product_data) {
-  const nameDataList = document.getElementById('sales-item-list');
+  const productNameInput = document.getElementById('purchase-item-name');
+  const nameDataList = document.getElementById('purchase-item-list');
+  const descriptionInput = document.getElementById('purchase-product-description');
+
   nameDataList.innerHTML = '';
 
   const product_map = createProductMap(product_data);
@@ -957,11 +979,31 @@ function populateProductNameOptions(product_data) {
   const productNames = Array.from(product_map.keys()); // Get all unique medicine names
 
   for (const name of productNames) {
+    const products = product_map.get(name);
     const optionElement = document.createElement("option");
     optionElement.value = name;
     optionElement.textContent = name;
+    optionElement.setAttribute('data-description', products[0].description);
     nameDataList.appendChild(optionElement);
   }
+
+  productNameInput.addEventListener('input', function () {
+    const product = this.value.trim();
+    const options = nameDataList.options;
+
+    for (let i = 0; i < options.length; i++) {
+      if (options[i].value === product) {
+        descriptionInput.value = options[i].dataset.description;
+        descriptionInput.disabled = true;
+        break;
+      } else {
+        descriptionInput.value = '';
+      }
+    }
+    
+  })
+
+
 }
 
 function populateCustomerNameOptions(customer_data) {
@@ -1034,6 +1076,86 @@ function createProductMap(products) {
 
   return productMap;
 }
+
+function createProductModal() {
+  const modal = document.createElement('div');
+  modal.className = 'product-modal-container';
+  modal.id = 'product-modal';
+  modal.innerHTML =
+    `<div class="product-modal-content">
+      <span onclick="document.getElementById('product-modal-container').style.display='none'" class="sales-close" title="Close Modal">&times;</span> 
+      <div class="sales-container">
+        <h2>New Product</h2>
+        <br>
+        <div class="sales-row">
+          <div class="sales-col-50">
+            <label for="product-name">Name <span style="color:red; font-size:20px;">*</span> </label>
+            <input type="text" id="product-name" name="productName">
+          </div>
+        
+        </div>
+        <label for="product-description">Description | Unit</label>
+        <textarea name="productDescription" id="product-description" style="width:100%; height:60px"></textarea>
+        <div class="sales-row" style="margin-top:20px">
+          <div class="sales-col-50">
+            <button class="sales-btn product-save">Add</button>
+          </div>
+          <div class="sales-col-50">
+            <button onclick="document.getElementById('product-modal-container').style.display='none'" class="sales-btn" style="background-color:red">Exit</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  return modal;
+}
+
+function appendOption () {
+  const modalProductNameInput = document.getElementById('product-modal').querySelector('#product-name');
+  const modalProductDescInput = document.getElementById('product-modal').querySelector("#product-description");
+
+  const productNameInput = document.getElementById('purchase-item-name');
+  const nameDataList = document.getElementById('purchase-item-list');
+
+  if(modalProductNameInput.value.trim()) {
+    const option = document.createElement('option');
+    option.id = modalProductNameInput.value.trim();
+    option.value = modalProductNameInput.value.trim();
+    option.setAttribute('data-description', modalProductDescInput.value.trim());  
+
+    nameDataList.appendChild(option);
+    productNameInput.value = option.value;
+    simulateChangeEvent(productNameInput);
+  }
+}
+
+
+function simulateChangeEvent(element) {
+  const changeEvent = new Event('input', { bubbles: true });
+  element.dispatchEvent(changeEvent);
+}
+
+function eraseProductInfo() {
+  const productNameInput = document.getElementById('purchase-item-name');
+  const productQuantityInput = document.getElementById('purchase-item-quantity');
+  const productUnitPriceInput = document.getElementById('purchase-item-price');
+  const productExpiryDateInput = document.getElementById('purchase-item-expiry');
+
+  productExpiryDateInput.value = '';
+  productNameInput.value = '';
+  productQuantityInput.value = '';
+  productUnitPriceInput.value = '';
+}
+
+function eraseCustomerInfo() {
+  document.getElementById('sales-customer-name').checked = false;
+  document.getElementById('sales-customer-name').value = '';
+}
+
+function wipeOutOrderTable(){
+  document.querySelector('.sales-table-container table tbody').innerHTML = '';
+  document.querySelector('.sales-table-container table thead.total-sales').style.display = 'none';
+}
+
 
 const salesPage = {
   makeSalesPage,

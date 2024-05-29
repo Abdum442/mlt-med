@@ -151,12 +151,21 @@ async function printHoldOrders (hold_table_body, product_data, customer_data) {
   const orderTableBody = document.getElementById('sales-current-order').querySelector('table tbody');
 
   
-  const holdOrderData = ordersObjectData.map(obj => {
-    if ( obj.checkout_status === 'hold' ) {
+  // const holdOrderData = ordersObjectData.map(obj => {
+  //   if ( obj.checkout_status === 'hold' ) {
+  //     const matchCustomerObj = customerObjData.find(customerObj => customerObj.id === obj.customer_id);
+  //     return [obj.id, matchCustomerObj.name, obj.customer_id, formatDate(obj.order_date), formatNumber(parseFloat(obj.total_amount))]
+  //   }
+  // });
+  let holdOrderData = [];
+  for (const obj of ordersObjectData) {
+    if (obj.checkout_status === 'hold') {
       const matchCustomerObj = customerObjData.find(customerObj => customerObj.id === obj.customer_id);
-      return [obj.id, matchCustomerObj.name, obj.customer_id, formatDate(obj.order_date), formatNumber(parseFloat(obj.total_amount))]
+      const data = [obj.id, matchCustomerObj.name, obj.customer_id, formatDate(obj.order_date), formatNumber(parseFloat(obj.total_amount))];
+      holdOrderData.push(data);
     }
-  });
+  }
+  console.log('hold orders : ', holdOrderData);
   holdOrderData.forEach(hold => {
     const trow = document.createElement('tr');
     hold.forEach(entry => {

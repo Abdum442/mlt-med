@@ -1,6 +1,7 @@
 import { CreateTableFromData, clickable_dropdown_btn } from "./tableConstructor.js";
 
 const inventoryMgtMenu = document.getElementById('inventoryMgt');
+const customerMgtMenu = document.getElementById('customerMgt');
 
 let rowData = {}; 
 
@@ -84,7 +85,7 @@ function inventoryContainer() {
 
 function productDetails(product_tab, product_modal) {
   product_tab.innerHTML = '';
-  const productsTableHeader = ['ID', 'Name', 'Description', 'Selling Price',
+  const productsTableHeader = ['ID', 'Name', 'Description/Unit', 'Selling Price',
     'Expiry Date', 'Remarks'];
 
   let commonData = {
@@ -94,6 +95,8 @@ function productDetails(product_tab, product_modal) {
   };
 
   const productsRawData = localStorage.getItem('products-data');
+  const purchaseData = JSON.parse(localStorage.getItem('purchase-data'));
+  console.log('purchase Data :', purchaseData);
 
   const productsObjData = JSON.parse(productsRawData);
   
@@ -121,7 +124,7 @@ function productDetails(product_tab, product_modal) {
       rowData['sellingPrice'] = reformatNumber(tr.cells[3].textContent);
       rowData['expiryDate'] = tr.cells[4].textContent;
       rowData['remark'] = tr.cells[5].textContent;
-      rowData['purchasePrice'] = productMap.get(parseInt(rowData.id));
+      // rowData['purchasePrice'] = productMap.get(parseInt(rowData.id));
 
       const dropContent = tr.cells[6].querySelector("td .dropdown-btn .drop-content");
 
@@ -136,11 +139,15 @@ function productDetails(product_tab, product_modal) {
         event.stopPropagation();
         product_modal.querySelector('[name="productName"]').value = rowData.productName;
         product_modal.querySelector('[name="productDescription"]').value = rowData.productDescription;
-        const purchasePrice = Number(rowData.purchasePrice);
+        // const purchasePrice = Number(rowData.purchasePrice);
+        const purchasePrice = purchaseData.find(purchase =>
+          parseInt(purchase.product_id) === parseInt(rowData.id)).unit_price;
+        console.log('product id : ', rowData.id);
+        console.log('purchase price : ', purchasePrice);
         product_modal.querySelector('[name="purchasePrice"]').value = formatNumber(purchasePrice);
         product_modal.querySelector('[name="sellingPrice"]').value = rowData.sellingPrice;
         product_modal.querySelector('[name="productRemark"]').value = rowData.remark;
-
+        
         product_modal.querySelector('[name="purchasePrice"]').disabled = true;
         product_modal.style.display = 'block';
       });
@@ -283,13 +290,15 @@ async function saveProductDetails(product_modal) {
   const selling_price = parseInt(product_modal.querySelector('[name="sellingPrice"]').value)
   formData['sellingPrice'] = selling_price;
   formData['productRemark'] = product_modal.querySelector('[name="productRemark"]').value;
-  console.log('remark: ', formData.productRemark);
+
 
 
 
   const id = await window.electronAPI.fetchData('modify-products-data', formData);
 
   product_modal.style.display = 'none';
+  customerMgtMenu.click();
+  inventoryMgtMenu.click();
 } 
 
 function formatNumber(number) {

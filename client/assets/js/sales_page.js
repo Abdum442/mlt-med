@@ -642,6 +642,7 @@ function orderTable(product_data) {
     element.dispatchEvent(changeEvent);
   }
 
+
   function dropDownBtn (){
     const dropContainer = document.createElement('div');
     dropContainer.className  = 'dropdown-btn';
