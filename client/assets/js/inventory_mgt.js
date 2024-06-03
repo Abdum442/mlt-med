@@ -10,23 +10,20 @@ inventoryMgtMenu.addEventListener('click', function () {
   inventoryContent.innerHTML = '';
 
   const tabContainer = inventoryContainer();
-  const productModal = createProductModal();
+  // const productModal = createProductModal();
 
-  const productContent = tabContainer.querySelector('#product-content');
+  // const productContent = tabContainer.querySelector('#product-content');
   const stockContent = tabContainer.querySelector('#stock-content');
   const expiryContent = tabContainer.querySelector('#expiry-content');
 
   inventoryContent.appendChild(tabContainer);
-  inventoryContent.appendChild(productModal);
+  // inventoryContent.appendChild(productModal);
 
   manageTabEvents(tabContainer);
 
-  productDetails(productContent, productModal);
+  // productDetails(productContent, productModal);
   stockDetails(stockContent);
   expiryDateDetails(expiryContent);
-  productModal.querySelector('.product-save').addEventListener('click', function () {
-    saveProductDetails(productModal);
-  });
 });
 
 function manageTabs(tabId, contId) {
@@ -44,13 +41,13 @@ function manageTabs(tabId, contId) {
 }
 
 function manageTabEvents(tab_cont) {
-  const productTab = tab_cont.querySelector('#product');
+  // const productTab = tab_cont.querySelector('#product');
   const stockTab = tab_cont.querySelector('#stock');
   const expiryTab = tab_cont.querySelector('#expiry');
 
-  productTab.addEventListener('click', function () {
-    manageTabs('product', 'product-content')
-  });
+  // productTab.addEventListener('click', function () {
+  //   manageTabs('product', 'product-content')
+  // });
   stockTab.addEventListener('click', function () {
     manageTabs('stock', 'stock-content')
   });
@@ -58,7 +55,7 @@ function manageTabEvents(tab_cont) {
     manageTabs('expiry', 'expiry-content')
   });
 
-  productTab.click();
+  stockTab.click();
 }
 
 function inventoryContainer() {
@@ -67,12 +64,8 @@ function inventoryContainer() {
   tabContainer.id = "inventory-container"
 
   tabContainer.innerHTML = `<div class="tab">
-              <button class="tab-link" id="product">Products</button>
               <button class="tab-link" id="stock">Stock Level</button>
               <button class="tab-link" id="expiry"> Expiry Date Tracker</button>
-            </div>
-            <div class="tab-content" id="product-content">
-              <h2>Product</h2>
             </div>
             <div class="tab-content" id="stock-content">
               <h2>Stock Level</h2>
@@ -112,7 +105,6 @@ function productDetails(product_tab, product_modal) {
   productsHTMLtable.renderTable();
 
   clickable_dropdown_btn(product_tab.querySelector('table'));
-
   product_tab.querySelectorAll('table tbody tr').forEach(function (tr) {
     // console.log(tr.cells[0].textContent, tr.cells[4].textContent);
     tr.querySelector("td .drop-btn").addEventListener('click', function (event) {

@@ -111,6 +111,58 @@ CREATE TABLE sales_order(
 // To alter an existing TABLE - add column
 ALTER TABLE table_name ADD COLUMN column_name VARCHAR(100);
 
+// To login to the database
+psql -d postgres -U mltdb //psw: mlttrading
+
+
+// change directory to server (cd server if you are at mlt-med)
+
+//then execute the following command to clean (empty) the database mltdb
+
+// command
+psql -U mlt -h localhost -p 5432 -d mltdb -f drop_all_tables.sql
+
+// you will be prompted for a password which is mlttrading (if you have not already changed it)
+
+// next, you create the database by executing the following command to restore the database based on 
+// the specifications from the script mlt_database_schema.sql
+
+// command
+psql -U mlt -h localhost -p 5432 -d mltdb -f database_schema.sql
+
+// now you should get your database restored which is exactly the same as mine 
+// however, you will find all the tables empty
+
+// To check if it as required, login to the database by using
+
+// command
+psql -d postgres -U mltdb
+
+// now run the following command to see all the tables in the database
+
+\dt \\ hit enter to see the content of the database. you should get 
+
+mltdb=> \dt
+           List of relations
+ Schema |     Name      | Type  | Owner 
+--------+---------------+-------+-------
+ public | bank_details  | table | mlt
+ public | company_debit | table | mlt
+ public | company_loans | table | mlt
+ public | company_stock | table | mlt
+ public | expenses      | table | mlt
+ public | products      | table | mlt
+ public | purchase      | table | mlt
+ public | retailers     | table | mlt
+ public | sales         | table | mlt
+ public | sales_order   | table | mlt
+ public | suppliers     | table | mlt
+ public | users         | table | mlt
+(12 rows)
+
+
+
+
 
 
 

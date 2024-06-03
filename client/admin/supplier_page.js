@@ -75,10 +75,9 @@ async function saveModification() {
 
   modal.style.display = 'none';
   viewTab.click();
-  setTimeout(() => {
-    customerMgt.click();
-    viewSupplierBtn.click();
-  }, 1000);
+  
+  customerMgt.click();
+  viewSupplierBtn.click();
 } 
 
 function renderSupplierTable () {

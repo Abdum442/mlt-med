@@ -7,6 +7,7 @@
   box-sizing: border-box;
 }
 
+
 :root {
   --blue: #2a2185;
   --white: #fff;
@@ -132,7 +133,8 @@
   /* Adjusted height */
 }
 
-.sales-row-arrange.sales-first-row .sales-column.sales-first-col #sales-product-card {
+.sales-row-arrange.sales-first-row .sales-column.sales-first-col #sales-product-card,
+.sales-row-arrange.sales-first-row .sales-column.sales-first-col #purchase-product-card {
   min-height: 55vh;
 }
 
@@ -192,7 +194,7 @@
   border-radius: 3px;
 }
 
-input[type=text] {
+input[type=text], input[type=date] {
   width: 100%;
   margin-bottom: 20px;
   padding: 12px;
