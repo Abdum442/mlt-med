@@ -173,6 +173,11 @@ mltdb=> \dt
  public | users         | table | mlt
 (12 rows)
 
+ id |   fullname    | username | password | role  | has_pic 
+----+---------------+----------+----------+-------+---------
+  1 | Mebratu Fenta | mebratu  | me       | admin | f
+  2 | Abdu Mohammed | abdu     | ab       | user  | f
+  3 | Admin         | admin    | admin    | admin | fs
 
 
 
