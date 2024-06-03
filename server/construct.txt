@@ -115,6 +115,19 @@ ALTER TABLE table_name ADD COLUMN column_name VARCHAR(100);
 psql -d postgres -U mltdb //psw: mlttrading
 
 
+
+********************** Cloning and restoring database *****************
+
+// change current directory to mlt-med
+// to pull changes to your local computer, run the following command
+
+// command
+git pull
+
+// look in to the files in server/ directory. If you see two new files dump_all_tables.sql
+// and mlt_database_schema.sql, then all is good. Otherwise, the changes are not pulled correctly
+
+
 // change directory to server (cd server if you are at mlt-med)
 
 //then execute the following command to clean (empty) the database mltdb
