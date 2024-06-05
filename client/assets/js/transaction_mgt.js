@@ -298,6 +298,7 @@ function orderDetails(order_tab) {
   }))
 
   let orderTableData = [];
+  const fullData = [];
 
   for ( const order of orderObjData ) {
     if (order.checkout_status === 'sold') {
@@ -310,8 +311,10 @@ function orderDetails(order_tab) {
       const orderData = [order.id, order_date, customer_name, total_amount, tax_withheld,
         amount_paid, amount_remaining];
       orderTableData.push(orderData);
+      fullData.push(order);
     } 
-  }
+  } 
+  console.log('full Data: ', fullData)
   commonData.tableData = orderTableData;
 
   const orderHTMLtable = new CreateTableFromData(commonData);

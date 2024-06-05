@@ -112,7 +112,7 @@ CREATE TABLE sales_order(
 ALTER TABLE table_name ADD COLUMN column_name VARCHAR(100);
 
 // To login to the database
-psql -d postgres -U mltdb //psw: mlttrading
+psqll -d mltdb -U mlt  //psw: mlttrading
 
 
 
@@ -180,7 +180,8 @@ mltdb=> \dt
   3 | Admin         | admin    | admin    | admin | fs
 
 
-
+INSERT INTO users (fullname, username, password, role, has_pic)
+VALUES (Admin, admin, admin, admin, f);
 
 
 

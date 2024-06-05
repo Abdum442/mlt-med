@@ -296,10 +296,10 @@ const getPurchase = (request, response) => {
 }
 
 const addPurchase = (request, response) => {
-  const { product_id, supplier_id, quantity, purchase_date, payment_method, amount_paid, tax_withheld, remarks } = request.body
+  const { product_id, supplier_id, quantity, purchase_date, payment_method, amount_paid, tax_withheld, remarks, unit_price } = request.body
 
-  pool.query('INSERT INTO purchase (product_id, supplier_id, quantity, purchase_date, payment_method, amount_paid, tax_withheld, remarks) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id',
-    [product_id, supplier_id, quantity, purchase_date, payment_method, amount_paid, tax_withheld, remarks], (error, results) => {
+  pool.query('INSERT INTO purchase (product_id, supplier_id, quantity, purchase_date, payment_method, amount_paid, tax_withheld, remarks, unit_price) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id',
+    [product_id, supplier_id, quantity, purchase_date, payment_method, amount_paid, tax_withheld, remarks, unit_price], (error, results) => {
       if (error) {
         throw error
       }

@@ -1,6 +1,6 @@
 const mainContainer = document.getElementById('sales-main-container');
 
-const modalContainer = document.getElementById('sales-modal');
+const modalContainer = document.getElementById('invoice-modal');
 const productModalContainer = document.getElementById('product-modal-container');
 
 const productModal = createProductModal();
@@ -35,7 +35,11 @@ const medicinalProducts = [
   { id: "1010", name: "Amoxicillin 500mg Capsules", stockLevel: '60', expiryDate: "2024-12-06", price: '45', description: "An antibiotic used to treat a wide variety of bacterial infections. It works by stopping the growth of bacteria." }
 ];
 
-makeSalesPage(medicinalProducts, customerDetails);
+const productData = getProductData();
+const supplierData = getCustomerData();
+
+
+makeSalesPage(productData, supplierData);
 
 
 
@@ -83,7 +87,9 @@ function makeSalesPage(product_data, customer_data) {
     populateProductNameOptions(product_data);
   })
 
-
+  document.getElementById('sales-save-order-btn').addEventListener('click', async function () {
+    await registerPurchase();
+  });
 }
 
 function getProductData() {
@@ -99,9 +105,7 @@ function getProductData() {
     const combProdObj = {
       id: prodObj.id,
       name: prodObj.name,
-      stockLevel: matchStockObj.quantity,
-      price: prodObj.saling_price,
-      expiryDate: formatDate(prodObj.expiry_date)
+      description: prodObj.description
     };
 
     productData.push(combProdObj);
@@ -110,14 +114,14 @@ function getProductData() {
 }
 
 function getCustomerData() {
-  const customerObjectData = JSON.parse(localStorage.getItem('retailers-data'));
+  const customerObjectData = JSON.parse(localStorage.getItem('suppliers-data'));
   const customerData = [];
 
   for (const customerObj of customerObjectData) {
     const custObj = {
       id: customerObj.id,
       name: customerObj.name,
-      tin_number: customerObj.tinnumber
+      tin_number: customerObj.taxinfo
     };
 
     customerData.push(custObj);
@@ -679,6 +683,8 @@ function orderTable(product_data) {
     return;
   }
 
+  const descriptionInput = document.getElementById('purchase-product-description');
+  const unitDescription = descriptionInput.value;
 
   const tbody = currentOrderDiv.querySelector('table tbody');
 
@@ -687,7 +693,7 @@ function orderTable(product_data) {
   const itemTotal = parseFloat(itemUnitPrice) * parseInt(itemQuantity); 
 
   const data = [itemName, formatDate(itemExpiryDate),
-  '', parseInt(itemQuantity), formatNumber(parseFloat(itemUnitPrice))]
+    unitDescription, formatNumber(parseFloat(itemUnitPrice)), parseInt(itemQuantity)]
   const tot = formatNumber(Number(itemTotal));
 
   const row = document.createElement('tr');
@@ -795,7 +801,7 @@ function printSalesReport() {
   const header = document.createElement('div');
   header.className = 'sales-header';
 
-  header.innerHTML = `<span onclick="document.querySelector('#sales-modal').style.display='none'"
+  header.innerHTML = `<span onclick="document.getElementById('invoice-modal').style.display='none'"
                          class="sales-close" title="Close Receipt">&times;</span>
                       <h1>MLT Trading PLC</h1>
                       <p>Kebele 06, Bahir Dar</p>
@@ -980,6 +986,7 @@ function populateProductNameOptions(product_data) {
 
   for (const name of productNames) {
     const products = product_map.get(name);
+    console.log('product lists: ', products);
     const optionElement = document.createElement("option");
     optionElement.value = name;
     optionElement.textContent = name;
@@ -1134,6 +1141,24 @@ function simulateChangeEvent(element) {
   element.dispatchEvent(changeEvent);
 }
 
+function parseDate(formattedDate) {
+  // Split the formatted date string into parts (assuming US format MM/DD/YYYY)
+  const parts = formattedDate.split('/');
+
+  // Check if the format seems valid (length of 3 and parts are numbers)
+  if (parts.length !== 3 || !parts.every(part => !isNaN(part))) {
+    throw new Error("Invalid date format. Expected DD/MM/YYYY");
+  }
+
+  // Extract month, day, and year as numbers (adjust month for zero-based indexing)
+  const day = parseInt(parts[0]);
+  const month = parseInt(parts[1]) - 1;
+  const year = parseInt(parts[2]);
+
+  // Create a new Date object and return it
+  return new Date(year, month, day);
+}
+
 function eraseProductInfo() {
   const productNameInput = document.getElementById('purchase-item-name');
   const productQuantityInput = document.getElementById('purchase-item-quantity');
@@ -1156,6 +1181,107 @@ function wipeOutOrderTable(){
   document.querySelector('.sales-table-container table thead.total-sales').style.display = 'none';
 }
 
+function getPurchasedProductFromTable() {
+  const table_body = document.getElementById('sales-current-order').querySelector('tbody');
+  let purchasedProducts = []; 
+  table_body.querySelectorAll('tr').forEach(row => {
+    const productName = row.cells[0].textContent;
+    const expiryDate = row.cells[1].textContent;
+    const unitDescription = row.cells[2].textContent;
+    const unitPrice = parseFloat(row.cells[3].textContent);
+    const quantity = parseInt(row.cells[4].textContent.trim());
+    const data = {
+      name: productName, 
+      expiry_date: parseDate(expiryDate),
+      unit_description: unitDescription,
+      purchase_price: unitPrice,
+      quantity: quantity
+    };
+    console.log('purchase: ', data)
+    purchasedProducts.push(data);
+  });
+  return purchasedProducts;
+} 
+
+function getPurchaseSupplierData(){
+  const supplierName = document.getElementById('sales-customer-name').value.trim();
+  const supplierId = document.getElementById('sales-customer-id').value.trim();
+  const withholdStatus = document.getElementById('sales-withhold').checked;
+
+  const data = {
+    supplier_name: supplierName,
+    supplier_id: parseInt(supplierId),
+    withhold_status: withholdStatus
+  }
+  return data;
+}
+
+
+async function registerPurchase() {
+  const purchasedProducts = getPurchasedProductFromTable();
+  const purchaseSupplier = getPurchaseSupplierData();
+  if (purchaseSupplier.supplier_name === ''){
+    alert('Supplier is Required');
+    return;
+  }
+
+  for (const product of purchasedProducts){
+    const ProductData = {
+      name: product.name,
+      description: product.unit_description,
+      purchase_price: product.purchase_price,
+      saling_price: null,
+      expiry_date: product.expiry_date,
+      supplier_id: purchaseSupplier.supplier_id,
+      remarks: ''
+    };
+    console.log('product: ', ProductData)
+    const productIdText = await window.electronAPI.fetchData('add-products-data', ProductData);
+    let productId = parseInt(JSON.parse(productIdText)[0].id);
+
+    const totalPrice = product.purchase_price * product.quantity;
+    let amountPaid; let withheldAmount;
+    if (purchaseSupplier.withhold_status) {
+      amountPaid = 0.98 * totalPrice;
+      withheldAmount = 0.02 * totalPrice;
+    } else {
+      amountPaid = totalPrice;
+      withheldAmount = 0;
+    }
+    const purchaseData = {
+      product_id: productId,
+      quantity: product.quantity,
+      purchase_date: new Date(),
+      payment_method: '',
+      amount_paid: amountPaid,
+      tax_withheld: withheldAmount,
+      remarks: '',
+      supplier_id: ProductData.supplier_id,
+      unit_price: ProductData.purchase_price
+    }
+    console.log('purchase data : ', purchaseData)
+
+    const purchaseIdText = await window.electronAPI.fetchData('add-purchase-data', purchaseData);
+    const purchaseId = parseInt(JSON.parse(purchaseIdText)[0].id);
+
+    const productStock = {
+      product_id: productId,
+      quantity: product.quantity,
+      purchase_id: purchaseId,
+      supplierId: purchaseSupplier.supplier_id,
+      remarks: '' 
+    } 
+
+    const productStockIdText = await window.electronAPI.fetchData('add-stock-data', productStock);
+    const productStockId = parseInt(JSON.parse(productStockIdText)[0].id);
+    
+    if (productId === productStockId){
+      console.log('Product name = ',productData.name, 'with id = ', productId, 'is successfully added');
+    }
+  }
+  document.getElementById('sales-exit-btn').click();
+
+}
 
 const salesPage = {
   makeSalesPage,

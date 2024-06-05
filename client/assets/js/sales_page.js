@@ -37,6 +37,7 @@ function makeSalesPage(product_data, customer_data) {
   modalContainer.innerHTML = '';
 
   
+  
 
   const salesPage = makeGrid(modalContainer);
   mainContainer.appendChild(salesPage);

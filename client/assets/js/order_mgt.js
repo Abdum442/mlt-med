@@ -41,10 +41,7 @@ salesCheckoutBtn.addEventListener('click', async function () {
   await checkoutOrder(salesOrderTbody);
 })
 
-
-
-async function reloadData (product_data, customer_data) {
-  document.getElementById('modal-loader').style.display = 'block';
+async function fetchData() {
   const raw_products_data = await window.electronAPI.fetchData('fetch-products-data');
   localStorage.setItem('products-data', raw_products_data);
 
@@ -56,9 +53,17 @@ async function reloadData (product_data, customer_data) {
 
   const raw_sales_data = await window.electronAPI.fetchData('fetch-sales-data');
   localStorage.setItem('sales-data', raw_sales_data);
-  
 
+  const raw_purchase_data = await window.electronAPI.fetchData('fetch-purchase-data');
+  localStorage.setItem('purchase-data', raw_sales_data);
+}
+
+
+
+async function reloadData (product_data, customer_data) {
+  document.getElementById('modal-loader').style.display = 'block';
   
+  await fetchData();
 
   const product_data_tmp = salesPage.getProductData();
   const customer_data_tmp = salesPage.getCustomerData();
@@ -75,7 +80,7 @@ async function reloadData (product_data, customer_data) {
       td.style.color = 'white';
     });
 
-  printHoldOrders(holdTable, productDataCopy, customerDataCopy);
+  // printHoldOrders(holdTable, productDataCopy, customerDataCopy);
 
   document.getElementById('modal-loader').style.display = 'none';
 }
@@ -347,8 +352,13 @@ async function checkoutOrder(order_table_body) {
   const customerNameInput = document.getElementById('sales-customer-name');
   let customerId;
   const customerName = customerNameInput.value.trim();
+  const trows = order_table_body.querySelectorAll('tr');
   if (customerName === '') {
     alert('Select a customer in Customer Info');
+    return;
+  }
+
+  if (trows.length === 0){
     return;
   }
   const customerDatalistElement = document.getElementById('sales-customer-list');
@@ -403,9 +413,12 @@ async function checkoutOrder(order_table_body) {
     matchedProductStockData.quantity -= quantitySold;
 
     const prodIdText = await window.electronAPI.fetchData('modify-stock-data', matchedProductStockData);
-
+    await fetchData();
   });
   salesPrintBtn.click();
+
+  salesReloadBtn.click();
+
   // salesReloadBtn.click();
   // const holdTab = document.getElementById('sales-hold-tab');
   // holdTab.click();

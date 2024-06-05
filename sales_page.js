@@ -1,6 +1,6 @@
 const mainContainer = document.getElementById('sales-main-container');
 
-const modalContainer = document.getElementById('sales-modal');
+const modalContainer = document.getElementById('invoice-modal');
 
 const customerDetails = [
   { id: "0", name: 'Walking', tin_number: '' },
@@ -684,7 +684,7 @@ function printSalesReport() {
   const header = document.createElement('div');
   header.className = 'sales-header';
 
-  header.innerHTML = `<span onclick="document.querySelector('.sales-modal').style.display='none'"
+  header.innerHTML = `<span onclick="document.getElementById('invoice-modal').style.display='none'"
                          class="sales-close" title="Close Receipt">&times;</span>
                       <h1>MLT Trading PLC</h1>
                       <p>Kebele 06, Bahir Dar</p>
