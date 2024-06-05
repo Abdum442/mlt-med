@@ -784,6 +784,8 @@ function printSalesReport() {
   receipt.appendChild(printBtn);
   modal.appendChild(receipt);
 
+  modal.querySelector('#sales-date').innerHTML = formatDate(new Date());
+
   return modal;
 }
 

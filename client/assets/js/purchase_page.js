@@ -811,7 +811,7 @@ function printSalesReport() {
   storeInfo.className = 'sales-store-info';
 
   storeInfo.innerHTML = `<p>Invoice #: <span id="sales-invoice-number">10001</span></p>
-                         <p>Date: <span id="sales-date">2024-04-15</span></p>`
+                         <p>Date: <span id="sales-date"></span></p>`
 
   const customerInfo = document.createElement('div');
   const customerName = document.getElementById('sales-customer-name').value;
@@ -899,6 +899,8 @@ function printSalesReport() {
   receipt.appendChild(table);
   receipt.appendChild(printBtn);
   modal.appendChild(receipt);
+
+  modal.querySelector('#sales-date').innerHTML = formatDate(new Date());
 
   return modal;
 }
