@@ -79,7 +79,7 @@ const salesReportWindow = () => {
         nodeIntegration: true,
       },
     });
-    // salesWin.maximize()
+    salesWin.maximize();
 
     salesWin.loadFile(data.file);
   })

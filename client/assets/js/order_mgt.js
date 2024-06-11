@@ -93,7 +93,6 @@ async function addSalesOrderFromHold (order_table_body) {
     alert('Select a customer in Customer Section');
     return;
   }
-  console.log('after return');
   const customerDatalistElement = document.getElementById('sales-customer-list');
 
   const selectedOption = customerDatalistElement.querySelector(`option[value="${customerName}"]`);
@@ -163,14 +162,16 @@ async function printHoldOrders (hold_table_body, product_data, customer_data) {
   //   }
   // });
   let holdOrderData = [];
+  const fullData = [];
   for (const obj of ordersObjectData) {
     if (obj.checkout_status === 'hold') {
       const matchCustomerObj = customerObjData.find(customerObj => customerObj.id === obj.customer_id);
       const data = [obj.id, matchCustomerObj.name, obj.customer_id, formatDate(obj.order_date), formatNumber(parseFloat(obj.total_amount))];
       holdOrderData.push(data);
+      fullData.push(obj);
     }
   }
-  console.log('hold orders : ', holdOrderData);
+  console.log('hold orders : ', fullData);
   holdOrderData.forEach(hold => {
     const trow = document.createElement('tr');
     hold.forEach(entry => {

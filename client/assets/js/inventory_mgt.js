@@ -89,7 +89,6 @@ function productDetails(product_tab, product_modal) {
 
   const productsRawData = localStorage.getItem('products-data');
   const purchaseData = JSON.parse(localStorage.getItem('purchase-data'));
-  console.log('purchase Data :', purchaseData);
 
   const productsObjData = JSON.parse(productsRawData);
   
@@ -164,7 +163,7 @@ function productDetails(product_tab, product_modal) {
 
 function stockDetails(stock_tab) {
   stock_tab.innerHTML = '';
-  const stockTableHeader = ['Item Name', 'Quantity', 'Purchase ID', 'Supplier', 'Remarks'];
+  const stockTableHeader = ['Item Name', 'Quantity', 'Purchase ID', 'Supplier'];
 
   let commonData = {
     tableId: "stock-content",
@@ -174,12 +173,21 @@ function stockDetails(stock_tab) {
 
   const stockObjData = JSON.parse(localStorage.getItem('stock-data'));
   const productObjData = JSON.parse(localStorage.getItem('products-data'));
+  const supplierObjData = JSON.parse(localStorage.getItem('suppliers-data'));
 
   const productMap = new Map(productObjData.map(prod => [parseInt(prod.id), prod.name]));
+  const supplierMap = new Map(supplierObjData.map(supplier => [parseInt(supplier.id), supplier.name]));
 
   const stockTableData = stockObjData.map(obj => {
     const prodName = productMap.get(parseInt(obj.product_id));
-    return [prodName, obj.quantity, obj.purchase_id, obj.supplier_id, obj.remarks];
+    let supplierName;
+    if(obj.supplier_id){
+      supplierName = supplierMap.get(parseInt(obj.supplier_id));
+    }else {
+      supplierName = '';
+    }
+
+    return [prodName, obj.quantity, obj.purchase_id, supplierName];
   });
 
 

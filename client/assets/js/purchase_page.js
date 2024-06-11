@@ -988,7 +988,6 @@ function populateProductNameOptions(product_data) {
 
   for (const name of productNames) {
     const products = product_map.get(name);
-    console.log('product lists: ', products);
     const optionElement = document.createElement("option");
     optionElement.value = name;
     optionElement.textContent = name;
@@ -1199,7 +1198,7 @@ function getPurchasedProductFromTable() {
       purchase_price: unitPrice,
       quantity: quantity
     };
-    console.log('purchase: ', data)
+    // console.log('purchase: ', data)
     purchasedProducts.push(data);
   });
   return purchasedProducts;
@@ -1261,7 +1260,7 @@ async function registerPurchase() {
       supplier_id: ProductData.supplier_id,
       unit_price: ProductData.purchase_price
     }
-    console.log('purchase data : ', purchaseData)
+    // console.log('purchase data : ', purchaseData)
 
     const purchaseIdText = await window.electronAPI.fetchData('add-purchase-data', purchaseData);
     const purchaseId = parseInt(JSON.parse(purchaseIdText)[0].id);
@@ -1270,9 +1269,11 @@ async function registerPurchase() {
       product_id: productId,
       quantity: product.quantity,
       purchase_id: purchaseId,
-      supplierId: purchaseSupplier.supplier_id,
+      supplier_id: purchaseSupplier.supplier_id,
       remarks: '' 
     } 
+
+    console.log('stock data: ', productStock);
 
     const productStockIdText = await window.electronAPI.fetchData('add-stock-data', productStock);
     const productStockId = parseInt(JSON.parse(productStockIdText)[0].id);

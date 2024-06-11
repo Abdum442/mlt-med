@@ -8,6 +8,8 @@ const mainContainer = document.getElementById('mainContainer');
 
 const modalLoader = document.getElementById('modal-loader');
 
+const dashboardDetails = document.getElementById('dashboard-details');
+
 // transactionMgtMenu.parentElement.addEventListener('click', function () {
 //   alert('transaction menu is clicked');
 // })
@@ -54,11 +56,35 @@ const frequentData = async function () {
   modalLoader.style.display = 'none';
 };
 
-customerMgtMenu.addEventListener('click', frequentData);
-// inventoryMgtMenu.addEventListener('click', frequentData);
-transactionMgtMenu.addEventListener('click', frequentData);
-financialReportMgtMenu.addEventListener('click', frequentData);
-settingMenu.addEventListener('click', frequentData);
+document.addEventListener("DOMContentLoaded", async () => {
+  await frequentData();
+});
+
+customerMgtMenu.addEventListener('click', async () => {
+  document.getElementById('detailed').style.display = 'block';
+  dashboardDetails.style.display = 'none';
+  await frequentData();
+});
+inventoryMgtMenu.addEventListener('click', async () => {
+  document.getElementById('detailed').style.display = 'block';
+  dashboardDetails.style.display = 'none';
+  await frequentData();
+});
+transactionMgtMenu.addEventListener('click', async () => {
+  document.getElementById('detailed').style.display = 'block';
+  dashboardDetails.style.display = 'none';
+  await frequentData();
+});
+financialReportMgtMenu.addEventListener('click', async () => {
+  document.getElementById('detailed').style.display = 'block';
+  dashboardDetails.style.display = 'none';
+  await frequentData();
+});
+settingMenu.addEventListener('click', async () => {
+  document.getElementById('detailed').style.display = 'block';
+  dashboardDetails.style.display = 'none';
+  await frequentData();
+});
 
 
 

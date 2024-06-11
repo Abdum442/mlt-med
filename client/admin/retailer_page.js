@@ -67,16 +67,23 @@ async function saveModification() {
   formData['licenceNumber'] = modal.querySelector('[name="mod-retailerLicence"]').value;
   formData['remark'] = modal.querySelector('[name="mod-retailerRemark"]').value;
 
+  if (formData.retailerName === '') {
+    alert('Specify Name of the customer');
+    return;
+  }
+  modal.style.display = 'none';
 
-
+  document.getElementById('modal-loader').style.display = 'block';
   const id = await window.electronAPI.fetchData('modify-retailers-data', formData);
 
-  modal.style.display = 'none';
+  const raw_retailers_data = await window.electronAPI.fetchData('fetch-retailers-data');
+  localStorage.setItem('retailers-data', raw_retailers_data);
+
+
+  document.getElementById('modal-loader').style.display = 'none';
+
+  viewRetailerBtn.click();
   viewTab.click();
-  setTimeout(() => {
-    customerMgt.click();
-    viewRetailerBtn.click();
-  }, 1000);
 } 
 
 function renderRetailerTable () {
@@ -165,14 +172,22 @@ async function addRetailerData () {
   formData['remark'] = addContent.querySelector('[name="retailerRemark"]').value;
 
   clearAddForm();
-
-  if(formData.retailerName === '') {
+  if (formData.retailerName === '') {
     alert('Specify Name of the customer');
-  } else {
-    const rowRawData = await window.electronAPI.fetchData('add-retailers-data', formData);
-
-    viewTab.click();
+    return;
   }
+
+  document.getElementById('modal-loader').style.display = 'block';
+  const rowRawData = await window.electronAPI.fetchData('add-retailers-data', formData);
+
+  const raw_retailers_data = await window.electronAPI.fetchData('fetch-retailers-data');
+  localStorage.setItem('retailers-data', raw_retailers_data);
+
+
+  document.getElementById('modal-loader').style.display = 'none';
+
+  viewRetailerBtn.click();
+  viewTab.click();
 
   
 }
