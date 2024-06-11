@@ -37,7 +37,6 @@ dashboardMenu.addEventListener('click', function () {
     const salesAmount = parseInt(sales.amount_received);
 
     const purchasePrice = parseFloat(productMap.get(parseInt(sales.product_id)).purchasePrice);
-    console.log('purchasePrice: ', purchasePrice);
 
     const purchaseCost = quantitySold * purchasePrice;
 
@@ -188,16 +187,22 @@ function constructDashboardDetails() {
     { id: 2, amount: 5000, dueDate: '2024-07-01', type: 'Debit' }
   ];
 
-  const salesData = [
-    { date: '2024-01-01', volume: 100 },
-    { date: '2024-01-02', volume: 120 },
-    { date: '2024-01-03', volume: 110 },
-    { date: '2024-01-31', volume: 150 },
-    { date: '2024-02-01', volume: 140 },
-    { date: '2024-02-02', volume: 160 },
-    { date: '2024-02-03', volume: 170 },
-    // Continue for other days
-  ];
+  const salesRawData = JSON.parse(localStorage.getItem('sales-data'));
+
+  const salesData = getSalesData(salesRawData, 7);
+
+    // const salesData = [
+    //   { date: '2024-01-01', volume: 100 },
+    //   { date: '2024-01-02', volume: 120 },
+    //   { date: '2024-01-03', volume: 110 },
+    //   { date: '2024-01-31', volume: 150 },
+    //   { date: '2024-02-01', volume: 140 },
+    //   { date: '2024-02-02', volume: 160 },
+    //   { date: '2024-02-03', volume: 170 },
+    //   // Continue for other days
+    // ];
+
+  // console.log('sales raw: ', salesRawData);  
 
   function formatDateLabels(data) {
     const labels = [];
@@ -269,7 +274,7 @@ function constructDashboardDetails() {
           }
         },
         y: {
-          beginAtZero: true,
+          beginAtZero: false,
           border: {
             display: false,
           },
@@ -289,7 +294,7 @@ function constructDashboardDetails() {
             },
             min: 80,
             max: 180,
-            stepSize: 20
+            stepSize: 5000
           },
           grid: {
             display: false
@@ -343,4 +348,60 @@ function constructDashboardDetails() {
     cell3.innerText = entry.dueDate;
     cell4.innerText = entry.type;
   });
+}
+
+function getSalesData(salesRawData, salesWindow) {
+  // Get today's date and set the time to 00:00:00 to ignore time component
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+ 
+  // Create a map to store sales volumes by date
+  const salesMap = new Map();
+
+  // Process the raw data
+  let total = 0;
+  salesRawData.forEach(entry => {
+    if (entry.checkout_status !== 'hold'){
+      const date = new Date(entry.sale_date);
+      date.setHours(0, 0, 0, 0); // Normalize the time part
+
+      const dateString = date.toISOString().split('T')[0];
+
+      console.log('sales date: ', entry.sale_date, 'formated date: ', dateString);
+      
+      if (!salesMap.has(dateString)) {
+        salesMap.set(dateString, 0);
+        total = 0;
+      } else {
+        total += parseFloat(entry.amount_received);
+      }
+
+      salesMap.set(dateString, salesMap.get(dateString) + parseFloat(entry.amount_received));
+    }
+    
+    
+  });   
+
+  // Create the result array
+  const result = [];
+
+  // Count backwards from today up to the salesWindow
+  for (let i = 0; i < salesWindow; i++) {
+    const date = new Date(today);
+    date.setDate(today.getDate() - i);
+    date.setHours(0, 0, 0, 0); // Normalize the time part
+
+    const formattedDate = date.toISOString().split('T')[0]; // Format date as YYYY-MM-DD
+    // console.log('i: ', i, 'string date : ', formattedDate);
+    const volume = Math.round(salesMap.get(formattedDate) || 0); // Get volume or 0 if no sales on that date
+
+    result.push({ date: formattedDate, volume });
+    // console.log('date: ', date, 'amount received: ', salesMap.get(date));
+  }
+  // console.log('date: ', date)
+  console.log('sales map: ', salesMap)
+
+  // console.log('sale data: ', salesMap.get(data));
+  // Reverse the result array to have the dates in chronological order
+  return result.reverse();
 }
