@@ -7,6 +7,42 @@ const pool = new Pool({
   password: 'mlttrading',
   port: 5432,
 })
+
+const sendQuery = async (request, response) => {
+  const { queryType, query, data} = request.body;
+
+  try {
+    let result;
+    switch(queryType) {
+      case 'SELECT':
+        result = await pool.query(query, data);
+        response.status(200).json(result.rows);
+        break;
+      case 'UPDATE':
+        result = await pool.query(query, data);
+        response.status(200).json({message: 'Update successful', rowCount: result.rowCount});
+        break;
+      case 'INSERT':
+        result = await pool.query(query, data);
+        response.status(200).json({ message: 'Insert successful', rowCount: result.rowCount });
+        break;
+      case 'DELETE':
+        result = await pool.query(query, data);
+        response.status(200).json({ message: 'Delete successful', rowCount: result.rowCount });
+        break;
+      case 'CREATE':
+        result = await pool.query(query);
+        response.status(201).json({ message: 'Table creation successful' });
+        break;
+      default:
+        response.status(400).json({ error: 'Invalid query type' });
+        break;
+    }
+  } catch (error) {
+    response.status(500).json({error: error.message})
+  }
+}
+
 const getUsers = (request, response) => {
   pool.query('SELECT * FROM users ORDER BY id ASC', (error, results) => {
     if (error) {
@@ -499,6 +535,7 @@ const bankData = {
 }
 
 module.exports = {
+  sendQuery,
   userData,
   supplierData,
   retailerData,

@@ -6,8 +6,9 @@ function CreateTableFromData(combined_data) {
   this.maxRows = 10;
 
   const make_headWrap = function () {
-    return `<div class="header_wrap">
-                      <div class="num_rows">
+    const headerWrap = document.createElement('div');
+    headerWrap.className = 'header_wrap';
+    headerWrap.innerHTML = `<div class="num_rows">
 		                    <div class="form-group">
                         <span>Show </span>
 			 		                <select class="form-control" name="state" id="maxRows">
@@ -22,8 +23,8 @@ function CreateTableFromData(combined_data) {
                       <div class="tb_search">
                         <input type="text" id="search_input_all"  
                             placeholder="Search.." class="form-control">
-                      </div>
-                    </div>`;
+                      </div>`;
+    return headerWrap;
   }
 
   const make_footWrap = function () {
@@ -56,6 +57,8 @@ function CreateTableFromData(combined_data) {
   this.renderTable = function () {
     let tableContainer = document.getElementById(this.tableId);
 
+    tableContainer.innerHTML = '';
+
     const headWrap = make_headWrap();
     const footWrap = make_footWrap();
 
@@ -78,7 +81,7 @@ function CreateTableFromData(combined_data) {
 
     table.appendChild(tbody);
 
-    tableContainer.innerHTML = headWrap;
+    tableContainer.appendChild(headWrap);
 
     tableContainer.appendChild(table);
 
@@ -87,9 +90,11 @@ function CreateTableFromData(combined_data) {
     make_table(tbody, 0, this.tableData.length);
 
 
+    // console.log('table id: ', this.tableId);
+    // console.log('table element: ', document.getElementById(this.tableId).querySelector('.header_wrap .form-control'));
 
-    const maxRowsContainer = document.getElementById('maxRows')
-    const paginationContainer = document.querySelector('.pagination');
+    const maxRowsContainer = document.getElementById(this.tableId).querySelector('.header_wrap .form-control')
+    const paginationContainer = document.getElementById(this.tableId).querySelector('.pagination');
 
     maxRowsContainer.addEventListener('change', (event) => {
       event.preventDefault();
@@ -161,7 +166,7 @@ function CreateTableFromData(combined_data) {
 
   this.searchFilter = function () {
 
-    const searchInputElement = document.getElementById("search_input_all");
+    const searchInputElement = document.getElementById(this.tableId).querySelector("#search_input_all");
 
     // const table_data = this.tableData;
 
@@ -171,8 +176,8 @@ function CreateTableFromData(combined_data) {
 
       const filter = event.target.value.toLowerCase();
       if (filter) {
-        document.getElementById('maxRows').dispatchEvent(new Event('change'));
-        document.getElementById('maxRows').value = '5000';
+        document.getElementById(this.tableId).querySelector('#maxRows').dispatchEvent(new Event('change'));
+        document.getElementById(this.tableId).querySelector('#maxRows').value = '5000';
         document.getElementById(this.tableId).querySelector('.rows_count').innerHTML = '';
         document.getElementById(this.tableId).querySelector('.pagination').innerHTML = '';
         // this.filteredData = table_data.filter(row => row.some(item => item.toLowerCase().includes(filter)));
@@ -202,7 +207,7 @@ function CreateTableFromData(combined_data) {
         });
       } else {
         
-        document.getElementById('maxRows').dispatchEvent(new Event('change'));
+        document.getElementById(this.tableId).querySelector('#maxRows').dispatchEvent(new Event('change'));
         
       }
 

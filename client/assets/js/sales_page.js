@@ -520,6 +520,14 @@ function orderTable(product_data) {
   const itemName = productNameInput.value;
   const product_map = createProductMap(product_data);
   const productList = product_map.get(itemName);
+  console.log('product list: ', productList);
+
+  for (const product of productList) {
+    if(product.price === null){
+      alert(`Selling Price of ${product.name} need to be set first.`)
+      return
+    }
+  }
 
   const totalStock = productList.reduce((sum, product) => sum + parseInt(product.stockLevel), 0);
 

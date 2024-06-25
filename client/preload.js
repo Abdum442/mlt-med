@@ -9,5 +9,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   }, 
   fetchData: (channel, data = null) => {
     return ipcRenderer.invoke(channel, data) 
+  },
+  sendQuery: (channel, queryType, query, data=null) => {
+    return ipcRenderer.invoke(channel, queryType, query, data);
   }
 })

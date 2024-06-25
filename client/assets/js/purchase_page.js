@@ -1273,7 +1273,7 @@ async function registerPurchase() {
       remarks: '' 
     } 
 
-    console.log('stock data: ', productStock);
+    // console.log('stock data: ', productStock);
 
     const productStockIdText = await window.electronAPI.fetchData('add-stock-data', productStock);
     const productStockId = parseInt(JSON.parse(productStockIdText)[0].id);

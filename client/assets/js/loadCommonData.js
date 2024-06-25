@@ -1,7 +1,7 @@
 const customerMgtMenu = document.getElementById('customerMgt');
 const inventoryMgtMenu = document.getElementById('inventoryMgt');
 const transactionMgtMenu = document.getElementById('transactionMgt');
-const financialReportMgtMenu = document.getElementById('financialRreportMgt');
+const financialReportMgtMenu = document.getElementById('financialReportMgt');
 const settingMenu = document.getElementById('setting');
 
 const mainContainer = document.getElementById('mainContainer');

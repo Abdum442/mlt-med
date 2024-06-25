@@ -4,6 +4,21 @@ const axios = require('axios');
 
 const serverUrl = 'http://localhost:3000';
 
+const handleQuery = (url_route) => {
+  ipcMain.handle(url_route, async (event, queryType, query, data) => {
+    try {
+      const response = await axios.post(`${serverUrl}/${url_route}`, {queryType, query, data});
+      return JSON.stringify(response.data);
+    } catch (err) {
+      if (err.code === 'ECONNRESET' || err.code === 'ECONNABORTED') {
+        console.error('Connection error:', err.message);
+      } else {
+        console.error('Other error:', err);
+      }
+    }
+  })
+}
+
 
 const fetchData = (urlRout) => {
   const channel = 'fetch-'+urlRout+'-data';
@@ -84,6 +99,8 @@ const salesReportWindow = () => {
     salesWin.loadFile(data.file);
   })
 }
+
+handleQuery('general-query');
 
 fetchData('users');
 fetchData('suppliers');

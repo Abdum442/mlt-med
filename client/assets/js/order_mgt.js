@@ -359,9 +359,6 @@ async function checkoutOrder(order_table_body) {
     return;
   }
 
-  if (trows.length === 0){
-    return;
-  }
   const customerDatalistElement = document.getElementById('sales-customer-list');
 
   const selectedOption = customerDatalistElement.querySelector(`option[value="${customerName}"]`);
@@ -393,7 +390,7 @@ async function checkoutOrder(order_table_body) {
     const productId = parseInt(tr.cells[0].textContent); 
     const stockLevel = productDataInfo.find(prod => prod.id === productId).stockLevel;
     const totalPrice = reformatNumber(tr.cells[5].textContent.trim());
-    if ( stockLevel < quantitySold ){
+    if (stockLevel < quantitySold){
       alert(`Insufficient Stock for ${tr.cells[1].textContent} with id ${tr.cells[0].textContent}. Amend your order`);
       return;
     }

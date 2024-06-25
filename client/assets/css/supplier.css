@@ -92,13 +92,15 @@ h1, h2, h3 {
 #recent_orders .modal .form-container{
   width: 100%;
 }
-#recent_orders input[type=text] {
+#recent_orders input[type=text],
+input[type=date] {
   width: 100%;
   margin-bottom: 20px;
   padding: 12px;
   border: 1px solid #ccc;
   border-radius: 3px;
 }
+
 #recent_orders textarea {
   resize: vertical;
   margin-bottom: 20px;

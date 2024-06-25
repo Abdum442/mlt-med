@@ -176,9 +176,9 @@ function purchaseTransactionContainer() {
   return tabContainer;
 }
 
-function salesDetails(sales_tab) {
+async function salesDetails(sales_tab) {
   sales_tab.innerHTML = '';
-  const salesTableHeader = ['ID', 'Date', 'Customer', 'Order ID', 'Item Name', 'Unit Price', 'Quantity', 'Total Price', 'Remarks'];
+  const salesTableHeader = ['ID', 'Date', 'Customer', 'Order ID', 'Item Name', 'Unit Price', 'Quantity', 'Total Price'];
 
   let commonData = {
     tableId: "sales-table-container",
@@ -186,41 +186,73 @@ function salesDetails(sales_tab) {
     tableData: []
   };
 
-  const salesRawData = localStorage.getItem('sales-data');
-  const productRawData = localStorage.getItem('products-data');
-  const retailerRawData = localStorage.getItem('retailers-data');
+  // const salesRawData = localStorage.getItem('sales-data');
+  // const productRawData = localStorage.getItem('products-data');
+  // const retailerRawData = localStorage.getItem('retailers-data');
 
+
+  // const salesObjData = JSON.parse(salesRawData);
+  // const productObjData = JSON.parse(productRawData);
+  // const retailerObjData = JSON.parse(retailerRawData);
+
+  const queryType = 'SELECT';
+  const query = `SELECT
+                    s.id AS id,
+                    s.sale_date AS date,
+                    r.name AS customer,
+                    s.order_id AS order_id,
+                    p.name AS product_name,
+                    p.saling_price AS selling_price,
+                    s.quantity_sold AS quantity,
+                    (s.quantity_sold * p.saling_price) AS total_price
+                  FROM sales s
+                  JOIN products p ON s.product_id = p.id
+                  JOIN retailers r ON s.retailer_id = r.id
+                  WHERE s.checkout_status = 'sold'`
+
+  const salesRawData = await window.electronAPI.sendQuery('general-query', queryType, query);
 
   const salesObjData = JSON.parse(salesRawData);
-  const productObjData = JSON.parse(productRawData);
-  const retailerObjData = JSON.parse(retailerRawData);
+  
+  const salesTableData = salesObjData.map(sales => 
+    
+    [
+    sales.id, 
+    formatDate(sales.date), 
+    sales.customer, 
+    sales.order_id, 
+    sales.product_name, 
+    sales.selling_price, 
+    sales.quantity, 
+    sales.total_price 
+  ])
 
-
-  const productMap = new Map(productObjData.map(item => 
-    [parseInt(item.id), {name: item.name, sellingPrice: item.saling_price}]));
+  // const productMap = new Map(productObjData.map(item => 
+  //   [parseInt(item.id), {name: item.name, sellingPrice: item.saling_price}]));
 
   
+  
 
-  const retailerMap = new Map(retailerObjData.map(retailer => 
-    [parseInt(retailer.id), retailer.name]));
-    let salesTableData = [];
-    for ( const sales of salesObjData) {
-      if (sales.checkout_status === 'sold') {
-        const product_id = parseInt(sales.product_id);
-        const item_name = productMap.get(product_id).name;
-        const customer_name = retailerMap.get(parseInt(sales.retailer_id));
-        const unit_price_number = parseFloat(productMap.get(product_id).sellingPrice);
-        const unit_price_formatted = formatNumber(parseFloat(unit_price_number));
-        const sales_date_formatted = formatDate(sales.sale_date);
-        const quantity_sold = sales.quantity_sold;
-        const quantity_sold_number = parseInt(quantity_sold);
-        const total_price_number = unit_price_number * quantity_sold_number;
-        const total_price_formatted = formatNumber(total_price_number);
-        const salesData = [sales.id, sales_date_formatted, customer_name, sales.order_id, item_name, unit_price_formatted, quantity_sold,
-          total_price_formatted, sales.remarks];
-        salesTableData.push(salesData);
-      }
-    }
+  // const retailerMap = new Map(retailerObjData.map(retailer => 
+  //   [parseInt(retailer.id), retailer.name]));
+  //   let salesTableData = [];
+  //   for ( const sales of salesObjData) {
+  //     if (sales.checkout_status === 'sold') {
+  //       const product_id = parseInt(sales.product_id);
+  //       const item_name = productMap.get(product_id).name;
+  //       const customer_name = retailerMap.get(parseInt(sales.retailer_id));
+  //       const unit_price_number = parseFloat(productMap.get(product_id).sellingPrice);
+  //       const unit_price_formatted = formatNumber(parseFloat(unit_price_number));
+  //       const sales_date_formatted = formatDate(sales.sale_date);
+  //       const quantity_sold = sales.quantity_sold;
+  //       const quantity_sold_number = parseInt(quantity_sold);
+  //       const total_price_number = unit_price_number * quantity_sold_number;
+  //       const total_price_formatted = formatNumber(total_price_number);
+  //       const salesData = [sales.id, sales_date_formatted, customer_name, sales.order_id, item_name, unit_price_formatted, quantity_sold,
+  //         total_price_formatted, sales.remarks];
+  //       salesTableData.push(salesData);
+  //     }
+  //   }
 
   commonData.tableData = salesTableData;
 
@@ -298,7 +330,6 @@ function orderDetails(order_tab) {
   }))
 
   let orderTableData = [];
-  const fullData = [];
 
   for ( const order of orderObjData ) {
     if (order.checkout_status === 'sold') {
@@ -311,10 +342,9 @@ function orderDetails(order_tab) {
       const orderData = [order.id, order_date, customer_name, total_amount, tax_withheld,
         amount_paid, amount_remaining];
       orderTableData.push(orderData);
-      fullData.push(order);
     } 
   } 
-  console.log('full Data: ', fullData)
+
   commonData.tableData = orderTableData;
 
   const orderHTMLtable = new CreateTableFromData(commonData);
@@ -335,7 +365,6 @@ function productDetails(product_tab, product_modal) {
 
   const productsRawData = localStorage.getItem('products-data');
   const purchaseData = JSON.parse(localStorage.getItem('purchase-data'));
-  console.log('purchase Data :', purchaseData);
 
   const productsObjData = JSON.parse(productsRawData);
 

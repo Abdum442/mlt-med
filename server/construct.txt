@@ -1,177 +1,15 @@
-# a database creation code 
+//after git pull  
 
-CREATE TABLE suppliers (
-ID SERIAL PRIMARY KEY,
-name VARCHAR(255),
-contactInfo VARCHAR(255),
-address VARCHAR(255),
-taxInfo VARCHAR(255),
-paymentTerms VARCHAR(255),
-remark VARCHAR(255)
-);
+cd server/
 
-CREATE TABLE products (
-  id SERIAL PRIMARY KEY,
-  name VARCHAR(100),
-  description VARCHAR(255),
-  purchase_price NUMERIC(10, 2),
-  saling_price NUMERIC(10, 2),
-  expiry_date DATE,
-  supplier_id INTEGER REFERENCES suppliers(id) ON UPDATE CASCADE,
-  remarks VARCHAR(100)
-);
+//then run the following command
 
+psql -U your_username -d mltdb -f mltdb_dump.sql 
 
-CREATE TABLE purchase (
-  id SERIAL PRIMARY KEY,
-  product_id INTEGER REFERENCES products(id) ON UPDATE CASCADE,
-  supplier_id INTEGER REFERENCES suppliers(id) ON UPDATE CASCADE,
-  quantity INTEGER,
-  purchase_date DATE,
-  payment_method VARCHAR(100),
-  amount_paid NUMERIC(10, 2),
-  tax_withheld NUMERIC(10, 2),
-  remarks VARCHAR(255)
-);
+//you will then be prompted for the database password which is mlttrading in case you forgot 
 
-CREATE TABLE expenses (
-  id SERIAL PRIMARY KEY,
-  description VARCHAR(255),
-  amount NUMERIC(10, 2),
-  expense_date DATE,
-  payment_method VARCHAR(100),
-  remarks VARCHAR(255)
-);
+// then after you are good to go in the usual sense
 
-CREATE TABLE company_stock (
-  product_id INTEGER REFERENCES products(id) ON UPDATE CASCADE,
-  quantity INTEGER,
-  purchase_id INTEGER REFERENCES purchase(id),
-  supplier_id INTEGER REFERENCES suppliers(id),
-  remarks VARCHAR(255)
-);
-
-CREATE TABLE retailers (
-  id SERIAL PRIMARY KEY,
-  name VARCHAR(100),
-  contact VARCHAR(100),
-  address VARCHAR(100),
-  payment_method VARCHAR(255),
-  remarks VARCHAR(100)
-);
-
-CREATE TABLE sales (
-  id SERIAL PRIMARY KEY,
-  product_id INTEGER REFERENCES products(id) ON UPDATE CASCADE,
-  retailer_id INTEGER REFERENCES retailers(id) ON UPDATE CASCADE,
-  quantity_sold INTEGER,
-  sale_date DATE,
-  payment_method VARCHAR(100),
-  amount_received NUMERIC(10, 2),
-  remarks VARCHAR(100)
-);
-
-CREATE TABLE bank_details (
-  id SERIAL PRIMARY KEY,
-  account_holder VARCHAR(100),
-  bank_name VARCHAR(100),
-  account_number INTEGER,
-  remarks VARCHAR(100)
-);
-
-CREATE TABLE company_loans (
-  id SERIAL PRIMARY KEY,
-  amount NUMERIC(10, 2),
-  interest_rate DECIMAL(5, 2),
-  duration_days INTEGER,
-  start_date DATE,
-  end_date DATE,
-  purpose VARCHAR(100),
-  remarks VARCHAR(100)
-);
-
-CREATE TABLE company_debit(
-  id SERIAL PRIMARY KEY,
-  amount NUMERIC(10, 2),
-  purpose VARCHAR(100),
-  interest_rate DECIMAL(5, 2),
-  payment_terms VARCHAR(100),
-  remarks VARCHAR(100)
-);
-
-CREATE TABLE sales_order(
-  id SERIAL PRIMARY KEY,
-  customer_id INTEGER REFERENCES retailers(id) ON UPDATE CASCADE,
-  order_date DATE,
-  total_amount NUMERIC(10, 2),
-  checkout_status BOOLEAN 
-);
-
-
-// To alter an existing TABLE - add column
-ALTER TABLE table_name ADD COLUMN column_name VARCHAR(100);
-
-// To login to the database
-psqll -d mltdb -U mlt  //psw: mlttrading
-
-
-
-********************** Cloning and restoring database *****************
-
-// change current directory to mlt-med
-// to pull changes to your local computer, run the following command
-
-// command
-git pull
-
-// look in to the files in server/ directory. If you see two new files dump_all_tables.sql
-// and mlt_database_schema.sql, then all is good. Otherwise, the changes are not pulled correctly
-
-
-// change directory to server (cd server if you are at mlt-med)
-
-//then execute the following command to clean (empty) the database mltdb
-
-// command
-psql -U mlt -h localhost -p 5432 -d mltdb -f drop_all_tables.sql
-
-// you will be prompted for a password which is mlttrading (if you have not already changed it)
-
-// next, you create the database by executing the following command to restore the database based on 
-// the specifications from the script mlt_database_schema.sql
-
-// command
-psql -U mlt -h localhost -p 5432 -d mltdb -f database_schema.sql
-
-// now you should get your database restored which is exactly the same as mine 
-// however, you will find all the tables empty
-
-// To check if it as required, login to the database by using
-
-// command
-psql -d postgres -U mltdb
-
-// now run the following command to see all the tables in the database
-
-\dt \\ hit enter to see the content of the database. you should get 
-
-mltdb=> \dt
-           List of relations
- Schema |     Name      | Type  | Owner 
---------+---------------+-------+-------
- public | bank_details  | table | mlt
- public | company_debit | table | mlt
- public | company_loans | table | mlt
- public | company_stock | table | mlt
- public | expenses      | table | mlt
- public | products      | table | mlt
- public | purchase      | table | mlt
- public | retailers     | table | mlt
- public | sales         | table | mlt
- public | sales_order   | table | mlt
- public | suppliers     | table | mlt
- public | users         | table | mlt
-(12 rows)
 
  id |   fullname    | username | password | role  | has_pic 
 ----+---------------+----------+----------+-------+---------
@@ -182,6 +20,11 @@ mltdb=> \dt
 
 INSERT INTO users (fullname, username, password, role, has_pic)
 VALUES (Admin, admin, admin, admin, f);
+
+
+
+
+
 
 
 
