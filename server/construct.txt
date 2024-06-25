@@ -4,7 +4,7 @@ cd server/
 
 //then run the following command
 
-psql -U your_username -d mltdb -f mltdb_dump.sql 
+psql -U mlt -d mltdb -f mltdb_dump.sql 
 
 //you will then be prompted for the database password which is mlttrading in case you forgot 
 
