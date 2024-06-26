@@ -2,9 +2,13 @@
 
 cd server/
 
-//then run the following command
+//then run the following command to remove all tables in the database mltdb
 
-psql -U mlt -d mltdb -f mltdb_dump.sql 
+psql -U mlt -h localhost -p 5432 -d mltdb -f drop_all_tables.sql
+
+//now restore the database to match with its state with mine, run the following command
+
+pg_restore -U mltdb -h localhost -p 5432 -d mltdb -v mltdb_dump.backup
 
 //you will then be prompted for the database password which is mlttrading in case you forgot 
 
