@@ -2,12 +2,14 @@ const dashboardMenu = document.getElementById('dashboard');
 
 document.addEventListener("DOMContentLoaded", () => {
   dashboardMenu.click();
-  constructDashboardDetails();  
 });
 
 dashboardMenu.addEventListener('click', async function () {
   document.getElementById('detailed').style.display = 'none';
   document.getElementById('dashboard-details').style.display = 'block';
+  document.getElementById('dashboard-details').innerHTML = '';
+
+  constructDashboardDetails();  
 
   const purchaseRawData = JSON.parse(localStorage.getItem('purchase-data'));
   const ordersRawData = JSON.parse(localStorage.getItem('orders-data'));
