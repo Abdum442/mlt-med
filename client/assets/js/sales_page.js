@@ -2,45 +2,17 @@ const mainContainer = document.getElementById('sales-main-container');
 
 const modalContainer = document.getElementById('sales-modal');
 
-// const customerDetails = [
-//   { id: "0", name: 'Walking', tin_number: '' },
-//   { id: "1", name: 'Dischem Ltd', tin_number: '1234gt3' },
-//   { id: '2', name: 'Beovac Trading PLC', tin_number: '' },
-//   { id: '3', name: 'Kare Pharmaceuticals PLC', tin_number: '9087UY' },
-//   { id: '4', name: 'GD Importr PLC', tin_number: '4675YHF' },
-//   { id: '5', name: 'Ashenafi Alle Import Trading', tin_number: '6473WFRDY' },
-//   { id: '6', name: 'VALDES PLC', tin_number: '345309YHTF' },
-//   { id: '7', name: 'BDU', tin_number: 'KJ987645' },
-//   { id: "8", name: 'ADDIS PHARMACEUTICAL FACTORY PLC', tin_number: '' },
-// ];
-
-// const medicinalProducts = [
-//   { id: "1001", name: "Paracetamol 500mg Tablets", stockLevel: '100', expiryDate: "2025-01-31", price: '45' },
-//   { id: "1011", name: "Paracetamol 500mg Tablets", stockLevel: '67', expiryDate: "2024-01-31", price: '45' },
-//   { id: "1002", name: "Aspirin 300mg Tablets", stockLevel: '50', expiryDate: "2024-08-14", price: '45' },
-//   { id: "1003", name: "Ibuprofen 200mg Tablets", stockLevel: '75', expiryDate: "2024-11-21", price: '45' },
-//   { id: "1004", name: "Diphenhydramine 25mg Capsules", stockLevel: '20', expiryDate: "2025-04-12", price: '45' },
-//   { id: "1005", name: "Loperamide 2mg Capsules", stockLevel: '45', expiryDate: "2024-09-27", price: '45' },
-//   { id: "1012", name: "Loperamide 2mg Capsules", stockLevel: '90', expiryDate: "2025-09-27", price: '45' },
-//   { id: "1013", name: "Loperamide 2mg Capsules", stockLevel: '60', expiryDate: "2024-11-27", price: '45' },
-//   { id: "1006", name: "Clotrimazole 1% Cream", stockLevel: '30', expiryDate: "2025-03-08", price: '45' },
-//   { id: "1007", name: "Salbutamol Inhaler (100mcg)", stockLevel: '25', expiryDate: "2024-10-10", price: '45' },
-//   { id: "1008", name: "Miconazole 2% Cream", stockLevel: '15', expiryDate: "2024-07-19", price: '45' },
-//   { id: "1009", name: "Prednisolone 5mg Tablets", stockLevel: '80', expiryDate: "2025-02-17", price: '45' },
-//   { id: "1010", name: "Amoxicillin 500mg Capsules", stockLevel: '60', expiryDate: "2024-12-06", price: '45' }
-// ];
-
 
 
 function makeSalesPage(product_data, customer_data) {
   mainContainer.innerHTML = '';
   modalContainer.innerHTML = '';
 
-  
-  
-
   const salesPage = makeGrid(modalContainer);
   mainContainer.appendChild(salesPage);
+
+  holdOrdersTable(product_data);
+
 
   salesPage.querySelector('#sales-order-tab').click();
 
@@ -51,6 +23,7 @@ function makeSalesPage(product_data, customer_data) {
 
   document.getElementById('sales-customer-name').addEventListener('input', manageCustomerInfo);
   populateCustomerNameOptions(customer_data);
+  managePaymentMode();
 
   document.getElementById('sales-add-order').addEventListener('click', function () {
     orderTable(product_data);
@@ -59,9 +32,18 @@ function makeSalesPage(product_data, customer_data) {
   
 }
 
-function getProductData() {
-  const productsObjectData = JSON.parse(localStorage.getItem('products-data'));
-  const stockObjectData = JSON.parse(localStorage.getItem('stock-data'));
+async function getProductData() {
+  
+
+  const queryProduct = `SELECT * FROM products`;
+
+  const queryStock = `SELECT * FROM company_stock`;
+
+  const productsRawData = await window.electronAPI.sendQuery('general-query', 'SELECT', queryProduct);
+  const stockRawData = await window.electronAPI.sendQuery('general-query', 'SELECT', queryStock);
+
+  const productsObjectData = JSON.parse(productsRawData);
+  const stockObjectData = JSON.parse(stockRawData);
 
   const productData = [];
 
@@ -82,8 +64,13 @@ function getProductData() {
   return productData;
 }
 
-function getCustomerData () {
-  const customerObjectData = JSON.parse(localStorage.getItem('retailers-data'));
+async function getCustomerData () {
+  
+
+  const query = `SELECT * FROM retailers`;
+  const customerRawData = await window.electronAPI.sendQuery('general-query', 'SELECT', query);
+  const customerObjectData = JSON.parse(customerRawData);
+
   const customerData = [];
 
   for (const customerObj of customerObjectData) {
@@ -121,6 +108,9 @@ function makeGrid(modal) {
 
   const orderTab = makeOrderTab();
   tabsCard.appendChild(orderTab);
+
+  const holdOrderTab = makeOrderHold();
+  tabsCard.appendChild(holdOrderTab);
 
   const buttonsCard = makeButtonsCard(modal);
 
@@ -192,10 +182,10 @@ function makeTabsCard() {
 
   tabsCard.appendChild(tab);
 
-  const orderHoldContent = document.createElement('div');
-  orderHoldContent.id = 'sales-hold-order';
+  // const orderHoldContent = document.createElement('div');
+  // orderHoldContent.id = 'sales-hold-order';
 
-  tabsCard.appendChild(orderHoldContent);
+  // tabsCard.appendChild(orderHoldContent);
 
   orderBtn.addEventListener('click', function () {
     manageTabs('sales-order-tab');
@@ -295,6 +285,39 @@ function makeButtonsCard(modal) {
   return buttonsCard;
 }
 
+function makeOrderHold() {
+  const holdOrderTab = document.createElement('div');
+  holdOrderTab.id = 'sales-hold-order';
+
+  const holdContent = document.createElement('div');
+  holdContent.className = 'sales-container';
+
+
+  holdContent.innerHTML = `<div class="sales-row">
+                                    <div class="sales-col-50">
+                                      <div class="sales-table-">
+                                        <table>
+                                          <thead>
+                                            <tr>
+                                              <td>Order ID</td>
+                                              <td>Customer Name</td>
+                                              <td>Customer ID</td>
+                                              <td>Order Date</td>
+                                              <td>Unpaid Amount</td>
+                                              <td>Action</td>
+                                            </tr>
+                                          </thead>
+                                          <tbody></tbody> 
+                                        </table>
+                                      </div>
+                                    </div>
+                                  </div>`;
+
+  holdOrderTab.appendChild(holdContent);
+
+  return holdOrderTab;
+}
+
 function makeOrderTab() {
   const orderTab = document.createElement('div');
   orderTab.id = 'sales-current-order';
@@ -342,8 +365,18 @@ function makeOrderTab() {
   const tfoot = document.createElement('thead');
   tfoot.className = 'total-sales';
   tfoot.innerHTML = `<tr class="summary">
+                        <td class="sales-text-right" colspan="5" style="color:white">Sub Total</td>
+                        <td class="sales-text-right" id="sales-sub-total"></td>
+                        <td></td>
+                      </tr>
+                      <tr class="summary">
+                        <td class="sales-text-right" colspan="5" style="color:white">Withheld</td>
+                        <td class="sales-text-right" id="sales-withhold-foot"></td>
+                        <td></td>
+                      </tr>
+                      <tr class="summary">
                         <td class="sales-text-right" colspan="5" style="color:white">Grand Total</td>
-                        <td class="sales-text-right" id="sales-grad-total"></td>
+                        <td class="sales-text-right" id="sales-grand-total"></td>
                         <td></td>
                       </tr>`;
   table.appendChild(tfoot);
@@ -364,9 +397,57 @@ function customerInfo() {
   const rowOuter = document.createElement('div');
   rowOuter.className = 'sales-row';
 
+  const rowPayment = document.createElement('div');
+  rowPayment.id = 'sales-payment';
+  rowPayment.className = 'sales-row';
+  // rowPayment.style.display = 'none';
 
+
+  const rule = document.createElement('div');
+  rule.innerHTML = `<hr> 
+                    <h2>Payment Mode</h2>
+                    <label>
+                      <input type="checkbox" id="sales-payment-mode" name="sales-payment-mode"> Partial Payment</input>
+                    </label> <br>`;
 
   container.appendChild(rowOuter);
+  container.appendChild(rule);
+  container.appendChild(rowPayment);
+
+  const leftCol50 = document.createElement('div');
+  leftCol50.className = 'sales-col-50';
+  leftCol50.style.display = 'none';
+
+  const amountPaidLabel = document.createElement('label');
+  amountPaidLabel.setAttribute('for', 'sales-amount-paid');
+  amountPaidLabel.textContent = 'Amount Paid';
+
+  const amountPaidInput = document.createElement('input');
+  amountPaidInput.id = 'sales-amount-paid';
+  amountPaidInput.type = 'text';
+
+  const remainingAmountLabel = document.createElement('label');
+  remainingAmountLabel.setAttribute('for', 'sales-remaining-amount');
+  remainingAmountLabel.textContent = 'Remaining Amount';
+
+  const remainingAmountInput = document.createElement('input');
+  remainingAmountInput.id = 'sales-remaining-amount';
+  remainingAmountInput.type = 'text';
+
+  leftCol50.appendChild(amountPaidLabel);
+  leftCol50.appendChild(amountPaidInput);
+  
+
+  const rightCol50 = document.createElement('div');
+  rightCol50.className = 'sales-col-50';
+  rightCol50.style.display = 'none';
+
+  rightCol50.appendChild(remainingAmountLabel);
+  rightCol50.appendChild(remainingAmountInput);
+
+  rowPayment.appendChild(leftCol50);
+  rowPayment.appendChild(rightCol50);
+
 
   const col75 = document.createElement('div');
   col75.className = 'sales-col-75';
@@ -419,7 +500,7 @@ function customerInfo() {
   iconContent.className = 'sales-icon-container'
 
   iconContent.innerHTML = `<label>
-                            <input type="checkbox" id="sales-withhold" name="sales-withhold"> Withholding
+                            <input type="checkbox" id="sales-withhold-check" name="sales-withhold-check"> Withholding
                            </label>`;
 
   col25.appendChild(iconContent);
@@ -511,16 +592,158 @@ function productInfo() {
   return container;
 }
 
+async function holdOrdersTable(product_data) {
+
+  const holdTableBody = document.getElementById('sales-hold-order').querySelector('table tbody');
+  holdTableBody.innerHTML = '';
+
+  const productNameInput = document.getElementById('sales-item-name');
+  const customerNameInput = document.getElementById('sales-customer-name');
+  const quantityOrderedInput = document.getElementById('sales-product-quantity');
+  const stockLevelInput = document.getElementById('sales-stock-level');
+  const salesAddOrderBtn = document.getElementById('sales-add-order');
+
+
+  const orderTableBody = document.getElementById('sales-current-order').querySelector('table tbody');
+
+  const query = `SELECT 
+                    so.id AS id,
+                    r.name AS customer_name,
+                    so.customer_id AS customer_id,
+                    so.order_date AS date,
+                    so.amount_remaining AS unpaid_amount
+                  FROM sales_order so
+                  JOIN retailers r on r.id = so.customer_id
+                  WHERE checkout_status = 'hold'
+                  ORDER BY so.order_date DESC`;
+  const holdOrderRawData = await window.electronAPI.sendQuery('general-query', 'SELECT', query);
+
+  const holdOrderObjData = JSON.parse(holdOrderRawData);
+
+  const holdOrderData = holdOrderObjData.map(hold => [
+    hold.id, hold.customer_name, hold.customer_id,
+    formatDate(hold.date), formatNumber(parseFloat(hold.unpaid_amount))
+  ]);
+
+  holdOrderData.forEach(hold => {
+    const trow = document.createElement('tr');
+    hold.forEach(entry => {
+      const tdata = document.createElement('td');
+      tdata.textContent = entry;
+      trow.appendChild(tdata);
+    })
+
+    const tdBtn = document.createElement('td');
+    tdBtn.className = 'action'
+    const actionBtn = dropDownBtn();
+
+    tdBtn.appendChild(actionBtn);
+    trow.appendChild(tdBtn);
+
+    holdTableBody.appendChild(trow);
+    const expandBtn = tdBtn.querySelector('a.modify');
+    const removeBtn = tdBtn.querySelector('a.delete');
+    const orderId = parseInt(hold[0]);
+
+    expandBtn.addEventListener('click', async function () {
+      const orderTab = document.getElementById('sales-order-tab');
+      orderTab.click();
+      orderTableBody.innerHTML = '';
+
+      const query = `SELECT p.id AS product_id, 
+                            p.name AS product_name, 
+                            s.quantity_sold AS quantity, 
+                            r.name AS customer_name,
+                            s.id
+                      FROM sales s
+                      JOIN products p ON p.id = s.product_id
+                      JOIN retailers r ON r.id = s.retailer_id
+                      WHERE s.order_id = $1 AND s.checkout_status = 'hold'`;
+      
+      const salesRawData = await window.electronAPI.sendQuery('general-query', 'SELECT', query, [orderId]);
+
+      const salesData = JSON.parse(salesRawData);
+
+      console.log(`Sales in the hold order with Id = ${orderId}, `, salesData);
+
+      
+
+      salesData.forEach(async sales => {
+        const salesId = parseInt(sales.id);
+        // delete the sales row with id = salesId
+        const query = `DELETE FROM sales WHERE id = $1`;
+        const deleteSalesRes = await window.electronAPI.sendQuery('general-query', 'DELETE', query, [salesId]);
+
+        console.log(`Sales with id = ${salesId} is deleted with message: ${JSON.parse(deleteSalesRes).message}`);
+
+        
+        // get the current stock quantity in company_stock with product_id = sales.product_id
+        let currentStock = await window.electronAPI.sendQuery('general-query', 'SELECT',
+         `SELECT quantity FROM company_stock WHERE product_id = $1`, 
+          [parseInt(sales.product_id)]
+        )
+        currentStock = parseInt(JSON.parse(currentStock)[0].quantity);
+
+        console.log(`current stock of item ${sales.product_name} is obtained to be: ${currentStock}`);
+
+        // update the stock with currentStock + sales.quantity where product_id = sales.product_id
+        const stockUpdateQuery = `UPDATE company_stock SET quantity = $1 WHERE product_id = $2`;
+        const updateStockRes = await window.electronAPI.sendQuery('general-query', 'UPDATE', stockUpdateQuery, 
+          [currentStock + parseInt(sales.quantity), parseInt(sales.product_id)]);
+        
+        console.log(`${sales.product_name} stock has been updated to ${currentStock + parseInt(sales.quantity)}, 
+          with message: ${JSON.parse(updateStockRes).message}`);
+        //update product data to update stockLevel in the sales system
+        product_data = getProductData();
+        
+        productNameInput.value = sales.product_name;
+        simulateChangeEvent(productNameInput);
+        const stockLevel = stockLevelInput.value;
+        let quantity = parseInt(sales.quantity);
+        if(parseInt(stockLevel) < parseInt(sales.quantity)){
+          alert(`${sales.product_name} stock is low. Please review the order carefully.`);
+          quantity = parseInt(stockLevel);
+        }
+        quantityOrderedInput.value = quantity;
+        salesAddOrderBtn.click();
+      })
+
+      const deleteOrderQuery = `DELETE FROM sales_order WHERE id = $1`;
+
+      const deleteRes = await window.electronAPI.sendQuery('general-query', 'DELETE', deleteOrderQuery, [orderId]);
+
+      console.log(`Order with id = ${orderId} is deleted with message: ${JSON.parse(deleteRes).message}`);
+      customerNameInput.value = hold[1];
+      simulateChangeEvent(customerNameInput);
+
+    });
+    removeBtn.addEventListener('click', async function () {
+      // salesObjectData.map(async sales => {
+      //   if (sales.order_id === hold[0]) {
+      //     const dataID = { id: sales.id };
+      //     const id = await window.electronAPI.fetchData('delete-sales-data', dataID);
+      //   }
+      // });
+      // const dataID = { id: hold[0] };
+      // const id = await window.electronAPI.fetchData('delete-orders-data', dataID);
+      // holdTableBody.removeChild(trow);
+    })
+  });
+}
+
 function orderTable(product_data) {
   const productNameInput = document.getElementById('sales-item-name');
   const stockLevelInput = document.getElementById('sales-stock-level');
   // const stockLevelDataList = document.getElementById('sales-stock-list');
+  const withholdCheck = document.getElementById('sales-withhold-check');
+
+  const tinNumberInput = document.getElementById('sales-tin-number');
+
   const productQuantity = document.getElementById('sales-product-quantity');
   const currentOrderDiv = document.getElementById('sales-current-order');
   const itemName = productNameInput.value;
   const product_map = createProductMap(product_data);
   const productList = product_map.get(itemName);
-  console.log('product list: ', productList);
 
   for (const product of productList) {
     if(product.price === null){
@@ -541,6 +764,12 @@ function orderTable(product_data) {
     let remainingOrder = quantity;
 
     const selectedItem = {};
+
+    let subTot = 0; let grandTot; let withhold;
+
+    const salesPayModCheck = document.getElementById('sales-payment-mode')
+    const salesPaidAmountInput = document.getElementById('sales-amount-paid');
+    const salesRemainingAmount = document.getElementById('sales-remaining-amount');
 
     for (const product of productList.sort(compareExpiry)) {
       if (remainingOrder === 0) {
@@ -566,7 +795,9 @@ function orderTable(product_data) {
     productQuantity.value = '';
     stockLevelInput.value = '';
     const tbody = currentOrderDiv.querySelector('table tbody');
-    const gradTotalCell = document.getElementById('sales-grad-total');
+    const subTotalCell = document.getElementById('sales-sub-total');
+    const withholdCell = document.getElementById('sales-withhold-foot');
+    const grandTotalCell = document.getElementById('sales-grand-total');
 
     for ( const orderItem of orderList ) {
       const data = [orderItem.iD, orderItem.name,
@@ -625,21 +856,66 @@ function orderTable(product_data) {
       });
 
     });
+
+    withholdCheck.addEventListener('change', function() {
+      if (withholdCheck.checked && tinNumberInput.value === ''){
+        alert('Choose customer name with TIN NUMBER');
+        withholdCheck.checked = false;
+      } else {
+        getGrandTotal();
+      }
+    });
+
+    salesPaidAmountInput.addEventListener('input', function () {
+      const amountPaidValue = parseFloat(salesPaidAmountInput.value.trim());
+      salesRemainingAmount.value = formatNumber(grandTot - amountPaidValue);
+      salesRemainingAmount.disabled = true;
+    })
+
     function getGrandTotal() {
-      let tot = 0;
+      subTot = 0;
       tbody.querySelectorAll('tr').forEach(tr => {
-        tot += reformatNumber(tr.cells[5].textContent);
+        subTot += reformatNumber(tr.cells[5].textContent);
       });
-      gradTotalCell.textContent = formatNumber(tot);
-    }
-    if(tbody.querySelectorAll('tr').length) {
-      gradTotalCell.parentNode.querySelectorAll('td').forEach(td => {
-        td.style.color = 'black';
-      });
-    } else {  
-      gradTotalCell.parentNode.querySelectorAll('td').forEach(td => {
-        td.style.color = 'white';
-      });
+
+      if(withholdCheck.checked){
+        grandTot = 0.98 * subTot;
+        withhold = 0.02 * subTot;
+      } else {
+        grandTot = subTot;
+        withhold = 0
+      }
+
+      if (salesPayModCheck.checked){
+        const amountPaidValue = parseFloat(salesPaidAmountInput.value.trim());
+        salesRemainingAmount.value = formatNumber(grandTot - amountPaidValue);
+        salesRemainingAmount.disabled = true;
+      }
+
+      grandTotalCell.textContent = formatNumber(grandTot);
+      subTotalCell.textContent = formatNumber(subTot);
+      withholdCell.textContent = formatNumber(withhold);
+      if(tbody.querySelectorAll('tr').length) {
+        grandTotalCell.parentNode.querySelectorAll('td').forEach(td => {
+          td.style.color = 'black';
+        });
+        subTotalCell.parentNode.querySelectorAll('td').forEach(td => {
+          td.style.color = 'black';
+        });
+        withholdCell.parentNode.querySelectorAll('td').forEach(td => {
+          td.style.color = 'black';
+        });
+      } else {  
+        grandTotalCell.parentNode.querySelectorAll('td').forEach(td => {
+          td.style.color = 'white';
+        });
+        subTotalCell.parentNode.querySelectorAll('td').forEach(td => {
+          td.style.color = 'white';
+        });
+        withholdCell.parentNode.querySelectorAll('td').forEach(td => {
+          td.style.color = 'white';
+        });
+      }
     }
   }
 
@@ -652,34 +928,28 @@ function orderTable(product_data) {
   }
 
 
-  function dropDownBtn (){
-    const dropContainer = document.createElement('div');
-    dropContainer.className  = 'dropdown-btn';
-    const dropBtn = document.createElement('button');
-    dropBtn.type = 'button';
-    dropBtn.className = 'drop-btn';
-    dropBtn.innerHTML = `Edit <ion-icon name="chevron-down-outline"></ion-icon>`
-    const dropdownContent = document.createElement('div');
-    dropdownContent.className = 'drop-content';
+  // function dropDownBtn (){
+  //   const dropContainer = document.createElement('div');
+  //   dropContainer.className  = 'dropdown-btn';
+  //   const dropBtn = document.createElement('button');
+  //   dropBtn.type = 'button';
+  //   dropBtn.className = 'drop-btn';
+  //   dropBtn.innerHTML = `Edit <ion-icon name="chevron-down-outline"></ion-icon>`
+  //   const dropdownContent = document.createElement('div');
+  //   dropdownContent.className = 'drop-content';
 
     
     
-    dropdownContent.innerHTML = `<a href="#" class="modify">Modify</a>
-                                 <a href="#" class="delete">Remove</a>`;
-    dropContainer.appendChild(dropBtn);
-    dropContainer.appendChild(dropdownContent);
+  //   dropdownContent.innerHTML = `<a href="#" class="modify">Modify</a>
+  //                                <a href="#" class="delete">Remove</a>`;
+  //   dropContainer.appendChild(dropBtn);
+  //   dropContainer.appendChild(dropdownContent);
 
-    return dropContainer;
-  }
+  //   return dropContainer;
+  // }
 }
 
-function onHoldOrders() {
 
-}
-
-function viewSalesReport() {
-
-}
 function printSalesReport() {
 
   const modal = document.createElement('div');
@@ -707,7 +977,7 @@ function printSalesReport() {
   const customerInfo = document.createElement('div');
   const customerName = document.getElementById('sales-customer-name').value;
   const customerTIN = document.getElementById('sales-tin-number').value;
-  const isWithhold = document.getElementById('sales-withhold').checked;
+  const isWithhold = document.getElementById('sales-withhold-check').checked;
   customerInfo.className = 'sales-customer-info';
 
   customerInfo.innerHTML = `<p>Customer Name: <span id="sales-customerName">${customerName}</span></p>
@@ -748,17 +1018,22 @@ function printSalesReport() {
   const withhold = isWithhold ? Gtotal * 0.02 : 0.00;
   const subtotal = isWithhold ? Gtotal * 0.98 : Gtotal;
   trGrandTotal.innerHTML = `<td class="sales-text-right" style="font-weight: bold" colspan="5">Grand Total</td>
-                            <td class="sales-text-right">${formatNumber(Gtotal)}</td>
+                            <td class="sales-text-right">${formatNumber(subtotal)}</td>
                             <td></td>`;
   trWithhold.innerHTML = `<td class="sales-text-right" style="font-weight: bold" colspan="5">Withhold Amount</td>
                           <td class="sales-text-right">${formatNumber(withhold)}</td>
                           <td></td>`;
   trSubtotal.innerHTML = `<td class="sales-text-right" style="font-weight: bold" colspan="5">Sub Total</td>
-                          <td class="sales-text-right">${formatNumber(subtotal)}</td>
+                          <td class="sales-text-right">${formatNumber(Gtotal)}</td>
                           <td></td>`;
-  tfoot.appendChild(trGrandTotal);
-  tfoot.appendChild(trWithhold);
   tfoot.appendChild(trSubtotal);
+  tfoot.appendChild(trWithhold);
+  tfoot.appendChild(trGrandTotal); 
+
+
+  const paymentModalityContainer = document.createElement('div');
+  paymentModalityContainer.id = 'receipt-modality-status'
+  paymentModalityContainer.style.width = '100%';
 
 
   const printBtn = document.createElement('div');
@@ -789,12 +1064,31 @@ function printSalesReport() {
   receipt.appendChild(storeInfo);
   receipt.appendChild(customerInfo);
   receipt.appendChild(table);
+  receipt.appendChild(paymentModalityContainer);
   receipt.appendChild(printBtn);
   modal.appendChild(receipt);
 
   modal.querySelector('#sales-date').innerHTML = formatDate(new Date());
-
+  
   return modal;
+}
+
+function managePaymentMode() {
+  const salesPaymentModeCheck = document.getElementById('sales-payment-mode');
+  const salesPaidAmountInput = document.getElementById('sales-amount-paid');
+  const salesRemainingAmount = document.getElementById('sales-remaining-amount');
+
+  salesPaymentModeCheck.addEventListener('change', function () {
+    if (salesPaymentModeCheck.checked) {
+      salesPaidAmountInput.parentNode.style.display = 'block';
+      salesRemainingAmount.parentNode.style.display = 'block';
+    } else {
+      salesPaidAmountInput.parentNode.style.display = 'none';
+      salesRemainingAmount.parentNode.style.display = 'none';
+    }
+  });
+
+
 }
 
 function manageCustomerInfo() {
@@ -802,13 +1096,17 @@ function manageCustomerInfo() {
   const customerNameInput = document.getElementById('sales-customer-name');
   const customerTinNumberInput = document.getElementById('sales-tin-number');
   const customerIdInput = document.getElementById('sales-customer-id');
+
+  
+
   const options = customerDataList.options;
   const selectedCustomerName = customerNameInput.value.trim();
   customerTinNumberInput.disable = false;
   for (let i = 0; i < options.length; i++) {
     if (options[i].value === selectedCustomerName) {
       customerIdInput.value = options[i].dataset.id;
-      customerTinNumberInput.value = options[i].dataset.tin;
+      const tin = options[i].dataset.tin === "null" ? '' : options[i].dataset.tin;
+      customerTinNumberInput.value = tin;
       customerTinNumberInput.disable = true;
       break;
     } else if (selectedCustomerName === '') {
@@ -816,8 +1114,9 @@ function manageCustomerInfo() {
       customerTinNumberInput.disable = true;
       break;
     }
-
   }
+  
+
 }
 
 function manageProductInfo(product_data) {
@@ -908,7 +1207,7 @@ function openModal(modal) {
 function compareExpiry(a, b) {
   const dateA = new Date(a.expiryDate);
   const dateB = new Date(b.expiryDate);
-  return dateB - dateA; // Earlier dates come first
+  return dateA - dateB; // Earlier dates come first
 }
 
 function formatNumber(number) {
@@ -953,6 +1252,29 @@ function createProductMap(products) {
   }
 
   return productMap;
+}
+
+function dropDownBtn() {
+  const dropContainer = document.createElement('div');
+
+  dropContainer.className = 'dropdown-btn';
+  const dropBtn = document.createElement('button');
+  dropBtn.type = 'button';
+  dropBtn.className = 'drop-btn';
+  dropBtn.innerHTML = `Edit <ion-icon name="chevron-down-outline"></ion-icon>`
+  const dropdownContent = document.createElement('div');
+  dropdownContent.className = 'drop-content';
+  dropdownContent.innerHTML = `<a href="#" class="modify">Expand</a>
+                               <a href="#" class="delete">Remove</a>`;
+  dropContainer.appendChild(dropBtn);
+  dropContainer.appendChild(dropdownContent);
+
+  return dropContainer;
+}
+
+function simulateChangeEvent(element) {
+  const changeEvent = new Event('input', { bubbles: true });
+  element.dispatchEvent(changeEvent);
 }
 
 const salesPage = {

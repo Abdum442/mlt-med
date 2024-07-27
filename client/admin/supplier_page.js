@@ -69,26 +69,37 @@ async function saveModification() {
   formData['licenceNumber'] = modal.querySelector('[name="mod-supplierLicence"]').value;
   formData['remark'] = modal.querySelector('[name="mod-supplierRemark"]').value;
 
+  document.getElementById('modal-loader').style.display = 'block';
 
+  // const id = await window.electronAPI.fetchData('modify-suppliers-data', formData);
 
-  const id = await window.electronAPI.fetchData('modify-suppliers-data', formData);
+  const query = `UPDATE suppliers SET name = $1, contactinfo = $2, 
+                                      address = $3, taxinfo = $4,
+                                      licencenumber = $5, remark = $6
+                                  WHERE id = $7`; 
+  const queryData = [formData.supplierName, formData.contactInfo, formData.address, 
+                     formData.taxInfo, formData.licenceNumber, formData.remark, formData.id];
+
+  const id = await window.electronAPI.sendQuery('general-query', 'UPDATE', query, queryData);
+
+  document.getElementById('modal-loader').style.display = 'none';
 
   modal.style.display = 'none';
-  viewTab.click();
-  
-  customerMgt.click();
   viewSupplierBtn.click();
+  viewTab.click();
 } 
 
-function renderSupplierTable () {
+async function renderSupplierTable () {
   detailContainer.innerHTML = '';
   detailContainer.appendChild(tabContainer);
   // addContent.appendChild(formContainer);
   detailContainer.appendChild(modal);
 
+  const query = `SELECT * FROM suppliers ORDER BY name ASC`;
 
+  const suppliersRowData = await window.electronAPI.sendQuery('general-query', 'SELECT', query);
 
-  const suppliersRowData = localStorage.getItem('suppliers-data');
+  // const suppliersRowData = localStorage.getItem('suppliers-data');
 
   const supplierObjData = JSON.parse(suppliersRowData);
 
@@ -166,10 +177,18 @@ async function addSupplierData () {
 
   clearAddForm();
   document.getElementById('modal-loader').style.display = 'block';
-  const rowRawData = await window.electronAPI.fetchData('add-suppliers-data', formData);
 
-  const raw_suppliers_data = await window.electronAPI.fetchData('fetch-suppliers-data');
-  localStorage.setItem('suppliers-data', raw_suppliers_data);
+  // const rowRawData = await window.electronAPI.fetchData('add-suppliers-data', formData);
+
+  const query = `INSERT INTO suppliers (name,contactinfo,address,taxinfo,licencenumber,remark)
+                  VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`;
+  const queryData = [formData.supplierName, formData.contactInfo, formData.address, 
+                     formData.taxInfo, formData.licenceNumber, formData.remark];
+
+  const rowRawData = await window.electronAPI.sendQuery('general-query', 'INSERT', query, queryData);
+
+  // const raw_suppliers_data = await window.electronAPI.fetchData('fetch-suppliers-data');
+  // localStorage.setItem('suppliers-data', raw_suppliers_data);
 
 
   document.getElementById('modal-loader').style.display = 'none';

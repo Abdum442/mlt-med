@@ -1,4 +1,9 @@
 const { contextBridge, ipcRenderer } = require('electron')
+// const Chart = require('chart.js/auto');  // Import using require
+
+// window.Chart = Chart;  // Make Chart.js globally available in renderer process
+
+// console.log('Chart imported in preload:', Chart);
 
 contextBridge.exposeInMainWorld('electronAPI', {
   sendToMain: (channel, data) => {

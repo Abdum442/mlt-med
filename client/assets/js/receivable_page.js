@@ -336,7 +336,7 @@ async function addNewReceivableData() {
     return;
   }
   const queryType = 'INSERT';
-  const query = 'INSERT INTO receivables (description, amount, due_date, amount_left, status) VALUES ($1, $2, $3, $4, $5)';
+  const query = 'INSERT INTO receivables (description, amount, due_date, amount_left, status) VALUES ($1, $2, $3, $4, $5) RETURNING id';
   const queryData = [data.description, data.amount, data.due_date, data.amount, 'pending'];
   const responseMessage = await window.electronAPI.sendQuery('general-query', queryType, query, queryData);
 
@@ -398,7 +398,7 @@ async function addPaymentData() {
   }
 
   const paymentQueryType = 'INSERT';
-  const paymentQuery = 'INSERT INTO payments_received (receivable_id, amount, payment_date) VALUES ($1, $2, $3)';
+  const paymentQuery = 'INSERT INTO payments_received (receivable_id, amount, payment_date) VALUES ($1, $2, $3) RETURNING id';
   const paymentQueryData = [
     paymentModalData.id,
     paymentModalData.amount,

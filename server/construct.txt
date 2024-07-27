@@ -8,7 +8,7 @@ psql -U mlt -h localhost -p 5432 -d mltdb -f drop_all_tables.sql
 
 //now restore the database to match with its state with mine, run the following command
 
-pg_restore -U mltdb -h localhost -p 5432 -d mltdb -v mltdb_dump.backup
+pg_restore -U mlt -h localhost -p 5432 -d mltdb -v mltdb_dump.backup
 
 //you will then be prompted for the database password which is mlttrading in case you forgot 
 
@@ -24,6 +24,45 @@ pg_restore -U mltdb -h localhost -p 5432 -d mltdb -v mltdb_dump.backup
 
 INSERT INTO users (fullname, username, password, role, has_pic)
 VALUES (Admin, admin, admin, admin, f);
+
+
+INSERT INTO permissions (name) 
+VALUES ('view_dashboard_total_sales'), 
+       ('view_dashboard_total_purchase_cost'), 
+       ('view_dashboard_operating_capital'),
+       ('view_dashboard_gross_profit'),
+       ('view_dashboard_revenue_graph'), 
+       ('view_dashboard_top_selling_products'), 
+       ('view_dashboard_recent_expenses_table'), 
+       ('view_dashboard_loans_and_debits'), 
+       ('view_suppliers_table'), 
+       ('edit_suppliers'), 
+       ('add_new_supplier'), 
+       ('view_retailers_table'), 
+       ('edit_retailers'), 
+       ('add_new_retailers'), 
+       ('view_stock_levels'), 
+       ('manage_stocks'), 
+       ('view_expiry_dates'), 
+       ('view_voided_items'), 
+       ('add_new_sales'), 
+       ('add_new_purchases'), 
+       ('view_purchase_price_in_products_table'), 
+       ('edit_product_list'), 
+       ('view_profit_loss_statements'), 
+       ('add_new_expenses'), 
+       ('add_new_payables'), 
+       ('edit_payables')
+       ('view_payment_made'), 
+       ('add_new_receivable'), 
+       ('edit_receivables'), 
+       ('view_payment_received'), 
+       ('view_settings'), 
+       ('view_add_user'), 
+       ('view_view_user_permissions');
+
+electron-packager ./client/ --platform darwin --arch x64 --out /Users/mebratuwakeni/app_dev/executables
+
 
 
 

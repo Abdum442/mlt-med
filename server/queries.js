@@ -24,7 +24,7 @@ const sendQuery = async (request, response) => {
         break;
       case 'INSERT':
         result = await pool.query(query, data);
-        response.status(200).json({ message: 'Insert successful', rowCount: result.rowCount });
+        response.status(200).json({ message: 'Insert successful', id: result.rows[0].id});
         break;
       case 'DELETE':
         result = await pool.query(query, data);

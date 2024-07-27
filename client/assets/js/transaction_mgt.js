@@ -6,7 +6,7 @@ const purchaseMainBtn = document.getElementById('purchaseBtn');
 
 
 
-salesMainBtn.addEventListener('click', function () {
+salesMainBtn.addEventListener('click', async function () {
   const transactionContent = document.body.querySelector('.details .recentOrders');
   transactionContent.innerHTML = '';
 
@@ -47,13 +47,13 @@ salesMainBtn.addEventListener('click', function () {
 
   manageTabEvents(tabContainer);
 
-  salesDetails(tableContainer);
-  orderDetails(orderTableContainer);
+  await salesDetails(tableContainer);
+  await orderDetails(orderTableContainer);
 
 
 });
 let rowData = {};
-purchaseMainBtn.addEventListener('click', function () {
+purchaseMainBtn.addEventListener('click', async function () {
   const transactionContent = document.body.querySelector('.details .recentOrders');
   transactionContent.innerHTML = '';
   const tabContainer = purchaseTransactionContainer();
@@ -93,8 +93,8 @@ purchaseMainBtn.addEventListener('click', function () {
 
   managePurchaseTabEvents(tabContainer);
 
-  purchaseDetails(tableContainer);
-  productDetails(productTableContainer, productModal);
+  await purchaseDetails(tableContainer);
+  await productDetails(productTableContainer, productModal);
   productModal.querySelector('.product-save').addEventListener('click', function () {
     saveProductDetails(productModal);
   });
@@ -204,27 +204,25 @@ async function salesDetails(sales_tab) {
                     p.name AS product_name,
                     p.saling_price AS selling_price,
                     s.quantity_sold AS quantity,
-                    (s.quantity_sold * p.saling_price) AS total_price
+                    s.amount_received AS total_price
                   FROM sales s
                   JOIN products p ON s.product_id = p.id
                   JOIN retailers r ON s.retailer_id = r.id
-                  WHERE s.checkout_status = 'sold'`
+                  WHERE s.checkout_status = 'sold' ORDER BY s.sale_date DESC`;
 
   const salesRawData = await window.electronAPI.sendQuery('general-query', queryType, query);
 
   const salesObjData = JSON.parse(salesRawData);
   
-  const salesTableData = salesObjData.map(sales => 
-    
-    [
+  const salesTableData = salesObjData.map(sales => [
     sales.id, 
     formatDate(sales.date), 
     sales.customer, 
     sales.order_id, 
     sales.product_name, 
-    sales.selling_price, 
+    formatNumber(parseFloat(sales.selling_price)), 
     sales.quantity, 
-    sales.total_price 
+    formatNumber(parseFloat(sales.total_price)) 
   ])
 
   // const productMap = new Map(productObjData.map(item => 
@@ -261,9 +259,9 @@ async function salesDetails(sales_tab) {
   salesHTMLtable.renderTable();
 }
 
-function purchaseDetails(purchase_tab) {
+async function purchaseDetails(purchase_tab) {
   purchase_tab.innerHTML = '';
-  const purchaseTableHeader = ['ID', 'Date', 'Supplier Comp.', 'Item Description', 'Unit Price', 'Quantity', 'Total Price', 'Remarks'];
+  const purchaseTableHeader = ['ID', 'Date', 'Supplier Comp.', 'Item Description', 'Unit Price', 'Quantity', 'Total Price'];
 
   let commonData = {
     tableId: "purchase-table-container",
@@ -271,39 +269,28 @@ function purchaseDetails(purchase_tab) {
     tableData: []
   };
 
-  const purchaseRawData = localStorage.getItem('purchase-data');
-  const productRawData = localStorage.getItem('products-data');
-  const suppliersRawData = localStorage.getItem('suppliers-data');
-
-
-  const purchaseObjData = JSON.parse(purchaseRawData);
-  const productObjData = JSON.parse(productRawData);
-  const supplierObjData = JSON.parse(suppliersRawData);
-
-
-  const productMap = new Map(productObjData.map(item =>
-    [parseInt(item.id), item.name ]));
-
-
-
-  const supplierMap = new Map(supplierObjData.map(supplier =>
-    [parseInt(supplier.id), supplier.name]));
-  let purchaseTableData = [];
-  for (const purchase of purchaseObjData) {
-    const product_id = parseInt(purchase.product_id);
-    const item_name = productMap.get(product_id);
-    const customer_name = supplierMap.get(parseInt(purchase.supplier_id));
-    const unit_price_number = parseFloat(purchase.unit_price);
-    const unit_price_formatted = formatNumber(unit_price_number);
-    const purchase_date_formatted = formatDate(purchase.purchase_date);
-    const quantity = purchase.quantity;
-    const quantity_number = parseInt(quantity);
-    const total_price_number = unit_price_number * quantity_number;
-    const total_price_formatted = formatNumber(total_price_number);
-    const purchaseData = [purchase.id, purchase_date_formatted, customer_name,item_name, unit_price_formatted, quantity,
-        total_price_formatted, purchase.remarks];
-    purchaseTableData.push(purchaseData);
-  }
+  const query = `SELECT 
+                    pch.id AS id,
+                    pch.purchase_date AS purchase_date,
+                    sup.name AS supplier_name,
+                    p.name AS product_description,
+                    pch.unit_price As unit_price,
+                    pch.quantity AS quantity,
+                    pch.amount_paid AS total_amount
+                  FROM purchase pch 
+                  JOIN products p ON pch.product_id = p.id
+                  JOIN suppliers sup ON pch.supplier_id = sup.id
+                  ORDER BY pch.purchase_date DESC`
+  const purchaseRawData = await window.electronAPI.sendQuery('general-query', 'SELECT', query);
+  const purchaseData = JSON.parse(purchaseRawData);
+  const purchaseTableData = purchaseData.map(p => [
+    p.id, 
+    formatDate(p.purchase_date), 
+    p.supplier_name, p.product_description, 
+    formatNumber(parseFloat(p.unit_price)),
+    p.quantity, 
+    formatNumber(parseFloat(p.total_amount))
+  ]);
 
   commonData.tableData = purchaseTableData;
 
@@ -312,7 +299,7 @@ function purchaseDetails(purchase_tab) {
   purchaseHTMLtable.renderTable();
 }
 
-function orderDetails(order_tab) {
+async function orderDetails(order_tab) {
   order_tab.innerHTML = '';
   const orderTableHeader = ['ID', 'Date', 'Customer Name', 'Total Amount', 'Tax Withheld', 'Amount Paid', 'Amount Remaining'];
 
@@ -322,28 +309,32 @@ function orderDetails(order_tab) {
     tableData: []
   };
 
-  const orderObjData = JSON.parse(localStorage.getItem('orders-data'));
-  const retailerObjData = JSON.parse(localStorage.getItem('retailers-data'));
+  const query = `SELECT 
+                    so.id AS id,
+                    so.order_date AS date,
+                    r.name AS customer,
+                    so.total_amount AS total,
+                    so.tax_withheld AS tax,
+                    so.amount_paid AS paid,
+                    so.amount_remaining AS remaining,
+                    so.checkout_status AS checkout_status  
+                  FROM sales_order so
+                  JOIN retailers r ON so.customer_id = r.id
+                  WHERE so.checkout_status = 'sold'
+                  ORDER BY so.order_date DESC`;
+  
+  const orderRawData = await window.electronAPI.sendQuery('general-query', 'SELECT', query);
 
-  const retailerMap = new Map(retailerObjData.map(retailer => {
-    return [parseInt(retailer.id), retailer.name];
-  }))
+  const orderObjData = JSON.parse(orderRawData);
 
-  let orderTableData = [];
-
-  for ( const order of orderObjData ) {
-    if (order.checkout_status === 'sold') {
-      const customer_name = retailerMap.get(parseInt(order.customer_id));
-      const order_date = formatDate(order.order_date);
-      const total_amount = formatNumber(parseFloat(order.total_amount));
-      const amount_paid = formatNumber(parseFloat(order.amount_paid));
-      const amount_remaining = formatNumber(parseFloat(order.amount_remaining));
-      const tax_withheld = formatNumber(parseFloat(order.tax_withheld));
-      const orderData = [order.id, order_date, customer_name, total_amount, tax_withheld,
-        amount_paid, amount_remaining];
-      orderTableData.push(orderData);
-    } 
-  } 
+  const orderTableData = orderObjData.map(or => [
+    or.id, formatDate(or.date), 
+    or.customer, 
+    formatNumber(parseFloat(or.total)), 
+    formatNumber(parseFloat(or.tax)),
+    formatNumber(parseFloat(or.paid)),
+    formatNumber(parseFloat(or.remaining))
+  ]);
 
   commonData.tableData = orderTableData;
 
@@ -352,7 +343,7 @@ function orderDetails(order_tab) {
   orderHTMLtable.renderTable();
 }
 
-function productDetails(product_tab, product_modal) {
+async function productDetails(product_tab, product_modal) {
   product_tab.innerHTML = '';
   const productsTableHeader = ['ID', 'Item Description', 'Unit', 'Selling Price',
     'Expiry Date', 'Remarks'];
@@ -363,12 +354,14 @@ function productDetails(product_tab, product_modal) {
     tableData: []
   };
 
-  const productsRawData = localStorage.getItem('products-data');
-  const purchaseData = JSON.parse(localStorage.getItem('purchase-data'));
+  const query = `SELECT * FROM products ORDER BY name ASC`;
+
+
+  const productsRawData = await window.electronAPI.sendQuery('general-query', 'SELECT', query);
+  
 
   const productsObjData = JSON.parse(productsRawData);
 
-  const productMap = new Map(productsObjData.map(item => [parseInt(item.id), item.purchase_price]));
 
   const productsTableData = productsObjData.map(obj => [obj.id, obj.name, obj.description, formatNumber(parseFloat(obj.saling_price)),
   formatDate(obj.expiry_date), obj.remarks]);
@@ -380,6 +373,12 @@ function productDetails(product_tab, product_modal) {
   productsHTMLtable.renderTable();
 
   clickable_dropdown_btn(product_tab.querySelector('table'));
+
+  const purchaseRawData = await window.electronAPI.sendQuery('general-query', 'SELECT', 
+    'SELECT * FROM purchase'
+  )
+
+  const purchaseData = JSON.parse(purchaseRawData);
 
   product_tab.querySelectorAll('table tbody tr').forEach(function (tr) {
     // console.log(tr.cells[0].textContent, tr.cells[4].textContent);

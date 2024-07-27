@@ -3,7 +3,7 @@ import { CreateTableFromData, clickable_dropdown_btn } from "./tableConstructor.
 const inventoryMgtMenu = document.getElementById('inventoryMgt');
 const customerMgtMenu = document.getElementById('customerMgt');
 
-inventoryMgtMenu.addEventListener('click', function () {
+inventoryMgtMenu.addEventListener('click', async function () {
   const inventoryContent = document.body.querySelector('.details .recentOrders');
   inventoryContent.innerHTML = '';
 
@@ -25,14 +25,14 @@ inventoryMgtMenu.addEventListener('click', function () {
   productContent.appendChild(voidsModal);
 
   voidsModal.querySelector('.void-save').addEventListener('click', async function () {
-    saveVoidDetails(voidsModal);
+    await saveVoidDetails(voidsModal);
   })
 
   manageTabEvents(tabContainer);
 
-  stockDetails(stockContent);
+  await stockDetails(stockContent);
   expiryDateDetails(expiryContent);
-  voidsDetails();
+  await voidsDetails();
 });
 
 function manageTabs(tabId, contId) {
@@ -349,7 +349,7 @@ async function saveVoidDetails(void_modal) {
   console.log('void data: ', formData);
   
   const queryType = 'INSERT';
-  const query = 'INSERT INTO voided_products (product_id, void_date, void_reason, void_quantity) VALUES ($1, $2, $3, $4)';
+  const query = 'INSERT INTO voided_products (product_id, void_date, void_reason, void_quantity) VALUES ($1, $2, $3, $4) RETURNING product_id AS id';
   const queryData = [formData.product_id, today, formData.void_reason, formData.void_quantity];
 
   const responseMessage = await window.electronAPI.sendQuery('general-query', queryType, query, queryData);

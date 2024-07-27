@@ -135,19 +135,19 @@
 
 .sales-row-arrange.sales-first-row .sales-column.sales-first-col #sales-product-card,
 .sales-row-arrange.sales-first-row .sales-column.sales-first-col #purchase-product-card {
-  min-height: 55vh;
-}
-
-.sales-row-arrange.sales-first-row .sales-column.sales-first-col #sales-customer-card {
   min-height: 45vh;
 }
 
+.sales-row-arrange.sales-first-row .sales-column.sales-first-col #sales-customer-card {
+  min-height: 55vh;
+}
+
 .sales-row-arrange.sales-first-row .sales-column.sales-second-col .sales-card:first-child {
-  min-height: 81vh;
+  min-height: 89vh;
 }
 
 .sales-row-arrange.sales-first-row .sales-column.sales-second-col #sales-button-card {
-  min-height: 19vh;
+  min-height: 11vh;
 }
 
 /* .sales-row-arrange .sales-first-row .sales-column .sales-second-col .sales-card:nth-child(even) .sales-row {
@@ -299,7 +299,7 @@ span.price {
   border-top: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-.sales-details table thead:last-child tr {
+.sales-details table thead.total-sales tr:first-child {
   border-top: 2px solid rgba(0, 0, 0, 0.5);
 }
 
@@ -592,13 +592,15 @@ button.drop-btn:focus {
   background-color: #ddd;
 }
 
-.show {
-  display: block;
-}
+
 
 button span {
   background-color: var(--black2);
 } */
+
+.show {
+  display: block;
+}
 
 button .title {
   position: relative;

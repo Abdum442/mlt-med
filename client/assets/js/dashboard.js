@@ -1,7 +1,16 @@
+// import Chart from 'chart.js/auto';
+
 const dashboardMenu = document.getElementById('dashboard');
+
+// const Chart = window.electronAPI.Chart;
+
+// document.addEventListener("DOMContentLoaded", () => {
+//   console.log('Chart object from preload:', Chart);
+// })
 
 document.addEventListener("DOMContentLoaded", () => {
   dashboardMenu.click();
+  console.log('Chart object from preload:', Chart);
 });
 
 dashboardMenu.addEventListener('click', async function () {
@@ -11,87 +20,18 @@ dashboardMenu.addEventListener('click', async function () {
 
   constructDashboardDetails();  
 
-  const purchaseRawData = JSON.parse(localStorage.getItem('purchase-data'));
-  const ordersRawData = JSON.parse(localStorage.getItem('orders-data'));
-  const salesRawData = JSON.parse(localStorage.getItem('sales-data'));
-  const productRawData = JSON.parse(localStorage.getItem('products-data'));
-  const stockRawData = JSON.parse(localStorage.getItem('stock-data'));
+  const totalCOGS = await getCOGS('2024-01-01');
+  const totalRevenue = await getTotalRevenue('2024-01-01');
+  const voidCOGS = await getVoidedCOGS('2024-01-01');
+  const totalReceivable = await getTotalReceivable();
+  const totalPayable = await getTotalPayable();
+  const totalExpenses = await getTotalExpense('2024-01-01');
+  const totalInventory = await getTotalInventoryCost();
 
-
-  const productMap = new Map(productRawData.map(item =>
-    [parseInt(item.id), 
-      { 
-        name: item.name,
-        sellingPrice: item.saling_price, 
-        purchasePrice: item.purchase_price 
-      }
-    ]));
-
-  const costUnsoldItem = Math.round(stockRawData.reduce((total, stock) =>{
-    const purchasePrice = parseFloat(productMap.get(parseInt(stock.product_id)).purchasePrice);
-    const leftItems = parseInt(stock.quantity);
-    const totalCost = purchasePrice * leftItems;
-    return total + totalCost;
-  }, 0));
-
-  const voidQuery = `SELECT 
-                          vp.id,
-                          p.name AS product_name,
-                          vp.void_date,
-                          vp.void_reason,
-                          vp.void_quantity,
-                          p.purchase_price,
-                          (vp.void_quantity * p.purchase_price) AS voided_cost
-                      FROM 
-                          voided_products vp
-                      JOIN 
-                          products p ON vp.product_id = p.id
-                      ORDER BY 
-                          vp.void_date DESC`;
-
-  const RawVoidProducts = await window.electronAPI.sendQuery('general-query', 'SELECT', voidQuery);
-
-  const voidProducts = JSON.parse(RawVoidProducts);
-
-  const totalVoidCOGS = voidProducts.reduce((acc, product) => {
-    return acc + parseFloat(product.voided_cost);
-  }, 0);
-
-  let totalProfit = Math.round(salesRawData.reduce((total, sales) => {
-    const quantitySold = parseInt(sales.quantity_sold);
-    const salesAmount = parseInt(sales.amount_received);
-
-    const purchasePrice = parseFloat(productMap.get(parseInt(sales.product_id)).purchasePrice);
-
-    const purchaseCost = quantitySold * purchasePrice;
-
-    const salesProfit = Math.round(salesAmount - purchaseCost); 
-    
-    return total + salesProfit;
-  }, 0));
-
-  totalProfit = Math.round(totalProfit - totalVoidCOGS);
-
-  
-
-
-  const totalPurchaseCost = Math.round(purchaseRawData.reduce((total, purchase) => total + parseFloat(purchase.amount_paid), 0));
-  const totalSales = Math.round(ordersRawData.reduce((total, order) => {
-    if(order.checkout_status === 'sold'){
-      return total + parseFloat(order.amount_paid);
-    } else {
-      return total;
-    }
-  }, 0));
-
-
-  document.getElementById('summary-purchase').innerText = `ETB ${totalPurchaseCost.toLocaleString('en-US')}`;
-  document.getElementById('summary-sales').innerText = `ETB ${totalSales.toLocaleString('en-US')}`;
-  document.getElementById('summary-profit').innerText = `ETB ${totalProfit.toLocaleString('en-US')}`;
-  document.getElementById('summary-operating-capital').innerText = `ETB ${(costUnsoldItem + totalSales).toLocaleString('en-US')}`;
-  
-
-  
+  document.getElementById('summary-purchase').innerText = `ETB ${(totalCOGS + voidCOGS).toLocaleString('en-US')}`;
+  document.getElementById('summary-sales').innerText = `ETB ${totalRevenue.toLocaleString('en-US')}`;
+  document.getElementById('summary-profit').innerText = `ETB ${(totalRevenue + totalReceivable - totalCOGS - totalPayable - totalExpenses).toLocaleString('en-US')}`;
+  document.getElementById('summary-operating-capital').innerText = `ETB ${(totalInventory + totalReceivable - totalPayable - totalExpenses).toLocaleString('en-US')}`;  
 });
 
 
@@ -195,16 +135,7 @@ async function constructDashboardDetails() {
     tableElement.appendChild(tbody);
   });
 
-  // Sample data
-  const totalRevenue = 100000;
-  const totalCost = 70000;
-  const operatingCapital = 30000;
-  const profit = 15000;
-  // const topSellingProducts = [
-  //   { product: 'Product A', totalSales: 5000 },
-  //   { product: 'Product B', totalSales: 4000 },
-  //   { product: 'Product C', totalSales: 3000 }
-  // ];
+
 
   const topSellingQueryType = 'SELECT'
   const topSellingQuery = `SELECT 
@@ -231,13 +162,6 @@ async function constructDashboardDetails() {
     totalSales: item.total_revenue
   }));
 
-  console.log('topSellingProducts: ', topSellingProducts);
-
-
-  // const recentExpenses = [
-  //   { expenseId: 1, category: 'Marketing', amount: 500, date: '2024-01-01' },
-  //   { expenseId: 2, category: 'Salaries', amount: 3000, date: '2024-01-02' }
-  // ];
 
   const recentExpenseQuery = `SELECT 
                                   e.id, 
@@ -263,10 +187,6 @@ async function constructDashboardDetails() {
     date: exp.date
   }))
 
-  // const loansDebits = [
-  //   { id: 1, amount: 10000, dueDate: '2024-06-01', type: 'Payable' },
-  //   { id: 2, amount: 5000, dueDate: '2024-07-01', type: 'Receivable' }
-  // ];
 
   const loansDebitsQuery = `SELECT 
                               id, 
@@ -294,26 +214,18 @@ async function constructDashboardDetails() {
 
   const loansDebits = JSON.parse(loansDebitsRaw);
 
-  const salesRawData = JSON.parse(localStorage.getItem('sales-data'));
+  const salesRawData = await window.electronAPI.sendQuery('general-query', 'SELECT',
+    `SELECT * FROM sales`);
+
+  const salesObjData = JSON.parse(salesRawData);
+
+  // const salesRawData = JSON.parse(localStorage.getItem('sales-data'));
 
 
 
 
 
-  const salesData = getSalesData(salesRawData, 18);
-
-    // const salesData = [
-    //   { date: '2024-01-01', volume: 100 },
-    //   { date: '2024-01-02', volume: 120 },
-    //   { date: '2024-01-03', volume: 110 },
-    //   { date: '2024-01-31', volume: 150 },
-    //   { date: '2024-02-01', volume: 140 },
-    //   { date: '2024-02-02', volume: 160 },
-    //   { date: '2024-02-03', volume: 170 },
-    //   // Continue for other days
-    // ];
-
-  // console.log('sales raw: ', salesRawData);  
+  const salesData = getSalesData(salesObjData, 18);
 
   function formatDateLabels(data) {
     const labels = [];
@@ -340,6 +252,8 @@ async function constructDashboardDetails() {
   const data = salesData.map(entry => entry.volume);
 
   // Sales Chart
+  
+  
   const ctx = document.getElementById('salesChart').getContext('2d');
   new Chart(ctx, {
     type: 'bar', // Set the main type to bar
@@ -510,13 +424,8 @@ function getSalesData(salesRawData, salesWindow) {
     const volume = Math.round(salesMap.get(formattedDate) || 0); // Get volume or 0 if no sales on that date
 
     result.push({ date: formattedDate, volume });
-    // console.log('date: ', date, 'amount received: ', salesMap.get(date));
   }
-  // console.log('date: ', date)
-  // console.log('sales map: ', salesMap)
 
-  // console.log('sale data: ', salesMap.get(data));
-  // Reverse the result array to have the dates in chronological order
   return result.reverse();
 }
 
@@ -547,4 +456,85 @@ function formatDate(dateString) {
 
   return formattedDate;
 
+}
+
+async function getCOGS(start_date) {
+  const query = `SELECT
+                  SUM(s.quantity_sold * p.purchase_price) AS total_cogs
+                  FROM 
+                    sales s
+                  JOIN 
+                    products p ON s.product_id = p.id
+                  WHERE
+                    s.sale_date BETWEEN $1 AND CURRENT_DATE`; 
+  const rowData = await window.electronAPI.sendQuery('general-query', 'SELECT', query, [start_date]);
+
+  const total_cogs = JSON.parse(rowData)[0].total_cogs;
+  return Math.round(parseFloat(total_cogs));
+}
+
+async function getVoidedCOGS(start_date) {
+  const query = `SELECT
+                  SUM(vp.void_quantity * p.purchase_price) AS void_cogs
+                  FROM 
+                    voided_products vp
+                  JOIN 
+                    products p ON vp.product_id = p.id
+                  WHERE
+                    vp.void_date BETWEEN $1 AND CURRENT_DATE`;
+  const rowData = await window.electronAPI.sendQuery('general-query', 'SELECT', query, [start_date]);
+
+  const total_cogs = (JSON.parse(rowData)[0].void_cogs) === null ? '0' : JSON.parse(rowData)[0].void_cogs;
+  return Math.round(parseFloat(total_cogs));
+}
+
+async function getTotalRevenue(start_date) {
+  const query = `SELECT SUM(total_amount) AS total_revenue
+                FROM sales_order
+                WHERE order_date BETWEEN $1 AND CURRENT_DATE`;
+
+  const rowData = await window.electronAPI.sendQuery('general-query', 'SELECT', query, [start_date]);
+  const total_revenue = JSON.parse(rowData)[0].total_revenue;
+  return Math.round(parseFloat(total_revenue));
+}
+
+async function getTotalReceivable() {
+  const query = `SELECT SUM(amount_left) AS total_receivable
+                  FROM receivables
+                  WHERE amount_left > 0`;
+
+  const rowData = await window.electronAPI.sendQuery('general-query', 'SELECT', query);
+  const total_revenue = JSON.parse(rowData)[0].total_receivable;
+  return Math.round(parseFloat(total_revenue));
+}
+
+async function getTotalPayable() {
+  const query = `SELECT SUM(amount_left) AS total_payable
+                  FROM payables
+                  WHERE amount_left > 0`;
+
+  const rowData = await window.electronAPI.sendQuery('general-query', 'SELECT', query);
+  const total_revenue = JSON.parse(rowData)[0].total_payable;
+  return Math.round(parseFloat(total_revenue));
+}
+
+async function getTotalInventoryCost () {
+  const query = `SELECT SUM(cs.quantity * p.purchase_price) AS total_inventory
+                  FROM company_stock cs
+                  JOIN products p ON cs.product_id = p.id
+                  WHERE cs.quantity > 0`;
+
+  const rowData = await window.electronAPI.sendQuery('general-query', 'SELECT', query);
+  const total = JSON.parse(rowData)[0].total_inventory;
+  return Math.round(parseFloat(total));
+}
+
+async function getTotalExpense(start_date) {
+  const query = `SELECT SUM(amount) AS total_expenses
+                  FROM expenses
+                  WHERE expense_date BETWEEN $1 AND CURRENT_DATE`;
+
+  const rowData = await window.electronAPI.sendQuery('general-query', 'SELECT', query, [start_date]);
+  const total = JSON.parse(rowData)[0].total_expenses;
+  return Math.round(parseFloat(total));
 }

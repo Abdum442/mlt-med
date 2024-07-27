@@ -241,7 +241,7 @@ async function addNewExpenseCategory() {
     return;
   }
   const queryType = 'INSERT';
-  const query = 'INSERT INTO expense_categories (name, description) VALUES ($1, $2)';
+  const query = 'INSERT INTO expense_categories (name, description) VALUES ($1, $2) RETURNING id';
   const queryData = [data.name, data.description];
   const responseMessage = await window.electronAPI.sendQuery('general-query', queryType, query, queryData);
 
@@ -263,7 +263,7 @@ async function addExpenseData() {
 
 
   const queryType = 'INSERT';
-  const query = 'INSERT INTO cat_expenses (date, description, amount, expense_category_id) VALUES ($1, $2, $3, $4)';
+  const query = 'INSERT INTO cat_expenses (date, description, amount, expense_category_id) VALUES ($1, $2, $3, $4) RETURNING id';
   const queryData = [
     new Date(),
     data.description,

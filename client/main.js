@@ -1,8 +1,14 @@
-const { app, BrowserWindow, ipcMain } = require('electron')
+const { app, BrowserWindow, contextBridge, ipcMain } = require('electron')
 const path = require('node:path')
 const axios = require('axios');
+const Chart = require('chart.js');
+
+const { exec } = require('child_process');
+
+const fs = require('fs');
 
 const serverUrl = 'http://localhost:3000';
+
 
 const handleQuery = (url_route) => {
   ipcMain.handle(url_route, async (event, queryType, query, data) => {
@@ -159,6 +165,7 @@ const createWindow = () => {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: true,
     },
+    icon: path.join(__dirname, 'assets/icons/payment.icns') // Path to your icon
   });
   win.maximize()
 
@@ -171,6 +178,7 @@ const createWindow = () => {
 
 
 app.whenReady().then(() => {
+  // startPostgres();
   createWindow()
 
   app.on('activate', () => {
@@ -182,6 +190,12 @@ app.whenReady().then(() => {
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
+    // stopPostgres();
     app.quit()
   }
-})  
+}) 
+
+// app.on('before-quit', () => {
+//   stopPostgres();
+// });
+

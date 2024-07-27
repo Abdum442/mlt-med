@@ -12,7 +12,9 @@
   <link rel="stylesheet" href="../assets/css/inventory.css">
   <link rel="stylesheet" href="../assets/css/dashboard.css">
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module" src="../node_modules/chart.js/dist/chart.umd.js"></script>
+  <script type="module" src="../node_modules/ionicons/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="../node_modules/ionicons/dist/ionicons/ionicons.js"></script>
 </head>
 
 <body>
@@ -52,15 +54,23 @@
             </span>
           </a>
           <div class="dropdown-container">
-            <a href="#" id="viewSupplier"><span class="subtitle">Suppliers</span></a>
-            <a href="#" id="viewRetailer"><span class="subtitle">Retailer</span></a>
+            <a href="#" id="viewSupplier">
+              <span class="sub-icon">
+                <ion-icon name="people-circle-outline"></ion-icon>
+              </span>
+                <span class="subtitle">Suppliers</span></a>
+            <a href="#" id="viewRetailer">
+              <span class="sub-icon">
+                <ion-icon name="people-circle-outline"></ion-icon>
+              </span>
+              <span class="subtitle">Retailer</span></a>
           </div>
         </li>
 
         <li>
           <a href="#" id="inventoryMgt">
             <span class="icon">
-              <ion-icon name="swap-horizontal-outline"></ion-icon>
+              <ion-icon name="cube-outline"></ion-icon>
             </span>
             <span class="title">Inventory Management</span>
             <span class="chevron-icon">
@@ -77,7 +87,7 @@
         <li>
           <a class="dropdown-btn" href="#" id="transactionMgt">
             <span class="icon">
-              <ion-icon name="bar-chart-outline"></ion-icon>
+              <ion-icon name="basket-outline"></ion-icon>
             </span>
             <span class="title">Sales & Purchase</span>
             <span class="chevron-icon">
@@ -85,15 +95,25 @@
             </span>
           </a>
           <div class="dropdown-container">
-            <a href="#" id="salesBtn"><span class="subtitle">Sales</span></a>
-            <a href="#" id="purchaseBtn"><span class="subtitle">Purchase</span></a>
+            <a href="#" id="salesBtn">
+              <span class="sub-icon">
+                <ion-icon name="card-outline"></ion-icon>
+              </span>
+              <span class="subtitle">Sales</span>
+            </a>
+            <a href="#" id="purchaseBtn">
+              <span class="sub-icon">
+                <ion-icon name="cart-outline"></ion-icon>
+              </span>
+              <span class="subtitle">Purchase</span>
+            </a>
           </div>
         </li>
 
         <li>
           <a class="dropdown-btn" href="#" id="financialReportMgt">
             <span class="icon">
-              <ion-icon name="bar-chart-outline"></ion-icon>
+              <ion-icon name="stats-chart-outline"></ion-icon>
             </span>
             <span class="title">Financials & Reports</span>
             <span class="chevron-icon">
@@ -101,11 +121,36 @@
             </span>
           </a>
           <div class="dropdown-container">
-            <a href="#" id="taxReportsBtn" style="display:none"><span class="subtitle">Tax Reports</span></a>
-            <a href="#" id="profitLossBtn"><span class="subtitle">Profit/Loss Statements</span></a>
-            <a href="#" id="expensesBtn"><span class="subtitle">Expenses</span></a>
-            <a href="#" id="payable-btn"><span class="subtitle">Payables</span></a>
-            <a href="#" id="receivable-btn"><span class="subtitle">Receivables</span></a>
+            <a href="#" id="taxReportsBtn" style="display:none">
+              <span class="sub-icon">
+                <ion-icon name="card-outline"></ion-icon>
+              </span>
+              <span class="subtitle">Tax Reports</span>
+            </a>
+            <a href="#" id="profitLossBtn">
+              <span class="sub-icon">
+                <ion-icon name="document-text-outline"></ion-icon>
+              </span>
+              <span class="subtitle">Profit/Loss Statements</span>
+            </a>
+            <a href="#" id="expensesBtn">
+              <span class="sub-icon">
+                <ion-icon name="cash-outline"></ion-icon>
+              </span>
+              <span class="subtitle">Expenses</span>
+            </a>
+            <a href="#" id="payable-btn">
+              <span class="sub-icon">
+                <ion-icon name="card-outline"></ion-icon>
+              </span>
+              <span class="subtitle">Payables</span>
+            </a>
+            <a href="#" id="receivable-btn">
+              <span class="sub-icon">
+                <ion-icon name="receipt-outline"></ion-icon>
+              </span>
+              <span class="subtitle">Receivables</span>
+            </a>
           </div>
         </li>
 
@@ -173,6 +218,7 @@
           </div>
 
           <div class="iconBx">
+            <!-- <ion-icon name="wallet-outline"></ion-icon> -->
             <ion-icon name="wallet-outline"></ion-icon>
           </div>
         </div>
@@ -202,7 +248,7 @@
         <div class="card">
           <div>
             <div class="numbers" id="summary-profit">$7,842</div>
-            <div class="cardName">Gross Profit</div>
+            <div class="cardName">Net Profit</div>
           </div>
 
           <div class="iconBx">
@@ -248,8 +294,8 @@
   <!-- <script type="module" src="../assets/js/sales_page.js"></script> -->
 
   <!-- ====== ionicons ======= -->
-  <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
-  <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+  <!-- <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script> -->
 
 
 </body>

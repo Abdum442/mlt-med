@@ -99,6 +99,10 @@ body {
   color: var(--blue);
 }
 
+ion-icon {
+  stroke: var(--blue);
+}
+
 .navigation ul li a .icon,
 .navigation ul li a .chevron-icon{
   position: relative;
@@ -109,11 +113,20 @@ body {
   text-align: center;
 }
 
+.navigation ul li .dropdown-container a .sub-icon {
+  position: relative;
+  display: block;
+  min-width: 40px;
+  height: 40px;
+  line-height: 55px;
+  text-align: center;
+}
+
 .dropdown-container {
   display: none;
   width: 100%;
   background-color: var(--blue);
-  padding-left: 80px;
+  padding-left: 70px;
   padding-top: 0;
 }
 
@@ -131,6 +144,10 @@ body {
 .navigation ul li a .icon ion-icon,
 .navigation ul li a .chevron-icon ion-icon
  {
+  font-size: 1.75rem;
+}
+
+.navigation ul li .sub-icon ion-icon {
   font-size: 1.75rem;
 }
 

@@ -66,7 +66,7 @@ async function profitLossTable() {
                         END AS status
                     FROM 
                         products p
-                    LEFT JOIN 
+                    JOIN 
                         sales s ON p.id = s.product_id
                     LEFT JOIN 
                         voided_products v ON p.id = v.product_id

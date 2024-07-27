@@ -64,6 +64,7 @@ customerMgtMenu.addEventListener('click', async () => {
   document.getElementById('detailed').style.display = 'block';
   dashboardDetails.style.display = 'none';
   await frequentData();
+  document.getElementById('viewSupplier').click();
 });
 inventoryMgtMenu.addEventListener('click', async () => {
   document.getElementById('detailed').style.display = 'block';

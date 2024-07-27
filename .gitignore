@@ -3,6 +3,8 @@ client/node_modules/
 
 server/node_modules/
 
+postgresql/
+
 # Ignore log files
 *.log
 

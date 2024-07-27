@@ -73,8 +73,15 @@ async function saveModification() {
   }
   modal.style.display = 'none';
 
+  const query = `UPDATE retailers SET name = $1, address = $2, contact = $3,
+                                      tinnumber = $4, remarks = $5, licencenumber = $6
+                                  WHERE id = $7`;
+  const queryData = [formData.retailerName,  formData.address, formData.contactInfo, 
+                     formData.taxInfo, formData.remark, formData.licenceNumber, formData.id];
   document.getElementById('modal-loader').style.display = 'block';
-  const id = await window.electronAPI.fetchData('modify-retailers-data', formData);
+
+  
+  const id = await window.electronAPI.sendQuery('general-query', 'UPDATE', query, queryData);
 
   const raw_retailers_data = await window.electronAPI.fetchData('fetch-retailers-data');
   localStorage.setItem('retailers-data', raw_retailers_data);
@@ -86,15 +93,17 @@ async function saveModification() {
   viewTab.click();
 } 
 
-function renderRetailerTable () {
+async function renderRetailerTable () {
   detailContainer.innerHTML = '';
   detailContainer.appendChild(tabContainer);
   // addContent.appendChild(formContainer);
   detailContainer.appendChild(modal);
 
+  const query = 'SELECT * FROM retailers ORDER BY name ASC';
 
+  document.getElementById('modal-loader').style.display = 'block';
 
-  const retailerRowData = localStorage.getItem('retailers-data');
+  const retailerRowData = await window.electronAPI.sendQuery('general-query', 'SELECT', query);
 
 
   const retailerObjData = JSON.parse(retailerRowData);
@@ -107,6 +116,8 @@ function renderRetailerTable () {
   const retailerHTMLtable = new CreateTableFromData(commonData);
 
   retailerHTMLtable.renderTable();
+
+  document.getElementById('modal-loader').style.display = 'none';
 
   clickable_dropdown_btn(tableContainer.querySelector('table'));
 
@@ -178,10 +189,15 @@ async function addRetailerData () {
   }
 
   document.getElementById('modal-loader').style.display = 'block';
-  const rowRawData = await window.electronAPI.fetchData('add-retailers-data', formData);
 
-  const raw_retailers_data = await window.electronAPI.fetchData('fetch-retailers-data');
-  localStorage.setItem('retailers-data', raw_retailers_data);
+  const query = `INSERT INTO retailers 
+                    (name, contact, address, tinnumber, licencenumber, remarks)
+                  VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`;
+  const queryData = [formData.retailerName, formData.contactInfo, 
+                     formData.address, formData.taxInfo, 
+                     formData.licenceNumber, formData.remark];
+
+  const rowRawData = await window.electronAPI.sendQuery('general-query', 'INSERT', query, queryData);
 
 
   document.getElementById('modal-loader').style.display = 'none';

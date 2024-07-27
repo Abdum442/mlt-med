@@ -22,7 +22,7 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
     if (userRole === "admin") {    
       window.location.href = "admin/admin_page.html"; // Redirect to admin page
     } else if (userRole === 'user') {
-      window.location.href = "user/user_page.html"; // Redirect to user page
+      window.location.href = "admin/admin_page.html"; // Redirect to user page
     } else {
       alert("Invalid credentials. Please try again.");
     }
