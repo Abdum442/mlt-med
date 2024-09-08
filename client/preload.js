@@ -17,5 +17,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
   },
   sendQuery: (channel, queryType, query, data=null) => {
     return ipcRenderer.invoke(channel, queryType, query, data);
-  }
+  },
+  onLogData: (callback) => ipcRenderer.on('log-data', callback)
 })

@@ -66,6 +66,26 @@ electron-packager ./client/ --platform darwin --arch x64 --out /Users/mebratuwak
 
 
 
+mlt-med 
+|
+|---client
+|   |
+|   |--- index.html
+|   |--- main.js
+|   |--- package-lock.json
+|   |--- package.json
+|   |--- preload.js
+|   |--- renderer.js
+|   |--- ...
+|---server
+|   |--- db_init 
+|   |    |--- schema.sql 
+|   |    |--- users.sql 
+|   |--- drop_all_tables.sql 
+|   |--- index.js
+|   |--- ...
+|--- ...
+
 
 
 

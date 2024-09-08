@@ -1,0 +1,21 @@
+services:
+  server:
+    image: mebr188/server-node:latest
+    restart: unless-stopped 
+    ports:
+      - 3000:3000
+    depends_on:
+      - postgres
+
+  postgres:
+    image: mebr188/db-postgres:custom
+    restart: unless-stopped
+    environment:
+          POSTGRES_PASSWORD: mlttrading
+          POSTGRES_USER: mlt 
+          POSTGRES_DB: mltdb
+    volumes:
+          - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

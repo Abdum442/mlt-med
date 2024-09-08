@@ -1,0 +1,8 @@
+FROM postgres:16
+
+COPY ./db_init/schema.sql /docker-entrypoint-initdb.d/
+COPY ./db_init/users.sql /docker-entrypoint-initdb.d/
+
+ENV POSTGRES_PASSWORD=mlttrading
+ENV POSTGRES_USER=mlt
+ENV POSTGRES_DB=mltdb

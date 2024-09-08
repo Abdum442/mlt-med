@@ -2,7 +2,7 @@ const Pool = require('pg').Pool
 
 const pool = new Pool({
   user: 'mlt',
-  host: 'localhost',
+  host: 'postgres',
   database: 'mltdb',
   password: 'mlttrading',
   port: 5432,

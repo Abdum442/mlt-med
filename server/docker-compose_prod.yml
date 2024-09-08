@@ -1,0 +1,16 @@
+services:
+  server:
+    image: server-server
+    restart: unless-stopped 
+    ports:
+      - 3000:3000
+    depends_on:
+      - postgres
+
+  postgres:
+    image: db-postgres:custom
+    restart: unless-stopped
+    environment:
+          POSTGRES_PASSWORD: mlttrading
+          POSTGRES_USER: mlt 
+          POSTGRES_DB: mltdb

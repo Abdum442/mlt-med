@@ -1,0 +1,12 @@
+<html>
+
+<body>
+  <pre id="logs"></pre>
+  <script>
+    window.electronAPI.onLogData((event, data) => {
+      document.getElementById('logs').innerText += data;
+    });
+  </script>
+</body>
+
+</html>

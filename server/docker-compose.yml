@@ -1,0 +1,25 @@
+services:
+  server:
+    build: .
+    restart: unless-stopped 
+    ports:
+      - 3000:3000
+    depends_on:
+      - postgres
+    volumes:
+      - .:/usr/src/app
+
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+          POSTGRES_PASSWORD: mlttrading
+          POSTGRES_USER: mlt 
+          POSTGRES_DB: mltdb
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db_init/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+      - ./db_init/users.sql:/docker-entrypoint-initdb.d/users.sql
+
+volumes:
+  pgdata:
