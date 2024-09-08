@@ -113,29 +113,6 @@ function checkServerDirectory(installWin) {
   }
   
 
-  ipcMain.handle('browse-clicked', async (event, data) => {
-    try {
-
-      const result = await dialog.showOpenDialog({
-        properties: ['openDirectory'],
-        title: 'Select a directory for server-node',
-      });
-
-      if (!result.canceled && result.filePaths.length > 0) {
-        const selectedDir =  result.filePaths[0];  // Return the selected directory path
-        const nodeServerDir = path.join(selectedDir, 'node-server');
-
-        // Check if node-server exists, if not, create it
-        if (!fs.existsSync(nodeServerDir)) {
-          fs.mkdirSync(nodeServerDir);
-        }
-        serDir = nodeServerDir;
-        installWin.webContents.send('browse-serverDir', serDir);
-      }
-    } catch (error) {
-      console.error('Error in browse-clicked handler:', error);
-    }
-  })
   if (serDir) {
     // Save config with server directory path
     config = { serverDirectory: serDir };
@@ -143,8 +120,7 @@ function checkServerDirectory(installWin) {
 
     return serDir;
   } else {
-    installWin.close();
-    app.quit(); // Exit if no directory chosen
+    return null;
   }
 }
 
@@ -388,10 +364,36 @@ app.whenReady().then(async () => {
   if (!isServerRunning){
     const installationWindow = createInstallWindow();
 
-    const serverDir = checkServerDirectory(installationWindow); // This will handle both first-time and subsequent starts
-    console.log("Server Dir From main: ", serverDir);
-    if (serverDir) {
-      runDockerCompose(serverDir, installationWindow);
+    const serverDirFromConfig = checkServerDirectory(installationWindow); // This will handle both first-time and subsequent starts
+    console.log("Server Dir From main: ", serverDirFromConfig);
+    if (serverDirFromConfig) {
+      runDockerCompose(serverDirFromConfig, installationWindow);
+    } else {
+      ipcMain.handle('browse-clicked', async (event, data) => {
+        try {
+
+          const result = await dialog.showOpenDialog({
+            properties: ['openDirectory'],
+            title: 'Select a directory for server-node',
+          });
+
+          if (!result.canceled && result.filePaths.length > 0) {
+            const selectedDir = result.filePaths[0];  // Return the selected directory path
+            const nodeServerDir = path.join(selectedDir, 'node-server');
+
+            // Check if node-server exists, if not, create it
+            if (!fs.existsSync(nodeServerDir)) {
+              fs.mkdirSync(nodeServerDir);
+            }
+
+            installWin.webContents.send('browse-serverDir', nodeServerDir);
+            runDockerCompose(nodeServerDir, installationWindow);
+          }
+        } catch (error) {
+          console.error('Error in browse-clicked handler:', error);
+        }
+      })
+
     }
     
   } else {
